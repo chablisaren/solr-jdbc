@@ -34,12 +34,15 @@ public abstract class SolrValue {
 		return ((ValueInt) convertTo(SolrType.INT)).getInt();
 	}
 
-	public SolrValue convertTo(SolrType type) {
-		if(getType() == type) {
+	public SolrValue convertTo(SolrType targetType) {
+		if(getType() == targetType) {
 			return this;
 		}
 		String s = getString();
-		switch(type) {
+		switch(targetType) {
+		case NULL: {
+			return ValueNull.INSTANCE;
+		}
 		case BOOLEAN: {
 			return ValueBoolean.get(getSignum() != 0);
 		}
@@ -62,6 +65,7 @@ public abstract class SolrValue {
 			return ValueArray.get(new SolrValue[]{ValueString.get(s)});
 		}
 		default:
+			// TODO DbExceptionを使う
 			throw new RuntimeException("データ変換エラー");
 		}
 	}

@@ -34,7 +34,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		this.tableColumns = new HashMap<String, List<SolrColumn>>();
 		try {
 			QueryResponse res = this.conn.getSolrServer().query(
-					new SolrQuery("meta.name:[a TO z]"));
+					new SolrQuery("meta.name:[A TO z]"));
 
 			for (SolrDocument doc : res.getResults()) {
 				String tableName = doc.getFieldValue("meta.name").toString();

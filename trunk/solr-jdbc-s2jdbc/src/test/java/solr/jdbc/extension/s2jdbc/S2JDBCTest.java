@@ -18,10 +18,12 @@ public class S2JDBCTest extends S2TestCase {
 	@Override
 	public void setUp() {
 		include("app.dicon");
-		jdbcManager.updateBySql("CREATE TABLE player (player_id number, team varchar(10), player_name varchar(50), registered_at DATE)").execute();
 	}
 
-	public void test_Entity() throws Exception {
+	
+	public void testSearchSimple() throws Exception {
+		jdbcManager.updateBySql("DROP TABLE PLAYER").execute();
+		jdbcManager.updateBySql("CREATE TABLE PLAYER(PLAYER_ID number, TEAM varchar(10), PLAYER_NAME varchar(50), REGISTERED_AT DATE)").execute();
 		Player player1 = new Player();
 		player1.playerId = 1;
 		player1.playerName = "高橋慶彦";
@@ -31,5 +33,9 @@ public class S2JDBCTest extends S2TestCase {
 		userTransaction.commit();
 
 		List<Player> playerList = playerService.findAll();
+		assertEquals(1, playerList.size());
+		Player player = playerList.get(0);
+		assertEquals("Entityに値が入っている", "高橋慶彦", player.playerName);
+		assertNull("設定しなかったところはnullが入る", player.registeredAt);
 	}
 }
