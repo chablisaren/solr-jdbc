@@ -1,0 +1,51 @@
+#Solr JDBC Example
+
+= using S2JDBC =
+
+== set up ==
+
+jdbc.dicon
+
+{{{
+<components namespace="jdbc">
+	<include path="jta.dicon"/>
+	<component name="xaDataSource"
+		class="org.seasar.extension.dbcp.impl.XADataSourceImpl">
+		<property name="driverClassName">"solr.jdbc.SolrDriver"</property>
+		<property name="URL">"jdbc:solr:s"</property>
+		<property name="user">""</property>
+		<property name="password">""</property>
+	</component>
+
+}}}
+
+s2jdbc.dicon
+
+{{{
+    <component name="solrDialect" class="solr.jdbc.extension.s2jdbc.dialect.SolrDialect"/>
+    <component name="jdbcManager"
+      class="org.seasar.extension.jdbc.manager.JdbcManagerImpl">
+        <property name="maxRows">0</property>
+        <property name="fetchSize">0</property>
+        <property name="queryTimeout">0</property>
+        <property name="dialect">solrDialect</property>
+        <property name="allowVariableSqlForBatchUpdate">true</property>
+    </component>
+}}}
+
+== Simple query example ==
+
+{{{
+		jdbcManager.updateBySql("DROP TABLE PLAYER").execute();
+		jdbcManager.updateBySql("CREATE TABLE PLAYER(PLAYER_ID number, TEAM varchar(10), PLAYER_NAME varchar(50), REGISTERED_AT DATE)").execute();
+		Player player1 = new Player();
+		player1.playerId = 1;
+		player1.playerName = "高橋慶彦";
+		player1.team = "カープ";
+		userTransaction.begin();
+		playerService.insert(player1);
+		userTransaction.commit();
+
+		List<Player> playerList = playerService.findAll();
+
+}}}
