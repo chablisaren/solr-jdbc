@@ -28,7 +28,7 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 		for(int i=0; i<solrColumns.size(); i++) {
 			if (StringUtils.equalsIgnoreCase(solrColumns.get(i).getAlias(), columnLabel)
 				|| StringUtils.equalsIgnoreCase(solrColumns.get(i).getColumnName(), columnLabel)) {
-				return i;
+				return i+1; // parameterIndexは1始まりなので+1する
 			}
 		}
 		throw new SQLException("column not found: "+columnLabel);
@@ -64,28 +64,32 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 
 	@Override
 	public String getColumnName(int column) throws SQLException {
-		SolrColumn solrColumn = solrColumns.get(column);
+		// TODO 0はSQLExceptionを返すようにする
+		SolrColumn solrColumn = solrColumns.get(column - 1);
 		return solrColumn.getColumnName();
 	}
 
 	public String getSolrColumnName(int column) throws SQLException {
-		SolrColumn solrColumn = solrColumns.get(column);
+		// TODO 0はSQLExceptionを返すようにする
+		SolrColumn solrColumn = solrColumns.get(column - 1);
 		return solrColumn.getSolrColumnName();
 	}
 
 	public SolrColumn getColumn(int column) throws SQLException {
-		return solrColumns.get(column);
+		// TODO 0はSQLExceptionを返すようにする
+		return solrColumns.get(column - 1);
 	}
 
 	@Override
 	public int getColumnType(int column) throws SQLException {
-		SolrColumn solrColumn = solrColumns.get(column);
+		// TODO 0はSQLExceptionを返すようにする
+		SolrColumn solrColumn = solrColumns.get(column - 1);
 		return DataType.getDataType(solrColumn.getType()).sqlType;
 	}
 
 	@Override
 	public String getColumnTypeName(int column) throws SQLException {
-		SolrColumn solrColumn = solrColumns.get(column);
+		SolrColumn solrColumn = solrColumns.get(column - 1);
 		return DataType.getDataType(solrColumn.getType()).jdbc;
 	}
 

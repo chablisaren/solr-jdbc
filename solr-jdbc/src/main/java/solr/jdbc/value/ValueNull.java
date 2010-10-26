@@ -1,6 +1,7 @@
 package solr.jdbc.value;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 
 public class ValueNull extends SolrValue {
 	public static final ValueNull INSTANCE = new ValueNull();
@@ -39,4 +40,8 @@ public class ValueNull extends SolrValue {
 		return null;
 	}
 
+	@Override
+	public Date getDate() {
+		return null;
+	}
 }

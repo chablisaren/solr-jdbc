@@ -307,15 +307,13 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 	}
 
 	@Override
-	public void setNull(int arg0, int arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void setNull(int parameterIndex, int sqlType) throws SQLException {
+		setParameter(parameterIndex, ValueNull.INSTANCE);
 	}
 
 	@Override
-	public void setNull(int arg0, int arg1, String arg2) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void setNull(int parameterIndex, int sqlType, String typeName) throws SQLException {
+		setParameter(parameterIndex, ValueNull.INSTANCE);
 	}
 
 	@Override
