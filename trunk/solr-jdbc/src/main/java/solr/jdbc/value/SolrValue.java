@@ -30,6 +30,10 @@ public abstract class SolrValue {
 		return ((ValueDecimal)convertTo(SolrType.DECIMAL)).getBigDecimal();
 	}
 
+	public int getInt() {
+		return ((ValueInt) convertTo(SolrType.INT)).getInt();
+	}
+
 	public SolrValue convertTo(SolrType type) {
 		if(getType() == type) {
 			return this;
@@ -38,6 +42,12 @@ public abstract class SolrValue {
 		switch(type) {
 		case BOOLEAN: {
 			return ValueBoolean.get(getSignum() != 0);
+		}
+		case INT: {
+			return ValueInt.get(Integer.parseInt(s.trim()));
+		}
+		case LONG: {
+			return ValueLong.get(Long.parseLong(s.trim()));
 		}
 		case DECIMAL: {
 			return ValueDecimal.get(new BigDecimal(s.trim()));

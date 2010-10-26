@@ -47,6 +47,7 @@ import org.apache.commons.lang.StringUtils;
 
 import solr.jdbc.SolrColumn;
 import solr.jdbc.impl.DatabaseMetaDataImpl;
+import solr.jdbc.impl.FunctionSolrColumn;
 import solr.jdbc.impl.ResultSetMetaDataImpl;
 import solr.jdbc.message.DbException;
 import solr.jdbc.message.ErrorCode;
@@ -55,6 +56,8 @@ public class SelectItemFinder implements SelectItemVisitor, ExpressionVisitor {
 	private final String tableName;
 	private final DatabaseMetaDataImpl dbMetaData;
 	private final ResultSetMetaDataImpl rsMetaData;
+
+	private SolrColumn currentColumn;
 
 	public SelectItemFinder(String tableName, DatabaseMetaDataImpl metaData) {
 		this.tableName  = tableName;
@@ -85,6 +88,11 @@ public class SelectItemFinder implements SelectItemVisitor, ExpressionVisitor {
 	@Override
 	public void visit(SelectExpressionItem expr) {
 		expr.getExpression().accept(this);
+		if (currentColumn != null) {
+			currentColumn.setAlias(expr.getAlias());
+			rsMetaData.addColumn(currentColumn);
+			currentColumn = null;
+		}
 	}
 
 	@Override
@@ -95,7 +103,7 @@ public class SelectItemFinder implements SelectItemVisitor, ExpressionVisitor {
 
 	@Override
 	public void visit(Function func) {
-		// TODO Auto-generated method stub
+		currentColumn = new FunctionSolrColumn(func);
 	}
 
 	@Override
@@ -243,7 +251,7 @@ public class SelectItemFinder implements SelectItemVisitor, ExpressionVisitor {
 			List<SolrColumn> solrColumns = dbMetaData.getSolrColumns(tableName);
 			for(SolrColumn solrColumn : solrColumns) {
 				if(StringUtils.equals(solrColumn.getColumnName(), column.getColumnName())) {
-					rsMetaData.addColumn(solrColumn);
+					currentColumn = solrColumn;
 					break;
 				}
 			}

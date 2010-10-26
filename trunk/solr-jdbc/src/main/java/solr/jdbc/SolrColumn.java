@@ -1,33 +1,15 @@
 package solr.jdbc;
 
+import org.apache.commons.lang.StringUtils;
+
 import solr.jdbc.value.SolrType;
 
-public class SolrColumn {
-	private String tableName;
-	private String columnName;
-	private SolrType type;
-	private SolrType originalType;
-
-	public SolrColumn(String tableName, String columnName, SolrType type) {
-		this.tableName = tableName;
-		this.columnName = columnName;
-		this.type = type;
-	}
-	
-	public SolrColumn(String solrColumnName) {
-		String[] columnNameTokens = solrColumnName.split("\\.", 3);
-		if (columnNameTokens.length != 3) {
-			throw new IllegalArgumentException("invalid solr column name: " + solrColumnName);
-		}
-		this.tableName = columnNameTokens[0];
-		this.columnName = columnNameTokens[1];
-		if (columnNameTokens[2].startsWith("M_")) {
-			type = SolrType.ARRAY;
-			originalType = SolrType.valueOf(columnNameTokens[2].substring(2));
-		} else {
-			this.type = SolrType.valueOf(columnNameTokens[2]);
-		}
-	}
+public abstract class SolrColumn {
+	protected String tableName;
+	protected String columnName;
+	protected String alias;
+	protected SolrType type;
+	protected SolrType originalType;
 
 	public SolrType getType() {
 		return type;
@@ -35,7 +17,7 @@ public class SolrColumn {
 
 	/**
 	 * Solr内部のフィールド名を返します
-	 * 
+	 *
 	 * @return Solrの内部フィールド名
 	 */
 	public String getSolrColumnName() {
@@ -45,7 +27,7 @@ public class SolrColumn {
 
 	/**
 	 * テーブル名を返します
-	 * 
+	 *
 	 * @return テーブル名
 	 */
 	public String getTableName() {
@@ -54,10 +36,25 @@ public class SolrColumn {
 
 	/**
 	 * JDBCとしてのカラム名を返します
-	 * 
+	 *
 	 * @return JDBCカラム名
 	 */
 	public String getColumnName() {
+		return columnName;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
+
+	public String getResultName() {
+		if (StringUtils.isNotEmpty(alias)) {
+			return alias;
+		}
 		return columnName;
 	}
 }
