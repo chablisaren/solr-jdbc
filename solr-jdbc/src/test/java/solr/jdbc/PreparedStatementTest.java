@@ -85,16 +85,19 @@ public class PreparedStatementTest extends TestCase{
 	public void test_カラムを選択する() throws Exception {
 		PreparedStatement stmt = conn.prepareStatement(
 				"SELECT player_name FROM player");
+		ResultSet rs = stmt.executeQuery();
+		while(rs.next()) {
+		}
+
+		stmt = conn.prepareStatement(
+			"SELECT player_name AS name FROM player");
+		rs = stmt.executeQuery();
+		while(rs.next()) {
+			System.out.println(rs.getString("name"));
+		}
+
 	}
 
-	public void test_グルーピング() throws Exception {
-		PreparedStatement selStmt = conn.prepareStatement(
-				"SELECT team, count(*) FROM player group by team");
-		ResultSet rs = selStmt.executeQuery();
-		while(rs.next()) {
-			System.out.println(rs.getString("team"));
-		}
-	}
 
 	public void test_UPDATE() throws SQLException {
 		PreparedStatement stmt = conn.prepareStatement(
@@ -109,4 +112,17 @@ public class PreparedStatementTest extends TestCase{
 		updStmt.setString(2, "ランディーバース");
 		assertEquals("1件が更新される", 1, updStmt.executeUpdate());
 	}
+
+	public void test_グルーピング() throws Exception {
+		PreparedStatement selStmt = conn.prepareStatement(
+				"SELECT team, count(*) AS num FROM player group by team");
+		ResultSet rs = selStmt.executeQuery();
+		System.out.println("-------------------------");
+		while(rs.next()) {
+			System.out.println(rs.getString("team"));
+			System.out.println(rs.getInt("num"));
+		}
+	}
+
+
 }

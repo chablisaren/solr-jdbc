@@ -40,7 +40,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 				String tableName = doc.getFieldValue("meta.name").toString();
 				List<SolrColumn> columns = new ArrayList<SolrColumn>();
 				for (Object cols : doc.getFieldValues("meta.columns")) {
-					columns.add(new SolrColumn(tableName + "." + cols.toString()));
+					columns.add(new DefaultSolrColumn(tableName + "." + cols.toString()));
 				}
 				tableColumns.put(tableName, columns);
 			}

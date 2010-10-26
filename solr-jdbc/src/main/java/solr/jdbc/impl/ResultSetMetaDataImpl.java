@@ -11,15 +11,23 @@ import solr.jdbc.SolrColumn;
 import solr.jdbc.value.DataType;
 
 public class ResultSetMetaDataImpl implements ResultSetMetaData {
-	private List<SolrColumn> solrColumns = new ArrayList<SolrColumn>();
+	private final List<SolrColumn> solrColumns = new ArrayList<SolrColumn>();
 
 	public void addColumn(SolrColumn solrColumn) {
 		solrColumns.add(solrColumn);
 	}
 
+	/**
+	 * カラムの名前から何番目のカラムかを検索する
+	 *
+	 * @param columnLabel カラムのラベル(ASで別名を割り当てている場合はそちらが優先される)
+	 * @return index of column
+	 * @throws SQLException
+	 */
 	public int findColumn(String columnLabel) throws SQLException{
 		for(int i=0; i<solrColumns.size(); i++) {
-			if (StringUtils.equalsIgnoreCase(solrColumns.get(i).getColumnName(), columnLabel)) {
+			if (StringUtils.equalsIgnoreCase(solrColumns.get(i).getAlias(), columnLabel)
+				|| StringUtils.equalsIgnoreCase(solrColumns.get(i).getColumnName(), columnLabel)) {
 				return i;
 			}
 		}
@@ -51,13 +59,22 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	@Override
 	public String getColumnLabel(int column) throws SQLException {
 		SolrColumn solrColumn = solrColumns.get(column);
-		return solrColumn.getSolrColumnName();
+		return solrColumn.getAlias();
 	}
 
 	@Override
 	public String getColumnName(int column) throws SQLException {
 		SolrColumn solrColumn = solrColumns.get(column);
+		return solrColumn.getColumnName();
+	}
+
+	public String getSolrColumnName(int column) throws SQLException {
+		SolrColumn solrColumn = solrColumns.get(column);
 		return solrColumn.getSolrColumnName();
+	}
+
+	public SolrColumn getColumn(int column) throws SQLException {
+		return solrColumns.get(column);
 	}
 
 	@Override
@@ -162,9 +179,15 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 		return null;
 	}
 
-	public String getCountColumn() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<SolrColumn> getCountColumnList() {
+		List<SolrColumn> countColumns = new ArrayList<SolrColumn>();
+		for(SolrColumn solrColumn : solrColumns) {
+			if(solrColumn instanceof FunctionSolrColumn &&
+				StringUtils.equals(((FunctionSolrColumn)solrColumn).getFunctionName(), "count")) {
+				countColumns.add(solrColumn);
+			}
+		}
+		return countColumns;
 	}
 
 }
