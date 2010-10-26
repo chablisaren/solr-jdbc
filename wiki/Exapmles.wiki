@@ -36,16 +36,16 @@ s2jdbc.dicon
 == Simple query example ==
 
 {{{
-		jdbcManager.updateBySql("DROP TABLE PLAYER").execute();
-		jdbcManager.updateBySql("CREATE TABLE PLAYER(PLAYER_ID number, TEAM varchar(10), PLAYER_NAME varchar(50), REGISTERED_AT DATE)").execute();
-		Player player1 = new Player();
-		player1.playerId = 1;
-		player1.playerName = "高橋慶彦";
-		player1.team = "カープ";
-		userTransaction.begin();
-		playerService.insert(player1);
-		userTransaction.commit();
+	jdbcManager.updateBySql("DROP TABLE PLAYER").execute();
+	jdbcManager.updateBySql("CREATE TABLE PLAYER(PLAYER_ID number, TEAM varchar(10), PLAYER_NAME varchar(50), REGISTERED_AT DATE)").execute();
+	Player player1 = new Player();
 
-		List<Player> playerList = playerService.findAll();
+	player1.playerId = 1;
+	player1.playerName = "高橋慶彦";
+	player1.team = "カープ";
+	userTransaction.begin();
+	playerService.insert(player1);
+	userTransaction.commit();
 
+	List<Player> playerList = playerService.findAll();
 }}}
