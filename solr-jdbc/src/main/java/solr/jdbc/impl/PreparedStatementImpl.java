@@ -46,7 +46,6 @@ import solr.jdbc.value.ValueString;
  * Solr PreparedStatement
  *
  * @author kawasima
- *
  */
 public class PreparedStatementImpl extends StatementImpl implements PreparedStatement {
 	private Statement statement;

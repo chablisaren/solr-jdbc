@@ -33,6 +33,8 @@ import solr.jdbc.value.SolrValue;
 
 public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsListVisitor{
 
+	private ConditionParser conditionParser;
+	
 	private String tableName;
 	private final StringBuilder query;
 	private final Map<String, String> solrOptions;
@@ -70,27 +72,14 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 
 	public String getQuery(SolrValue[] params) {
 		String queryString;
-		if(query.length() == 0) {
+		if(conditionParser == null) {
+			// select all records if there is no WHERE clause.
 			queryString = "id:@"+tableName+".*";
 		} else {
-			queryString = query.toString();
+			queryString = conditionParser.getQuery(params);
 		}
 
-		StringBuilder sb = new StringBuilder();
-		int i=0;
-		int paramIndex=0;
-		while(true) {
-			int j = queryString.indexOf("{}", i);
-			if (j < 0) break;
-			sb.append(queryString.substring(i, j));
-			sb.append(params[paramIndex++].getQueryString());
-			i = j+2;
-		}
-		if(i<queryString.length()) {
-			sb.append(queryString.substring(i));
-		}
-
-		return sb.toString();
+		return queryString;
 	}
 
 	@Override
@@ -107,7 +96,8 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 
 		// Where句の解析
 		if (plainSelect.getWhere()!=null) {
-			ConditionParser conditionParser = new ConditionParser(metaData);
+			conditionParser = new ConditionParser(metaData);
+			conditionParser.setTableName(tableName);
 			plainSelect.getWhere().accept(conditionParser);
 		}
 
@@ -129,6 +119,9 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 			solrOptions.put("start", Long.toString(limit.getOffset()));
 			solrOptions.put("rows", Long.toString(limit.getRowCount()));
 		}
+		
+		if(conditionParser != null)
+			parameterSize = conditionParser.getParameterSize();
 	}
 
 	private void parseGroupBy(List<Column> groupByColumns) {

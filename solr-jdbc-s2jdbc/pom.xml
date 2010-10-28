@@ -31,6 +31,31 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+  	<repository>
+  		<releases>
+  			<enabled>false</enabled>
+  		</releases>
+  		<snapshots>
+  			<enabled>true</enabled>
+  			<updatePolicy>daily</updatePolicy>
+  		</snapshots>
+  		<id>maven-snapshot.seasar.org</id>
+  		<name>The Seasar Foundation Maven2 Snapshot Repository</name>
+  		<url>http://maven.seasar.org/maven2-snapshot</url>
+  	</repository>
+  	<repository>
+  		<releases>
+  			<enabled>true</enabled>
+  		</releases>
+  		<snapshots>
+  			<enabled>false</enabled>
+  		</snapshots>
+  		<id>maven.seasar.org</id>
+  		<name>The Seasar Foundation Maven2 Repository</name>
+  		<url>http://maven.seasar.org/maven2</url>
+  	</repository>
+  </repositories>
   <dependencies>
   	<dependency>
   		<groupId>org.seasar.container</groupId>
@@ -128,14 +153,15 @@
   <distributionManagement>
   	<repository>
   		<uniqueVersion>false</uniqueVersion>
-  		<id>maven.seasar.org</id>
-  		<name>The Seasar Foundation Maven2 Repository</name>
-  		<url>http://maven.seasar.org/maven2</url>
+  		<id></id>
+  		<name></name>
+  		<url></url>
   	</repository>
   	<snapshotRepository>
-  		<id>maven-snapshot.seasar.org</id>
-  		<name>The Seasar Foundation Maven2 Snapshot Repository</name>
-  		<url>http://maven.seasar.org/maven2-snapshot</url>
+  		<uniqueVersion>false</uniqueVersion>
+  		<id></id>
+  		<name></name>
+  		<url></url>
   	</snapshotRepository>
   	<downloadUrl></downloadUrl>
   </distributionManagement>
