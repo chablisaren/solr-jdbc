@@ -387,28 +387,27 @@ public abstract class AbstractResultSet implements ResultSet {
 	}
 
 	@Override
-	public Object getObject(int i) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+	public Object getObject(int columnIndex) throws SQLException {
+		SolrValue v = get(columnIndex);
+		return v.getObject();
 	}
 
 	@Override
-	public Object getObject(String s) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+	public Object getObject(String columnLabel) throws SQLException {
+		return get(columnLabel).getObject();
 	}
 
 	@Override
 	public Object getObject(int arg0, Map<String, Class<?>> arg1)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		// TODO Unsupported
 		return null;
 	}
 
 	@Override
 	public Object getObject(String arg0, Map<String, Class<?>> arg1)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		// TODO Unsupported
 		return null;
 	}
 

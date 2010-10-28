@@ -6,6 +6,7 @@ import javax.transaction.UserTransaction;
 
 import org.seasar.extension.jdbc.JdbcManager;
 import org.seasar.extension.unit.S2TestCase;
+import org.seasar.framework.beans.util.BeanMap;
 
 import solr.jdbc.extension.s2jdbc.entity.Player;
 import solr.jdbc.extension.s2jdbc.service.PlayerService;
@@ -37,5 +38,14 @@ public class S2JDBCTest extends S2TestCase {
 		Player player = playerList.get(0);
 		assertEquals("Entityに値が入っている", "高橋慶彦", player.playerName);
 		assertNull("設定しなかったところはnullが入る", player.registeredAt);
+		
+		player.playerName = "野村謙二郎";
+		int res = playerService.update(player);
+		
+		assertEquals("1件更新される", 1, res);
+		
+		player = playerService.find(1);
+		assertEquals("playerNameの値が更新されている", "野村謙二郎", player.playerName);
+		
 	}
 }
