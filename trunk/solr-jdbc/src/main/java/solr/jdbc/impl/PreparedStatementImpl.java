@@ -1,5 +1,6 @@
 package solr.jdbc.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.omg.CORBA.portable.ValueFactory;
+
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
@@ -36,9 +39,11 @@ import solr.jdbc.message.DbException;
 import solr.jdbc.message.ErrorCode;
 import solr.jdbc.value.DataType;
 import solr.jdbc.value.SolrValue;
+import solr.jdbc.value.ValueArray;
 import solr.jdbc.value.ValueBoolean;
 import solr.jdbc.value.ValueDate;
 import solr.jdbc.value.ValueDecimal;
+import solr.jdbc.value.ValueDouble;
 import solr.jdbc.value.ValueNull;
 import solr.jdbc.value.ValueString;
 
@@ -117,68 +122,68 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 
 	@Override
 	public ParameterMetaData getParameterMetaData() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setArray(int parameterIndex, Array x) throws SQLException {
-		throw new SQLFeatureNotSupportedException("setArray");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setAsciiStream(int i, InputStream in) throws SQLException {
-		throw new SQLFeatureNotSupportedException("setAsciiStream");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setAsciiStream(int arg0, InputStream arg1, int arg2)
 			throws SQLException {
-		throw new SQLFeatureNotSupportedException("setAsciiStream");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setAsciiStream(int arg0, InputStream arg1, long arg2)
 			throws SQLException {
-		throw new SQLFeatureNotSupportedException("setAsciiStream");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
-	public void setBigDecimal(int arg0, BigDecimal arg1) throws SQLException {
-		// TODO Auto-generated method stub
+	public void setBigDecimal(int parameterIndex, BigDecimal x) throws SQLException {
+		SolrValue value = ValueDecimal.get(x);
+		setParameter(parameterIndex, value);
 	}
 
 	@Override
 	public void setBinaryStream(int arg0, InputStream arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException("setBinaryStream");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setBinaryStream(int arg0, InputStream arg1, int arg2)
 			throws SQLException {
-		throw new SQLFeatureNotSupportedException("setBinaryStream");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setBinaryStream(int arg0, InputStream arg1, long arg2)
 			throws SQLException {
-		throw new SQLFeatureNotSupportedException("setBinaryStream");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setBlob(int arg0, Blob arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException("setBlob");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setBlob(int arg0, InputStream arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException("setBlob");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setBlob(int arg0, InputStream arg1, long arg2)
 			throws SQLException {
-		throw new SQLFeatureNotSupportedException("setBlob");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
@@ -189,47 +194,59 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 
 	@Override
 	public void setByte(int arg0, byte arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException("setByte");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setBytes(int arg0, byte[] arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException("setByte");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
-	public void setCharacterStream(int arg0, Reader arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException("setCharacterStream");
+	public void setCharacterStream(int parameterIndex, Reader r) throws SQLException {
+		setClob(parameterIndex, r);
 	}
 
 	@Override
 	public void setCharacterStream(int arg0, Reader arg1, int arg2)
 			throws SQLException {
-		throw new SQLFeatureNotSupportedException("setCharacterStream");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setCharacterStream(int arg0, Reader arg1, long arg2)
 			throws SQLException {
-		throw new SQLFeatureNotSupportedException("setCharacterStream");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
-	public void setClob(int arg0, Clob arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void setClob(int parameterIndex, Clob clob) throws SQLException {
+		Reader r = clob.getCharacterStream();
+		setClob(parameterIndex, r);
 	}
 
 	@Override
-	public void setClob(int arg0, Reader arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void setClob(int parameterIndex, Reader r) throws SQLException {
+		char[] cbuf = new char[4096];
+		StringBuilder sb = new StringBuilder();
+		while(true) {
+			try {
+				int c = r.read(cbuf);
+				if(c == 0)
+					break;
+				sb.append(cbuf);
+			} catch(IOException e) {
+				throw DbException.get(ErrorCode.IO_EXCEPTION, e);
+			}
+		}
+		SolrValue value = ValueString.get(sb.toString());
+		setParameter(parameterIndex, value);
 	}
 
 	@Override
 	public void setClob(int arg0, Reader arg1, long arg2) throws SQLException {
-		// TODO Auto-generated method stub
-
+		//TODO
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
@@ -245,15 +262,15 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 	}
 
 	@Override
-	public void setDouble(int arg0, double arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void setDouble(int parameterIndex, double x) throws SQLException {
+		SolrValue value = ValueDouble.get(x);
+		setParameter(parameterIndex, value);
 	}
 
 	@Override
-	public void setFloat(int arg0, float arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void setFloat(int parameterIndex, float x) throws SQLException {
+		SolrValue value = ValueDouble.get(x);
+		setParameter(parameterIndex, value);
 	}
 
 	@Override
@@ -269,40 +286,36 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 	}
 
 	@Override
-	public void setNCharacterStream(int arg0, Reader arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void setNCharacterStream(int parameterIndex, Reader r) throws SQLException {
+		setClob(parameterIndex, r);
 	}
 
 	@Override
 	public void setNCharacterStream(int arg0, Reader arg1, long arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
-	public void setNClob(int arg0, NClob arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void setNClob(int parameterIndex, NClob nclob) throws SQLException {
+		Reader r = nclob.getCharacterStream();
+		setClob(parameterIndex, r);
 	}
 
 	@Override
-	public void setNClob(int arg0, Reader arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void setNClob(int parameterIndex, Reader r) throws SQLException {
+		setClob(parameterIndex, r);
 	}
 
 	@Override
 	public void setNClob(int arg0, Reader arg1, long arg2) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
-	public void setNString(int arg0, String arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void setNString(int parameterIndex, String s) throws SQLException {
+		ValueString value = ValueString.get(s);
+		setParameter(parameterIndex, value);
 	}
 
 	@Override
@@ -337,23 +350,21 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 
 	@Override
 	public void setRef(int arg0, Ref arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException("setBlob");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setRowId(int arg0, RowId arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException("setBlob");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
 	public void setSQLXML(int arg0, SQLXML arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException("setBlob");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
-	public void setShort(int arg0, short arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void setShort(int arg0, short x) throws SQLException {
 	}
 
 	@Override
@@ -389,7 +400,7 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 
 	@Override
 	public void setURL(int arg0, URL arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException("setURL");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override
@@ -405,7 +416,7 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 
 	@Override
 	public void cancel() throws SQLException {
-		throw new SQLFeatureNotSupportedException("cancel");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
 	@Override

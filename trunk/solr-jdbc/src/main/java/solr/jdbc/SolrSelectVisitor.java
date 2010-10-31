@@ -11,6 +11,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.ColumnIndex;
 import net.sf.jsqlparser.statement.select.ColumnReferenceVisitor;
+import net.sf.jsqlparser.statement.select.Distinct;
 import net.sf.jsqlparser.statement.select.FromItemVisitor;
 import net.sf.jsqlparser.statement.select.Limit;
 import net.sf.jsqlparser.statement.select.OrderByElement;
@@ -113,6 +114,10 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 			hasGroupBy = true;
 		}
 
+		// Distinct
+		Distinct distinct = plainSelect.getDistinct();
+		distinct.getOnSelectItems();
+		
 		// Limitの解析
 		Limit limit = plainSelect.getLimit();
 		if(limit != null) {
