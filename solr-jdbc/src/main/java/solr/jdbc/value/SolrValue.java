@@ -2,6 +2,7 @@ package solr.jdbc.value;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.Timestamp;
 
 
 public abstract class SolrValue {
@@ -26,6 +27,11 @@ public abstract class SolrValue {
 		return ((ValueDate)convertTo(SolrType.DATE)).getDateNoCopy();
 	}
 
+	public Timestamp getTimestamp() {
+		Date d = getDate();
+		return new Timestamp(d.getTime());
+	}
+	
 	public BigDecimal getBigDecimal() {
 		return ((ValueDecimal)convertTo(SolrType.DECIMAL)).getBigDecimal();
 	}
@@ -34,6 +40,10 @@ public abstract class SolrValue {
 		return ((ValueInt) convertTo(SolrType.INT)).getInt();
 	}
 
+	public double getDouble() {
+		return ((ValueDouble) convertTo(SolrType.DOUBLE)).getDouble();
+	}
+	
 	public SolrValue convertTo(SolrType targetType) {
 		if(getType() == targetType) {
 			return this;
