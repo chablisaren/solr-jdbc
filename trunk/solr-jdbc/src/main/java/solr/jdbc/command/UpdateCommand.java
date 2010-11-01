@@ -44,6 +44,11 @@ public class UpdateCommand extends Command {
 	}
 
 	@Override
+	public boolean isQuery() {
+		return false;
+	}
+	
+	@Override
 	public ResultSet executeQuery() {
 		throw DbException.get(ErrorCode.METHOD_ONLY_ALLOWED_FOR_QUERY);
 	}

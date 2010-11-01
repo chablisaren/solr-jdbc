@@ -28,6 +28,11 @@ public class SelectCommand extends Command {
 	}
 
 	@Override
+	public boolean isQuery() {
+		return true;
+	}
+	
+	@Override
 	public void parse() {
 		DatabaseMetaData metaData = null;
 
