@@ -29,6 +29,11 @@ public class InsertCommand extends Command {
 	}
 
 	@Override
+	public boolean isQuery() {
+		return false;
+	}
+	
+	@Override
 	public void parse() {
 		expressionParser = new ExpressionParser();
 		insStmt.getItemsList().accept(expressionParser);

@@ -15,6 +15,11 @@ public class DropCommand extends Command {
 	}
 	
 	@Override
+	public boolean isQuery() {
+		return false;
+	}
+	
+	@Override
 	public void parse() {
 		
 	}

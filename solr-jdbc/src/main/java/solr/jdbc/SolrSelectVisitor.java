@@ -116,7 +116,9 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 
 		// Distinct
 		Distinct distinct = plainSelect.getDistinct();
-		distinct.getOnSelectItems();
+		if(distinct != null) {
+			List<Distinct> distinctItems = distinct.getOnSelectItems();
+		}
 		
 		// Limitの解析
 		Limit limit = plainSelect.getLimit();

@@ -22,6 +22,8 @@ public abstract class Command {
 	}
 
 	public abstract void parse();
+	public abstract boolean isQuery();
+	
 	protected void initParameters(int size) {
 		parameters = new ArrayList<SolrValue>(size);
 		for(int i=0; i<size; i++) {

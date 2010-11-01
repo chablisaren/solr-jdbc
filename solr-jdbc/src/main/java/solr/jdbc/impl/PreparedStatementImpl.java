@@ -244,7 +244,7 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 	}
 
 	@Override
-	public void setClob(int arg0, Reader arg1, long arg2) throws SQLException {
+	public void setClob(int parameterIndex, Reader r, long arg2) throws SQLException {
 		//TODO
 		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
@@ -415,24 +415,9 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 	}
 
 	@Override
-	public void cancel() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
-	}
-
-	@Override
 	public void clearBatch() throws SQLException {
 		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public void clearWarnings() throws SQLException {
-		checkClosed();
-	}
-
-	@Override
-	public void close() throws SQLException {
-		isClosed = true;
 	}
 
 	@Override
@@ -499,117 +484,6 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 		throw new SQLFeatureNotSupportedException();
 	}
 
-	@Override
-	public Connection getConnection() throws SQLException {
-		return this.conn;
-	}
-
-	@Override
-	public int getFetchDirection() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getFetchSize() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public ResultSet getGeneratedKeys() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean getMoreResults() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean getMoreResults(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public int getQueryTimeout() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public ResultSet getResultSet() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getResultSetConcurrency() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getResultSetHoldability() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getResultSetType() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getUpdateCount() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public SQLWarning getWarnings() throws SQLException {
-		return null;
-	}
-
-	@Override
-	public boolean isClosed() throws SQLException {
-		return isClosed;
-	}
-
-	@Override
-	public boolean isPoolable() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void setCursorName(String arg0) throws SQLException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setEscapeProcessing(boolean arg0) throws SQLException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public <T> T unwrap(Class<T> iface) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	private void setParameter(int parameterIndex, SolrValue value) throws SQLException {
 		checkClosed();
 		parameterIndex--;
@@ -617,9 +491,4 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 		parameters.set(parameterIndex, value);
 	}
 
-	private void checkClosed() throws SQLException{
-		if(isClosed)
-			throw DbException.get(ErrorCode.OBJECT_CLOSED).getSQLException();
-
-	}
 }
