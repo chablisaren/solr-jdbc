@@ -1,8 +1,6 @@
 package solr.jdbc.command;
 
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Map;
 
 import net.sf.jsqlparser.statement.select.Select;
@@ -34,14 +32,8 @@ public class SelectCommand extends Command {
 	
 	@Override
 	public void parse() {
-		DatabaseMetaData metaData = null;
-
-		try {
-			metaData= this.conn.getMetaData();
-		} catch (SQLException e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e);
-		}
-		selectVisitor = new SolrSelectVisitor((DatabaseMetaDataImpl)metaData);
+		DatabaseMetaDataImpl metaData= this.conn.getMetaDataImpl();
+		selectVisitor = new SolrSelectVisitor(metaData);
 		select.getSelectBody().accept(selectVisitor);
 		initParameters(selectVisitor.getParameterSize());
 	}

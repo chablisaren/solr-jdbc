@@ -17,6 +17,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 
 import solr.jdbc.SolrColumn;
+import solr.jdbc.message.DbException;
+import solr.jdbc.message.ErrorCode;
 import solr.jdbc.value.DataType;
 
 
@@ -25,12 +27,12 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	private final SolrConnection conn;
 	private Map<String, List<SolrColumn>> tableColumns;
 
-	public DatabaseMetaDataImpl(SolrConnection conn) throws SQLException  {
+	public DatabaseMetaDataImpl(SolrConnection conn) {
 		this.conn = conn;
 		buildMetadata();
 	}
 
-	private void buildMetadata() throws SQLException {
+	private void buildMetadata() {
 		this.tableColumns = new HashMap<String, List<SolrColumn>>();
 		try {
 			QueryResponse res = this.conn.getSolrServer().query(
@@ -46,7 +48,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 			}
 
 		} catch (Exception e) {
-			throw new SQLException(e);
+			throw DbException.get(ErrorCode.IO_EXCEPTION, e);
 		}
 	}
 
@@ -59,7 +61,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		return null;
 
 	}
-	public List<SolrColumn> getSolrColumns(String tableName) throws SQLException {
+	public List<SolrColumn> getSolrColumns(String tableName) {
 		if(tableColumns == null)
 			buildMetadata();
 		return this.tableColumns.get(tableName);

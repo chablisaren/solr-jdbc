@@ -1,7 +1,6 @@
 package solr.jdbc.command;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -47,22 +46,20 @@ public class InsertCommand extends Command {
 
 	@Override
 	public int executeUpdate() {
+		DatabaseMetaDataImpl metaData = this.conn.getMetaDataImpl();
 		String tableName = insStmt.getTable().getName();
-
-		List<SolrColumn> columns = null;
-		try {
-			DatabaseMetaDataImpl metaData= (DatabaseMetaDataImpl)this.conn.getMetaData();
-			if (insStmt.getColumns() == null) {
-				columns = metaData.getSolrColumns(tableName);
-			} else {
-				columns = new ArrayList<SolrColumn>();
-				for(Column column : (List<Column>)insStmt.getColumns()) {
-					String columnName = column.getColumnName();
-					columns.add(metaData.getSolrColumn(tableName, columnName));
-				}
+		List<SolrColumn> columns = metaData.getSolrColumns(tableName);
+		if(columns == null)
+			throw DbException.get(ErrorCode.TABLE_OR_VIEW_NOT_FOUND, tableName);
+		
+		if (insStmt.getColumns() != null) {
+			columns = new ArrayList<SolrColumn>();
+			for(Column column : (List<Column>)insStmt.getColumns()) {
+				SolrColumn solrColumn = metaData.getSolrColumn(tableName, column.getColumnName());
+				if(solrColumn == null)
+					throw DbException.get(ErrorCode.COLUMN_NOT_FOUND, column.getColumnName());
+				columns.add(solrColumn);
 			}
-		} catch (SQLException e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e);
 		}
 
 		List<SolrValue> insParams = expressionParser.getParameters();

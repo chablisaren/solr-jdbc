@@ -9,7 +9,6 @@ import java.net.URL;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
-import java.sql.Connection;
 import java.sql.Date;
 import java.sql.NClob;
 import java.sql.ParameterMetaData;
@@ -20,15 +19,12 @@ import java.sql.ResultSetMetaData;
 import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import java.sql.SQLWarning;
 import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
-import org.omg.CORBA.portable.ValueFactory;
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
@@ -39,7 +35,6 @@ import solr.jdbc.message.DbException;
 import solr.jdbc.message.ErrorCode;
 import solr.jdbc.value.DataType;
 import solr.jdbc.value.SolrValue;
-import solr.jdbc.value.ValueArray;
 import solr.jdbc.value.ValueBoolean;
 import solr.jdbc.value.ValueDate;
 import solr.jdbc.value.ValueDecimal;
@@ -66,8 +61,8 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 			this.command = CommandFactory.getCommand(statement);
 			command.setConnection(conn);
 			command.parse();
-		} catch (JSQLParserException ex) {
-			throw new SQLException(ex);
+		} catch (JSQLParserException e) {
+			throw DbException.get(ErrorCode.SYNTAX_ERROR, e);
 		}
 	}
 

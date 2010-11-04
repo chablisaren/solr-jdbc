@@ -259,9 +259,8 @@ public class ConditionParser implements ExpressionVisitor {
 	public void visit(Column column) {
 		SolrColumn solrColumn = metaData.getSolrColumn(tableName, column.getColumnName());
 		if (solrColumn == null) {
-			throw DbException.get(ErrorCode.COLUMN_NOT_FOUND);
+			throw DbException.get(ErrorCode.COLUMN_NOT_FOUND, column.getColumnName());
 		}
-//			currentSolrType = solrColumn.getType();
 		query.append(solrColumn.getSolrColumnName());
 	}
 
