@@ -17,6 +17,7 @@ public class ValueNull extends SolrValue {
 		return null;
 	}
 	
+	@Override
 	public int getInt() {
 		return 0;
 	}

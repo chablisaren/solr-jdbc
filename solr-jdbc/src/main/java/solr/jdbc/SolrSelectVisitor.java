@@ -166,6 +166,10 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 	@Override
 	public void visit(Table table){
 		tableName = table.getName();
+		if(metaData.getSolrColumns(tableName) == null) {
+			throw DbException.get(ErrorCode.TABLE_OR_VIEW_NOT_FOUND, tableName);
+		}
+
 	}
 
 	@Override

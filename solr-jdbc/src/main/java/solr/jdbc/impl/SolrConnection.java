@@ -174,6 +174,13 @@ public abstract class SolrConnection implements Connection {
 		}
 		return metaData;
 	}
+	
+	public DatabaseMetaDataImpl getMetaDataImpl() {
+		if (metaData == null) {
+			metaData = new DatabaseMetaDataImpl(this);
+		}
+		return metaData;
+	}
 
 	@Override
 	public int getTransactionIsolation() throws SQLException {
@@ -265,7 +272,12 @@ public abstract class SolrConnection implements Connection {
 	@Override
 	public PreparedStatement prepareStatement(String sql) throws SQLException {
 		checkClosed();
-		PreparedStatementImpl stmt = new PreparedStatementImpl(this, sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+		PreparedStatementImpl stmt;
+		try {
+			stmt = new PreparedStatementImpl(this, sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+		} catch(DbException e) {
+			throw e.getSQLException();
+		}
 		return stmt;
 	}
 

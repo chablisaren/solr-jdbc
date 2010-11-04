@@ -34,7 +34,6 @@ public class UpdateCommand extends Command {
 	private ExpressionParser expressionParser;
 	private ConditionParser conditionParser;
 
-	private String queryString;
 	/** UPDATE文でSET句で指定されているカラム */
 	private final Map<String, Integer> solrColumnNames;
 
@@ -64,7 +63,7 @@ public class UpdateCommand extends Command {
 		try {
 			response = conn.getSolrServer().query(query);
 		} catch (SolrServerException e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e.getMessage());
+			throw DbException.get(ErrorCode.IO_EXCEPTION, e);
 		}
 		// 対象件数が0件の場合は更新を行わずに0を返す
 		if (response.getResults().getNumFound() == 0) {
@@ -99,7 +98,7 @@ public class UpdateCommand extends Command {
 			conn.getSolrServer().deleteByQuery(query.getQuery());
 			conn.getSolrServer().add(inDocs);
 		} catch (Exception e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e.getMessage());
+			throw DbException.get(ErrorCode.IO_EXCEPTION, e);
 		}
 
 		return inDocs.size();
@@ -107,14 +106,10 @@ public class UpdateCommand extends Command {
 
 	@Override
 	public void parse() {
-		DatabaseMetaData metaData = null;
-
-		try {
-			metaData= this.conn.getMetaData();
-		} catch (SQLException e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e);
-		}
+		DatabaseMetaDataImpl metaData= this.conn.getMetaDataImpl();
 		String tableName = updStmt.getTable().getName();
+		if(metaData.getSolrColumns(tableName) == null)
+			throw DbException.get(ErrorCode.TABLE_OR_VIEW_NOT_FOUND, tableName);
 
 		// Where句の解析
 		conditionParser = new ConditionParser((DatabaseMetaDataImpl)metaData);

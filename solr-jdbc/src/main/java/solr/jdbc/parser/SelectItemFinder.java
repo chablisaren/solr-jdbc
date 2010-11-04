@@ -1,6 +1,5 @@
 package solr.jdbc.parser;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import net.sf.jsqlparser.expression.AllComparisonExpression;
@@ -43,8 +42,6 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItemVisitor;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
-import org.apache.commons.lang.StringUtils;
-
 import solr.jdbc.SolrColumn;
 import solr.jdbc.impl.DatabaseMetaDataImpl;
 import solr.jdbc.impl.FunctionSolrColumn;
@@ -71,13 +68,9 @@ public class SelectItemFinder implements SelectItemVisitor, ExpressionVisitor {
 
 	@Override
 	public void visit(AllColumns cols) {
-		try {
-			List<SolrColumn> solrColumns = dbMetaData.getSolrColumns(tableName);
-			for(SolrColumn solrColumn : solrColumns) {
-				rsMetaData.addColumn(solrColumn);
-			}
-		} catch (SQLException e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, "Metadata Not Found");
+		List<SolrColumn> solrColumns = dbMetaData.getSolrColumns(tableName);
+		for(SolrColumn solrColumn : solrColumns) {
+			rsMetaData.addColumn(solrColumn);
 		}
 	}
 
@@ -240,18 +233,9 @@ public class SelectItemFinder implements SelectItemVisitor, ExpressionVisitor {
 
 	@Override
 	public void visit(Column column) {
-		try {
-			List<SolrColumn> solrColumns = dbMetaData.getSolrColumns(tableName);
-			for(SolrColumn solrColumn : solrColumns) {
-				if(StringUtils.equals(solrColumn.getColumnName(), column.getColumnName())) {
-					currentColumn = solrColumn;
-					break;
-				}
-			}
-		} catch (SQLException e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, "Metadata Not Found");
-		}
-
+		currentColumn = dbMetaData.getSolrColumn(tableName, column.getColumnName());
+		if(currentColumn == null)
+			throw DbException.get(ErrorCode.COLUMN_NOT_FOUND, column.getColumnName());
 	}
 
 	@Override

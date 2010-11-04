@@ -4,24 +4,19 @@ import java.io.IOException;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 
-import solr.jdbc.SolrColumn;
 import solr.jdbc.impl.DatabaseMetaDataImpl;
 import solr.jdbc.message.DbException;
 import solr.jdbc.message.ErrorCode;
 import solr.jdbc.parser.ConditionParser;
 import solr.jdbc.value.SolrValue;
 
-import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.delete.Delete;
-import net.sf.jsqlparser.statement.update.Update;
 
 public class DeleteCommand extends Command {
 	private final Delete delStmt;

@@ -29,9 +29,7 @@ import solr.jdbc.SolrColumn;
 import solr.jdbc.message.DbException;
 import solr.jdbc.message.ErrorCode;
 import solr.jdbc.value.DataType;
-import solr.jdbc.value.SolrType;
 import solr.jdbc.value.SolrValue;
-import solr.jdbc.value.ValueDouble;
 import solr.jdbc.value.ValueNull;
 
 public abstract class AbstractResultSet implements ResultSet {

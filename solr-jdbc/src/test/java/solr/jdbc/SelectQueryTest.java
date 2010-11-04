@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import solr.jdbc.message.ErrorCode;
+
 import junit.framework.TestCase;
 
 public class SelectQueryTest extends TestCase {
@@ -18,55 +20,109 @@ public class SelectQueryTest extends TestCase {
 		conn = DriverManager.getConnection("jdbc:solr:s");
 	}
 	
+	@Override
 	public void tearDown() throws Exception {
 		conn.close();
 	}
 	
 	public void testStatement() {
-		String[] expected = {"高橋慶彦","山崎隆造","衣笠祥雄","山本浩二","ランディーバース"};
-		try {
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT player_name FROM player ORDER BY player_id");
-			int i=0;
-			while(rs.next()) {
-				assertEquals(expected[i], rs.getString("player_name"));
-				i+=1;
-			}
-		} catch(SQLException e) {
-			fail("SQLException:" + e.getMessage());
-		}
+		String[][] expected = {{"高橋慶彦"},{"山崎隆造"},{"衣笠祥雄"},{"山本浩二"},{"ランディーバース"}};
+		verifyStatement("SELECT player_name FROM player ORDER BY player_id",
+				expected);
 	}
 
 	public void testStatementLimit() {
-		String[] expected = {"山崎隆造","衣笠祥雄","山本浩二"};
+		String[][] expected = {{"山崎隆造"},{"衣笠祥雄"},{"山本浩二"}};
+		verifyStatement("SELECT player_name FROM player ORDER BY player_id LIMIT 3 OFFSET 1",
+				expected);
+	}
+	
+	public void testStatementOrderBy() {
+		Object[][] expected = {{"ランディーバース"},{"山本浩二"},{"衣笠祥雄"},{"山崎隆造"},{"高橋慶彦"}};
+		verifyStatement("SELECT player_name FROM player ORDER BY player_id DESC",
+				expected);
+	}
+
+	public void testStatementCondition() {
+		Object[][] expected1 = {{"山崎隆造"}};
+		verifyStatement("SELECT player_name FROM player WHERE player_id > 1 AND player_id < 3",
+				expected1);
+		Object[][] expected2 = {{"高橋慶彦"}, {"山崎隆造"}, {"衣笠祥雄"}};
+		verifyStatement("SELECT player_name FROM player WHERE player_id >= 1 AND player_id <= 3",
+				expected2);
+	}
+	public void testStatementOr() {
+		Object[][] expected1 = {{"ランディーバース"}};
+		Object[] params = {"阪神"};
+		verifyPreparedStatement(
+				"SELECT player_name FROM player WHERE (player_id = 1 OR player_id = 5) AND team=?",
+				params,
+				expected1);
+	}
+	
+	public void testStatementGroupBy() {
+		Object[][] expected = {{"カープ", "4"}, {"阪神", "1"}};
+		verifyStatement("SELECT team, count(*) FROM player GROUP BY team", expected);
+	}
+
+	public void testStatementTableNotFound() {
+		try {
+			conn.prepareStatement("select * from prayer");
+			fail("No Exception");
+		} catch (SQLException e) {
+			assertEquals("TableOrViewNotFound", ErrorCode.TABLE_OR_VIEW_NOT_FOUND, e.getErrorCode());
+		}
+		
+	}
+	
+	public void testStatementColumnNotFound() {
+		try {
+			conn.prepareStatement("select prayer_name from player");
+			fail("No Exception");
+		} catch (SQLException e) {
+			assertEquals("ColumnNotFound", ErrorCode.COLUMN_NOT_FOUND, e.getErrorCode());
+		}
+	}
+	
+	private void verifyStatement(String selectQuery, Object[][] expected) {
 		try {
 			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT player_name FROM player ORDER BY player_id LIMIT 3 OFFSET 1");
+			ResultSet rs = stmt.executeQuery(selectQuery);
 			int i=0;
 			while(rs.next()) {
-				assertEquals(expected[i], rs.getString("player_name"));
+				for(int j=0; j<expected[i].length; j++) {
+					assertEquals(expected[i][j], rs.getString(j+1));
+				}
 				i+=1;
 			}
+			assertEquals("件数が正しい", expected.length, i);
 		} catch(SQLException e) {
+			e.printStackTrace();
 			fail("SQLException:" + e.getMessage());
 		}
 	}
 	
-	public void testStatementOrderBy() {
-		String[] expected = {"ランディーバース","山本浩二","衣笠祥雄","山崎隆造","高橋慶彦"};
+	private void verifyPreparedStatement(String selectQuery, Object[] params, Object[][] expected) {
 		try {
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT player_name FROM player ORDER BY player_id DESC");
+			PreparedStatement stmt = conn.prepareStatement(selectQuery);
+			for(int i=0; i<params.length; i++) {
+				stmt.setObject(i+1, params[i]);
+			}
+			ResultSet rs = stmt.executeQuery();
 			int i=0;
 			while(rs.next()) {
-				assertEquals(expected[i], rs.getString("player_name"));
+				for(int j=0; j<expected[i].length; j++) {
+					assertEquals(expected[i][j], rs.getString(j+1));
+				}
 				i+=1;
 			}
 		} catch(SQLException e) {
+			e.printStackTrace();
 			fail("SQLException:" + e.getMessage());
 		}
+		
 	}
-
+	
 	public SelectQueryTest() throws Exception {
 		super();
 		Connection setUpConn;
