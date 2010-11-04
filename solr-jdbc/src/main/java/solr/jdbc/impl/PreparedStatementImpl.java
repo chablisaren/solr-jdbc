@@ -55,7 +55,6 @@ import solr.jdbc.value.ValueString;
 public class PreparedStatementImpl extends StatementImpl implements PreparedStatement {
 	private Statement statement;
 	private List<SolrValue[]> batchParameters;
-	private boolean isClosed = false;
 	private ResultSetMetaData rsMetaData;
 	private Command command;
 
@@ -109,7 +108,7 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 	public int executeUpdate() throws SQLException {
 		checkClosed();
 		try {
-			return this.command.executeUpdate();
+			return command.executeUpdate();
 		} catch (DbException e) {
 			throw e.getSQLException();
 		}

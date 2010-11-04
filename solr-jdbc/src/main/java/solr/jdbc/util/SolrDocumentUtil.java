@@ -10,7 +10,7 @@ public class SolrDocumentUtil {
 		if (value instanceof ValueArray) {
 			SolrValue[] values = ((ValueArray)value).getList();
 			for(SolrValue v : values) {
-				document.addField(columnName, value.getString());
+				document.addField(columnName, v.getString());
 			}
 		}
 		else {

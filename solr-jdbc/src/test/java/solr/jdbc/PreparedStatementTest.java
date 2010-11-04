@@ -117,7 +117,6 @@ public class PreparedStatementTest extends TestCase{
 		PreparedStatement selStmt = conn.prepareStatement(
 				"SELECT team, count(*) AS num FROM player group by team");
 		ResultSet rs = selStmt.executeQuery();
-		System.out.println("-------------------------");
 		while(rs.next()) {
 			System.out.println(rs.getString("team"));
 			System.out.println(rs.getInt("num"));
