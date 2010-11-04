@@ -5,6 +5,9 @@
     <include path="jdbc.dicon"/>
     <include path="s2jdbc-internal.dicon"/>
 
+    <component name="propertyMetaFactory" class="solr.jdbc.extension.s2jdbc.meta.SolrPropertyMetaFactoryImpl"/>
+	<component name="entityMetaFactory" class="org.seasar.extension.jdbc.meta.EntityMetaFactoryImpl"/>
+
     <component name="solrDialect" class="solr.jdbc.extension.s2jdbc.dialect.SolrDialect"/>
     <component name="jdbcManager"
       class="org.seasar.extension.jdbc.manager.JdbcManagerImpl">
