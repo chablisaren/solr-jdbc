@@ -3,10 +3,10 @@
 	"http://www.seasar.org/dtd/components21.dtd">
 <components namespace="jdbc">
 	<include path="jta.dicon"/>
-	
+
 	<component name="xaDataSource"
 		class="org.seasar.extension.dbcp.impl.XADataSourceImpl">
-		<property name="driverClassName">"solr.jdbc.SolrDriver"</property>
+		<property name="driverClassName">"com.google.code.solr_jdbc.SolrDriver"</property>
 		<property name="URL">"jdbc:solr:s"</property>
 		<property name="user">""</property>
 		<property name="password">""</property>

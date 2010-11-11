@@ -1,4 +1,4 @@
-package solr.jdbc.extension.s2jdbc.meta;
+package com.google.code.solr_jdbc.extension.s2jdbc.meta;
 
 import java.util.List;
 
@@ -8,8 +8,9 @@ import org.seasar.extension.jdbc.PropertyMetaFactory;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.meta.PropertyMetaFactoryImpl;
 
-import solr.jdbc.extension.s2jdbc.types.ArrayType;
-import solr.jdbc.extension.s2jdbc.types.ListType;
+import com.google.code.solr_jdbc.extension.s2jdbc.types.ArrayType;
+import com.google.code.solr_jdbc.extension.s2jdbc.types.ListType;
+
 
 public class SolrPropertyMetaFactoryImpl extends PropertyMetaFactoryImpl {
 	public final static ValueType ARRAY = new ArrayType(); 

@@ -1,4 +1,4 @@
-package solr.jdbc.extension.s2jdbc.types;
+package com.google.code.solr_jdbc.extension.s2jdbc.types;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
