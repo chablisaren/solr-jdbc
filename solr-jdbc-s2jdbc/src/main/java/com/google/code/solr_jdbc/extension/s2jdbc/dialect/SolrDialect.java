@@ -1,20 +1,11 @@
-package solr.jdbc.extension.s2jdbc.dialect;
-
-import java.util.List;
+package com.google.code.solr_jdbc.extension.s2jdbc.dialect;
 
 import javax.persistence.GenerationType;
 
-import org.seasar.extension.jdbc.PropertyMeta;
-import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.dialect.StandardDialect;
 
-import solr.jdbc.extension.s2jdbc.types.ArrayType;
-import solr.jdbc.extension.s2jdbc.types.ListType;
-
 public class SolrDialect extends StandardDialect {
-	public static final ValueType ARRAY_TYPE = new ArrayType();
-	public static final ValueType LIST_TYPE  = new ListType();
-	
+
 	@Override
 	public String getName() {
 	    return "solr";
@@ -72,16 +63,5 @@ public class SolrDialect extends StandardDialect {
         return false;
     }
 
-    @Override
-    public ValueType getValueType(PropertyMeta propertyMeta) {
-    	Class<?> clazz = propertyMeta.getPropertyClass();
-    	if (List.class.isAssignableFrom(clazz)) {
-    		return LIST_TYPE;
-    	}
-    	else if (clazz.isArray()) {
-    		return ARRAY_TYPE;
-    	}
-    	return super.getValueType(propertyMeta);
-    }
 
 }

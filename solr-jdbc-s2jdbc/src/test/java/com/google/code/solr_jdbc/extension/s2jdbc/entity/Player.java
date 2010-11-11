@@ -1,4 +1,4 @@
-package solr.jdbc.extension.s2jdbc.entity;
+package com.google.code.solr_jdbc.extension.s2jdbc.entity;
 
 import java.sql.Date;
 import java.sql.Timestamp;
