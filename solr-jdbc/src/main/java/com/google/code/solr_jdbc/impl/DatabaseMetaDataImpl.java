@@ -173,11 +173,15 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 		for (SolrColumn column : tableColumns.get(table)) {
 			Object[] columnMeta = new Object[22];
+			columnMeta[1] = ""; // TABLE_SCHEM
 			columnMeta[2] = column.getTableName();
 			columnMeta[3] = column.getColumnName(); // COLUMN_NAME
 
 			columnMeta[4] = DataType.getDataType(column.getType()).sqlType; // DATA_TYPE
 			columnMeta[5] = DataType.getDataType(column.getType()).jdbc; // TYPE_NAME
+			columnMeta[6] = 0; // COLUMN_SIZE
+			columnMeta[8] = 0; // DECIMAL_DIGITS
+			columnMeta[10] = DatabaseMetaData.columnNullableUnknown; // NULLABLE
 			rs.add(Arrays.asList(columnMeta));
 		}
 
@@ -186,8 +190,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public Connection getConnection() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return conn;
 	}
 
 	@Override
@@ -285,17 +288,29 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	}
 
 	@Override
-	public ResultSet getImportedKeys(String s, String s1, String s2)
+	public ResultSet getImportedKeys(String catalog, String schema, String table)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		CollectionResultSet rs = new CollectionResultSet();
+		String[] columns = {
+				"PKTABLE_CAT", "PKTABLE_SCHEM", "PKTABLE_NAME", "PKCOLUMN_NAME",
+				"FKTABLE_CAT", "FKTABLE_SCHEM", "FKTABLE_NAME", "FKCOLUMN_NAME",
+				"KEY_SEQ", "UPDATE_RULE", "DELETE_RULE", "FK_NAME", "PK_NAME", "DEFERRABILITY"
+				};
+		rs.setColumns(Arrays.asList(columns));
+		return rs;
 	}
 
 	@Override
-	public ResultSet getIndexInfo(String s, String s1, String s2, boolean flag,
-			boolean flag1) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+	public ResultSet getIndexInfo(String catalog, String schema, String table, boolean unique,
+			boolean approximate) throws SQLException {
+		CollectionResultSet rs = new CollectionResultSet();
+		String[] columns = {
+				"TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "NON_UNIQUE",
+				"INDEX_QUALIFIER", "INDEX_NAME", "TYPE", "ORDINAL_POSITION",
+				"COLUMN_NAME", "ASC_OR_DESC", "CARDINALITY", "PAGES", "FILTER_CONDITION"
+				};
+		rs.setColumns(Arrays.asList(columns));
+		return rs;
 	}
 
 	@Override
@@ -437,10 +452,27 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	}
 
 	@Override
-	public ResultSet getPrimaryKeys(String s, String s1, String s2)
+	public ResultSet getPrimaryKeys(String catalog, String schema, String table)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		CollectionResultSet rs;
+		String[] columns = { "TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "COLUMN_NAME",
+				"KEY_SEQ", "PK_NAME"
+		};
+		rs = new CollectionResultSet();
+		rs.setColumns(Arrays.asList(columns));
+
+		/* TODO PKをセットする
+		for (SolrColumn column : tableColumns.get(table)) {
+			Object[] columnMeta = new Object[6];
+			columnMeta[2] = column.getTableName();
+			columnMeta[3] = column.getColumnName(); // COLUMN_NAME
+
+			columnMeta[4] = DataType.getDataType(column.getType()).sqlType; // KEY_SEQ
+			columnMeta[5] = DataType.getDataType(column.getType()).jdbc; // PK_NAME
+			rs.add(Arrays.asList(columnMeta));
+		}
+		*/
+		return rs;
 	}
 
 	@Override
@@ -565,7 +597,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		rs.setColumns(Arrays.asList(columns));
 
 		for (String tableName : tableColumns.keySet()) {
-			Object[] tableMeta = { null, null, tableName, "TABLE", "", null,
+			Object[] tableMeta = { null, "", tableName, "TABLE", "", null,
 					null, null, null, null };
 			rs.add(Arrays.asList(tableMeta));
 		}
