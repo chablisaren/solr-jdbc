@@ -66,6 +66,8 @@ public class CreateTableCommand extends Command{
 				doc.addField("meta.columns", columnDef.getColumnName()+".M_"+dt.type.name());
 			} else {
 				DataType dt = DataType.getTypeByName(sqlTypeName);
+				if (dt == null)
+					throw DbException.get(ErrorCode.UNKNOWN_DATA_TYPE, sqlTypeName);
 				doc.addField("meta.columns", columnDef.getColumnName()+"."+dt.type.name());
 			}
 		}

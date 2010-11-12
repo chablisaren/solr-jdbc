@@ -1,9 +1,9 @@
 package com.google.code.solr_jdbc.value;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.sql.Date;
 import java.util.HashMap;
 
 /**
@@ -26,14 +26,14 @@ public class DataType {
 			TYPES_BY_VALUE_TYPE.add(null);
 		}
  		add(SolrType.NULL, Types.NULL, "Null", new String[]{"NULL"});
- 		add(SolrType.BOOLEAN, Types.BOOLEAN, "Boolean", new String[]{"BOOLEAN", "BIT", "BOOL"});
+ 		add(SolrType.BOOLEAN, Types.BOOLEAN, "Boolean", new String[]{"BOOLEAN", "BIT", "BOOL", "TINYINT"});
  		add(SolrType.INT, Types.INTEGER, "Int", new String[]{"INTEGER", "INT"});
  		add(SolrType.LONG, Types.BIGINT, "Long", new String[]{"BIGINT", "LONG"});
  		add(SolrType.DECIMAL, Types.NUMERIC, "BigDecimal", new String[]{"NUMERIC","NUMBER"});
  		add(SolrType.DOUBLE, Types.DOUBLE, "Double", new String[]{"DOUBLE"});
  		add(SolrType.FLOAT, Types.FLOAT, "Float", new String[]{"FLOAT"});
  		add(SolrType.STRING, Types.VARCHAR, "String", new String[]{"VARCHAR", "VARCHAR2", "NVARCHAR", "NVARCHAR2", "VARCHAR_CASESENSITIVE", "CHARACTER VARYING", "TID"});
- 		add(SolrType.BIGRAM, Types.CLOB, "Clob", new String[]{"CLOB"});
+ 		add(SolrType.BIGRAM, Types.CLOB, "Clob", new String[]{"CLOB", "TEXT"});
  		add(SolrType.DATE, Types.DATE, "Date", new String[]{"DATE"});
  		add(SolrType.ARRAY, Types.ARRAY, "Array", new String[]{"ARRAY"});
 	}
@@ -61,12 +61,12 @@ public class DataType {
 		}
 		return dt;
 	}
-	
+
 	public static int covertSolrTypeToSQLType(SolrType type) {
 		DataType dt = TYPES_BY_VALUE_TYPE.get(type.ordinal());
 		return dt.sqlType;
 	}
-	
+
 	public static SolrType convertSQLTypeToSolrType(int sqlType) {
 		switch(sqlType) {
 		case Types.CHAR:
@@ -84,7 +84,7 @@ public class DataType {
 			throw new RuntimeException("UNKNOWN sql types:" + sqlType);
 		}
 	}
-	
+
 	public static SolrValue convertToValue(Object x) {
 		if (x == null) {
 			return ValueNull.INSTANCE;
@@ -109,7 +109,7 @@ public class DataType {
 			return ValueString.get(x.toString()); // FIXME 知らない型は強制的にStringにする
 		}
 	}
-	
+
 	public static DataType getTypeByName(String name) {
 		return TYPES_BY_NAME.get(name.toUpperCase());
 	}
