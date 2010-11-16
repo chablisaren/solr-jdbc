@@ -171,8 +171,6 @@
         	<groupId>jsqlparser</groupId>
         	<artifactId>jsqlparser</artifactId>
         	<version>0.6.3</version>
-        	<scope>system</scope>
-        	<systemPath>${project.basedir}/lib/jsqlparser-0.6.3.jar</systemPath>
         </dependency>
         <dependency>
         	<groupId>org.slf4j</groupId>
