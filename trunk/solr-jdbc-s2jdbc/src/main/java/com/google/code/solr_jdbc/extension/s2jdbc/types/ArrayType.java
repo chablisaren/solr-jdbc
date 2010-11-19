@@ -1,5 +1,6 @@
 package com.google.code.solr_jdbc.extension.s2jdbc.types;
 
+import java.sql.Array;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,7 +9,6 @@ import java.sql.Types;
 
 import org.apache.commons.lang.StringUtils;
 import org.seasar.extension.jdbc.types.AbstractValueType;
-import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.extension.jdbc.util.BindVariableUtil;
 
 public class ArrayType extends AbstractValueType {
@@ -18,13 +18,21 @@ public class ArrayType extends AbstractValueType {
 	
 	@Override
 	public Object getValue(ResultSet resultSet, int index) throws SQLException{
-		return (Object[])resultSet.getArray(index).getArray();
+		Array array = resultSet.getArray(index);
+		if(array == null) {
+			return null;
+		}
+		return (Object[])array.getArray();
 	}
 	
 	@Override
 	public Object getValue(ResultSet resultSet, String columnName)
 		throws SQLException {
-		return (Object[])resultSet.getArray(columnName).getArray();
+		Array array = resultSet.getArray(columnName);
+		if (array == null) {
+			return null;
+		}
+		return (Object[])array.getArray();
 	}
 	
 	@Override

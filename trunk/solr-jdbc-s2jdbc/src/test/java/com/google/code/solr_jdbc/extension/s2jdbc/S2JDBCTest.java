@@ -35,10 +35,17 @@ public class S2JDBCTest extends S2TestCase {
 		player1.position.add("遊撃手");
 		userTransaction.begin();
 		playerService.insert(player1);
+
+		Player player2 = new Player();
+		player2.playerId = 2;
+		player2.playerName = "山崎隆造";
+		player2.team = "カープ";
+		player2.position = null;
+		playerService.insert(player2);
 		userTransaction.commit();
 
 		List<Player> playerList = playerService.findAll();
-		assertEquals(1, playerList.size());
+		assertEquals(2, playerList.size());
 		Player player = playerList.get(0);
 		assertEquals("Entityに値が入っている", "高橋慶彦", player.playerName);
 		assertNull("設定しなかったところはnullが入る", player.registeredAt);
