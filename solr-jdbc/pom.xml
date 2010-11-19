@@ -9,14 +9,7 @@
 		<outputDirectory>target/classes</outputDirectory>
 		<resources>
 			<resource>
-				<targetPath>target/classes</targetPath>
-				<filtering>false</filtering>
 				<directory>src/main/resources</directory>
-			</resource>
-			<resource>
-				<targetPath>target/test-classes</targetPath>
-				<filtering>false</filtering>
-				<directory>src/test/resources</directory>
 			</resource>
 		</resources>
 		<testOutputDirectory>target/test-classes</testOutputDirectory>
