@@ -1,5 +1,6 @@
 package com.google.code.solr_jdbc.extension.s2jdbc.types;
 
+import java.sql.Array;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,18 +21,26 @@ public class ListType extends AbstractValueType {
 	
 	@Override
 	public Object getValue(ResultSet resultSet, int index) throws SQLException {
-		Object[] array = (Object[])resultSet.getArray(index).getArray();
-		if (array == null) {
+		Array array = resultSet.getArray(index);
+		if(array == null) {
 			return null;
 		}
-		return Arrays.asList(array);
+		Object[] value = (Object[])array.getArray();
+		if (value == null) {
+			return null;
+		}
+		return Arrays.asList(value);
 	}
 
 	@Override
 	public Object getValue(ResultSet resultSet, String columnName)
 			throws SQLException {
-		Object[] array = (Object[])resultSet.getArray(columnName).getArray();
+		Array array = resultSet.getArray(columnName);
 		if (array == null) {
+			return null;
+		}
+		Object[] value = (Object[])array.getArray();
+		if (value == null) {
 			return null;
 		}
 		return Arrays.asList(array);
