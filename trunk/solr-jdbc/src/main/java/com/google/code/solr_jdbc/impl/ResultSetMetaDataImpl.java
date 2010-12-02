@@ -8,6 +8,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.code.solr_jdbc.SolrColumn;
+import com.google.code.solr_jdbc.message.DbException;
+import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.value.DataType;
 
 
@@ -59,8 +61,13 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 
 	@Override
 	public String getColumnLabel(int column) throws SQLException {
-		SolrColumn solrColumn = solrColumns.get(column);
-		return solrColumn.getAlias();
+		if(column > getColumnCount() || column <= 0)
+			throw DbException.get(ErrorCode.COLUMN_COUNT_DOES_NOT_MATCH);
+		SolrColumn solrColumn = solrColumns.get(column - 1);
+		String columnName = solrColumn.getAlias();
+		if(columnName != null)
+			return columnName;
+		return solrColumn.getColumnName();
 	}
 
 	@Override

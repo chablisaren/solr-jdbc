@@ -85,6 +85,17 @@ public class SelectQueryTest extends TestCase {
 		}
 	}
 
+	/**
+	 * get resultSet by column name
+	 */
+	public void testGetColumnLabel() throws SQLException {
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("Select player_name from player where player_id=3");
+		assertTrue(rs.next());
+		assertEquals("player_name", rs.getMetaData().getColumnLabel(1));
+		assertEquals("衣笠祥雄", rs.getString("player_name"));
+	}
+	
 	private void verifyStatement(String selectQuery, Object[][] expected) {
 		try {
 			Statement stmt = conn.createStatement();
