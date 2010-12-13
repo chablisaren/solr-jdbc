@@ -4,6 +4,17 @@
 	<artifactId>solr-jdbc</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
 	<name>solr-jdbc</name>
+	<distributionManagement>
+		<repository>
+			<id>remote-repository</id>
+			<url>dummy</url>
+		</repository>
+		<snapshotRepository>
+			<id>remote-repository</id>
+			<url>dummy</url>
+		</snapshotRepository>
+	</distributionManagement>
+	
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<outputDirectory>target/classes</outputDirectory>
