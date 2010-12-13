@@ -65,6 +65,15 @@ public class SelectQueryTest extends TestCase {
 		Object[][] expected = {{"カープ", "4"}, {"阪神", "1"}};
 		verifyStatement("SELECT team, count(*) FROM player GROUP BY team", expected);
 	}
+	
+	public void testStatementIn() {
+		Object[][] expected = {{"高橋慶彦"}, {"衣笠祥雄"}};
+		Object[] params = {"3"};
+		verifyPreparedStatement(
+				"SELECT player_name FROM player WHERE player_id in (1,?)",
+				params,
+				expected);
+	}
 
 	public void testStatementTableNotFound() {
 		try {
@@ -95,6 +104,7 @@ public class SelectQueryTest extends TestCase {
 		assertEquals("player_name", rs.getMetaData().getColumnLabel(1));
 		assertEquals("衣笠祥雄", rs.getString("player_name"));
 	}
+	
 	
 	private void verifyStatement(String selectQuery, Object[][] expected) {
 		try {

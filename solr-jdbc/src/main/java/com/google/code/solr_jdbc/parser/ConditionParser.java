@@ -221,8 +221,20 @@ public class ConditionParser implements ExpressionVisitor {
 	}
 
 	@Override
-	public void visit(InExpression arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+	public void visit(InExpression expr) {
+		expr.getLeftExpression().accept(this);
+		query.append(":(");
+		ExpressionParser exprParser = new ExpressionParser();
+		expr.getItemsList().accept(exprParser);
+		for(SolrValue val : exprParser.getParameters()) {
+			if(val == null) {
+				query.append("{}");
+			} else {
+				query.append("\"" + val.getQueryString() + "\"");
+			}
+		}
+		parameterSize += exprParser.getParameterSize();
+		query.append(") ");
 	}
 
 	@Override
@@ -231,7 +243,7 @@ public class ConditionParser implements ExpressionVisitor {
 	}
 
 	@Override
-	public void visit(LikeExpression arg0) {
+	public void visit(LikeExpression expr) {
 		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 

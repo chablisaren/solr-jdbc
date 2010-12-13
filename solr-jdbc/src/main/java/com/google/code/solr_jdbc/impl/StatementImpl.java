@@ -255,7 +255,7 @@ public class StatementImpl implements Statement {
 
 	@Override
 	public boolean isClosed() throws SQLException {
-		return isClosed();
+		return isClosed;
 	}
 
 	@Override

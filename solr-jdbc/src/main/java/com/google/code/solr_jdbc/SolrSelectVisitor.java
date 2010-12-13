@@ -38,7 +38,6 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 	private ConditionParser conditionParser;
 	
 	private String tableName;
-	private final StringBuilder query;
 	private final Map<String, String> solrOptions;
 	private final DatabaseMetaDataImpl metaData;
 	private final List<String> selectColumns;
@@ -47,7 +46,6 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 	private boolean hasGroupBy = false;
 
 	public SolrSelectVisitor(DatabaseMetaDataImpl metaData) {
-		this.query = new StringBuilder();
 		this.selectColumns = new ArrayList<String>();
 		this.solrOptions = new HashMap<String, String>();
 		this.metaData = metaData;
@@ -84,6 +82,7 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 		return queryString;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(PlainSelect plainSelect) {
 		plainSelect.getFromItem().accept(this);
@@ -126,6 +125,9 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 		if(limit != null) {
 			solrOptions.put("start", Long.toString(limit.getOffset()));
 			solrOptions.put("rows", Long.toString(limit.getRowCount()));
+		} else {
+			solrOptions.put("start", "0");
+			solrOptions.put("rows", "10000");
 		}
 		
 		if(conditionParser != null)
