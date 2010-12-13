@@ -31,6 +31,7 @@ public class ErrorCode {
 		case TABLE_OR_VIEW_ALREADY_EXISTS: return "42S01";
 		case TABLE_OR_VIEW_NOT_FOUND: return "42S02";
 		case COLUMN_NOT_FOUND: return "42S22";
+		case FEATURE_NOT_SUPPORTED: return "HYC00";
 		case GENERAL_ERROR: return "HY000";
 		default:
 			return ""+errorCode;
