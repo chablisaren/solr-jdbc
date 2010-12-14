@@ -63,7 +63,7 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 			command.setConnection(conn);
 			command.parse();
 		} catch (JSQLParserException e) {
-			throw DbException.get(ErrorCode.SYNTAX_ERROR, e);
+			throw DbException.get(ErrorCode.SYNTAX_ERROR, e.getMessage());
 		}
 	}
 

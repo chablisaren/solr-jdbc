@@ -8,42 +8,50 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.google.code.solr_jdbc.message.ErrorCode;
 
-public class SelectQueryTest extends TestCase {
+import static org.junit.Assert.*;
+
+public class SelectQueryTest {
 	Connection conn;
 
-	@Override
+	@Before
 	public void setUp() throws Exception {
-		init();
 		conn = DriverManager.getConnection("jdbc:solr:s");
 	}
 
-	@Override
+	@After
 	public void tearDown() throws Exception {
 		conn.close();
 	}
 
+	@Test
 	public void testStatement() {
 		String[][] expected = {{"高橋慶彦"},{"山崎隆造"},{"衣笠祥雄"},{"山本浩二"},{"ランディーバース"}};
 		verifyStatement("SELECT player_name FROM player ORDER BY player_id",
 				expected);
 	}
 
+	@Test
 	public void testStatementLimit() {
 		String[][] expected = {{"山崎隆造"},{"衣笠祥雄"},{"山本浩二"}};
 		verifyStatement("SELECT player_name FROM player ORDER BY player_id LIMIT 3 OFFSET 1",
 				expected);
 	}
 
+	@Test
 	public void testStatementOrderBy() {
 		Object[][] expected = {{"ランディーバース"},{"山本浩二"},{"衣笠祥雄"},{"山崎隆造"},{"高橋慶彦"}};
 		verifyStatement("SELECT player_name FROM player ORDER BY player_id DESC",
 				expected);
 	}
 
+	@Test
 	public void testStatementCondition() {
 		Object[][] expected1 = {{"山崎隆造"}};
 		verifyStatement("SELECT player_name FROM player WHERE player_id > 1 AND player_id < 3",
@@ -52,6 +60,8 @@ public class SelectQueryTest extends TestCase {
 		verifyStatement("SELECT player_name FROM player WHERE player_id >= 1 AND player_id <= 3",
 				expected2);
 	}
+	
+	@Test
 	public void testStatementOr() {
 		Object[][] expected1 = {{"ランディーバース"}};
 		Object[] params = {"阪神"};
@@ -61,20 +71,23 @@ public class SelectQueryTest extends TestCase {
 				expected1);
 	}
 
+	@Test
 	public void testStatementGroupBy() {
 		Object[][] expected = {{"カープ", "4"}, {"阪神", "1"}};
 		verifyStatement("SELECT team, count(*) FROM player GROUP BY team", expected);
 	}
 	
+	@Test
 	public void testStatementIn() {
-		Object[][] expected = {{"高橋慶彦"}, {"衣笠祥雄"}};
-		Object[] params = {"3"};
+		Object[][] expected = {{"山崎隆造"}, {"衣笠祥雄"}, {"ランディーバース"}};
+		Object[] params = {"一塁手", "二塁手"};
 		verifyPreparedStatement(
-				"SELECT player_name FROM player WHERE player_id in (1,?)",
+				"SELECT player_name FROM player WHERE position in (?,?) order by player_id",
 				params,
 				expected);
 	}
 
+	@Test
 	public void testStatementTableNotFound() {
 		try {
 			conn.prepareStatement("select * from prayer");
@@ -85,6 +98,7 @@ public class SelectQueryTest extends TestCase {
 
 	}
 
+	@Test
 	public void testStatementColumnNotFound() {
 		try {
 			conn.prepareStatement("select prayer_name from player");
@@ -97,6 +111,7 @@ public class SelectQueryTest extends TestCase {
 	/**
 	 * get resultSet by column name
 	 */
+	@Test
 	public void testGetColumnLabel() throws SQLException {
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("Select player_name from player where player_id=3");
@@ -145,7 +160,8 @@ public class SelectQueryTest extends TestCase {
 
 	}
 
-	public void init() throws Exception {
+	@BeforeClass
+	public static void init() throws Exception {
 		Connection setUpConn;
 		Class.forName(SolrDriver.class.getName());
 
@@ -157,37 +173,43 @@ public class SelectQueryTest extends TestCase {
 		}
 
 		PreparedStatement stmt = setUpConn.prepareStatement(
-				"CREATE TABLE player (player_id number, team varchar(10), player_name varchar(50), registered_at DATE)");
+				"CREATE TABLE player (player_id number, team varchar(10), player_name varchar(50), position varchar(10) ARRAY, registered_at DATE)");
 		stmt.executeUpdate();
 
-		PreparedStatement insStmt = setUpConn.prepareStatement("INSERT INTO player Values (?,?,?,?)");
+		PreparedStatement insStmt = setUpConn.prepareStatement("INSERT INTO player Values (?,?,?,?,?)");
 		insStmt.setInt(1, 1);
 		insStmt.setString(2, "カープ");
 		insStmt.setString(3, "高橋慶彦");
-		insStmt.setDate(4, new Date(System.currentTimeMillis()));
+		insStmt.setObject(4, new String[]{"遊撃手"});
+		insStmt.setDate(5, new Date(System.currentTimeMillis()));
 		insStmt.executeUpdate();
 
 		insStmt.setInt(1, 2);
 		insStmt.setString(2, "カープ");
 		insStmt.setString(3, "山崎隆造");
-		insStmt.setDate(4, new Date(System.currentTimeMillis()));
+		insStmt.setObject(4, new String[]{"遊撃手","二塁手"});
+		insStmt.setDate(5, new Date(System.currentTimeMillis()));
 		insStmt.executeUpdate();
+
 		insStmt.setInt(1, 3);
 		insStmt.setString(2, "カープ");
 		insStmt.setString(3, "衣笠祥雄");
-		insStmt.setDate(4, new Date(System.currentTimeMillis()));
+		insStmt.setObject(4, new String[]{"一塁手","三塁手"});
+		insStmt.setDate(5, new Date(System.currentTimeMillis()));
 		insStmt.executeUpdate();
 
 		insStmt.setInt(1, 4);
 		insStmt.setString(2, "カープ");
 		insStmt.setString(3, "山本浩二");
-		insStmt.setDate(4, new Date(System.currentTimeMillis()));
+		insStmt.setObject(4, new String[]{"外野手"});
+		insStmt.setDate(5, new Date(System.currentTimeMillis()));
 		insStmt.executeUpdate();
 
 		insStmt.setInt(1, 5);
 		insStmt.setString(2, "阪神");
 		insStmt.setString(3, "ランディーバース");
-		insStmt.setDate(4, new Date(System.currentTimeMillis()));
+		insStmt.setObject(4, new String[]{"一塁手","外野手"});
+		insStmt.setDate(5, new Date(System.currentTimeMillis()));
 		insStmt.executeUpdate();
 
 		setUpConn.commit();
