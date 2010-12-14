@@ -88,7 +88,7 @@
    <dynamicField name="*.text_ws" type="text_ws" indexed="true"  stored="true" compressed="false" multiValued="false" />
 
    <!-- bigram -->
-   <dynamicField name="*.BIGRAM" type="bigram" indexed="true"  stored="true" compressed="false" multiValued="false" />
+   <dynamicField name="*.TEXT" type="bigram" indexed="true"  stored="true" compressed="false" multiValued="false" />
 
  </fields>
 
