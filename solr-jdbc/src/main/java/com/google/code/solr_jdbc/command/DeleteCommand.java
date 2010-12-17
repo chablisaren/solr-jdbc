@@ -40,7 +40,7 @@ public class DeleteCommand extends Command {
 		try {
 			 response = conn.getSolrServer().deleteByQuery(query.getQuery());
 		} catch (SolrServerException e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e.getMessage());
+			throw DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error");
 		} catch (IOException e) {
 			throw DbException.get(ErrorCode.IO_EXCEPTION, e);
 		}
@@ -60,7 +60,7 @@ public class DeleteCommand extends Command {
 		try {
 			metaData= this.conn.getMetaData();
 		} catch (SQLException e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e);
+			throw DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error");
 		}
 		String tableName = delStmt.getTable().getName();
 

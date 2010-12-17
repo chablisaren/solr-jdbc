@@ -37,7 +37,7 @@ public class DropCommand extends Command {
 					"meta.name:"+statement.getName()+" OR id:@"+statement.getName()+".*");
 			conn.commit();
 		} catch(Exception e) {
-			DbException.get(ErrorCode.GENERAL_ERROR, e);
+			DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error");
 		}
 		return 0;
 	}

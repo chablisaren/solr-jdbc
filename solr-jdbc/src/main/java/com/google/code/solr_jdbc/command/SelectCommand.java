@@ -56,7 +56,7 @@ public class SelectCommand extends Command {
 				rs = new DefaultResultSetImpl(response.getResults(), selectVisitor.getResultSetMetaData());
 			}
 		} catch (SolrServerException e) {
-			DbException.get(ErrorCode.GENERAL_ERROR, e);
+			DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error");
 		}
 
 		return rs;
