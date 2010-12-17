@@ -33,7 +33,7 @@ public class DataType {
  		add(SolrType.DOUBLE, Types.DOUBLE, "Double", new String[]{"DOUBLE"});
  		add(SolrType.FLOAT, Types.FLOAT, "Float", new String[]{"FLOAT"});
  		add(SolrType.STRING, Types.VARCHAR, "String", new String[]{"VARCHAR", "VARCHAR2", "NVARCHAR", "NVARCHAR2", "VARCHAR_CASESENSITIVE", "CHARACTER VARYING", "TID"});
- 		add(SolrType.BIGRAM, Types.CLOB, "Clob", new String[]{"CLOB", "TEXT"});
+ 		add(SolrType.TEXT, Types.CLOB, "Clob", new String[]{"CLOB", "TEXT"});
  		add(SolrType.DATE, Types.DATE, "Date", new String[]{"DATE"});
  		add(SolrType.ARRAY, Types.ARRAY, "Array", new String[]{"ARRAY"});
 	}
