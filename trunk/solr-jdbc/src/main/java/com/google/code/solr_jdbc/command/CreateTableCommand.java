@@ -76,11 +76,11 @@ public class CreateTableCommand extends Command{
 			conn.getSolrServer().add(doc);
 			conn.commit();
 		} catch (SolrServerException e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e);
+			throw DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error");
 		} catch (IOException e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e);
+			throw DbException.get(ErrorCode.IO_EXCEPTION, e);
 		} catch (SQLException e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e);
+			throw DbException.get(ErrorCode.GENERAL_ERROR, e, "Commit Error");
 		}
 		return 0;
 	}

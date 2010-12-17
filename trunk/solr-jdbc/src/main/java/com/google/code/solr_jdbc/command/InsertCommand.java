@@ -79,7 +79,7 @@ public class InsertCommand extends Command {
 		try {
 			conn.getSolrServer().add(doc);
 		} catch (Exception e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e);
+			throw DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error");
 		}
 
 		return doc.size();
