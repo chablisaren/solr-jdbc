@@ -72,17 +72,23 @@
 
    <!-- Integer -->
    <dynamicField name="*.INT" type="sint" indexed="true" stored="true" compressed="false" multiValued="false" />
+   <dynamicField name="*.M_INT" type="sint" indexed="true" stored="true" compressed="false" multiValued="true" />
    <dynamicField name="*.LONG" type="slong" indexed="true" stored="true" compressed="false" multiValued="false" />
+   <dynamicField name="*.M_LONG" type="slong" indexed="true" stored="true" compressed="false" multiValued="true" />
    <dynamicField name="*.DECIMAL" type="slong" indexed="true" stored="true" compressed="false" multiValued="false" />
+   <dynamicField name="*.M_DECIMAL" type="slong" indexed="true" stored="true" compressed="false" multiValued="true" />
 
    <!-- Double -->
    <dynamicField name="*.DOUBLE" type="sdouble" indexed="true" stored="true"  compressed="false" multiValued="false" />
+   <dynamicField name="*.M_DOUBLE" type="sdouble" indexed="true" stored="true"  compressed="false" multiValued="true" />
 
    <!-- date -->
    <dynamicField name="*.DATE" type="date" indexed="true"  stored="true"  compressed="false" multiValued="false" />
+   <dynamicField name="*.M_DATE" type="date" indexed="true"  stored="true"  compressed="false" multiValued="true" />
 
    <!-- boolean -->
    <dynamicField name="*.BOOLEAN" type="boolean" indexed="true"  stored="true"  compressed="false" multiValued="false" />
+   <dynamicField name="*.M_BOOLEAN" type="boolean" indexed="true"  stored="true"  compressed="false" multiValued="true" />
 
    <!-- white space text -->
    <dynamicField name="*.text_ws" type="text_ws" indexed="true"  stored="true" compressed="false" multiValued="false" />

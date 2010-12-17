@@ -4,7 +4,7 @@ public enum SolrType {
 	NULL,
 	STRING,
 	DECIMAL,
-	BIGRAM,
+	TEXT,
 	DATE,
 	BOOLEAN,
 	INT,
