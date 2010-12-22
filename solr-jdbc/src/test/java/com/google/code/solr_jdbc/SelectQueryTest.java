@@ -31,28 +31,28 @@ public class SelectQueryTest {
 	}
 
 	@Test
-	public void testStatement() {
+	public void testStatement() throws SQLException {
 		String[][] expected = {{"高橋慶彦"},{"山崎隆造"},{"衣笠祥雄"},{"山本浩二"},{"ランディーバース"}};
 		verifyStatement("SELECT player_name FROM player ORDER BY player_id",
 				expected);
 	}
 
 	@Test
-	public void testStatementLimit() {
+	public void testStatementLimit() throws SQLException {
 		String[][] expected = {{"山崎隆造"},{"衣笠祥雄"},{"山本浩二"}};
 		verifyStatement("SELECT player_name FROM player ORDER BY player_id LIMIT 3 OFFSET 1",
 				expected);
 	}
 
 	@Test
-	public void testStatementOrderBy() {
+	public void testStatementOrderBy() throws SQLException {
 		Object[][] expected = {{"ランディーバース"},{"山本浩二"},{"衣笠祥雄"},{"山崎隆造"},{"高橋慶彦"}};
 		verifyStatement("SELECT player_name FROM player ORDER BY player_id DESC",
 				expected);
 	}
 
 	@Test
-	public void testStatementCondition() {
+	public void testStatementCondition() throws SQLException {
 		Object[][] expected1 = {{"山崎隆造"}};
 		verifyStatement("SELECT player_name FROM player WHERE player_id > 1 AND player_id < 3",
 				expected1);
@@ -62,7 +62,7 @@ public class SelectQueryTest {
 	}
 	
 	@Test
-	public void testStatementOr() {
+	public void testStatementOr() throws SQLException {
 		Object[][] expected1 = {{"ランディーバース"}};
 		Object[] params = {"阪神"};
 		verifyPreparedStatement(
@@ -72,13 +72,13 @@ public class SelectQueryTest {
 	}
 
 	@Test
-	public void testStatementGroupBy() {
+	public void testStatementGroupBy() throws SQLException {
 		Object[][] expected = {{"カープ", "4"}, {"阪神", "1"}};
 		verifyStatement("SELECT team, count(*) FROM player GROUP BY team", expected);
 	}
 	
 	@Test
-	public void testStatementIn() {
+	public void testStatementIn() throws SQLException {
 		Object[][] expected = {{"山崎隆造"}, {"衣笠祥雄"}, {"ランディーバース"}};
 		Object[] params = {"一塁手", "二塁手"};
 		verifyPreparedStatement(
@@ -99,12 +99,15 @@ public class SelectQueryTest {
 	}
 
 	@Test
-	public void testStatementColumnNotFound() {
+	public void testStatementColumnNotFound() throws SQLException {
+		PreparedStatement stmt = null;
 		try {
-			conn.prepareStatement("select prayer_name from player");
+			stmt = conn.prepareStatement("select prayer_name from player");
 			fail("No Exception");
 		} catch (SQLException e) {
 			assertEquals("ColumnNotFound", ErrorCode.COLUMN_NOT_FOUND, e.getErrorCode());
+		} finally {
+			stmt.close();
 		}
 	}
 
@@ -113,17 +116,23 @@ public class SelectQueryTest {
 	 */
 	@Test
 	public void testGetColumnLabel() throws SQLException {
-		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("Select player_name from player where player_id=3");
-		assertTrue(rs.next());
-		assertEquals("player_name", rs.getMetaData().getColumnLabel(1));
-		assertEquals("衣笠祥雄", rs.getString("player_name"));
+		Statement stmt = null;
+		try {
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery("Select player_name from player where player_id=3");
+			assertTrue(rs.next());
+			assertEquals("player_name", rs.getMetaData().getColumnLabel(1));
+			assertEquals("衣笠祥雄", rs.getString("player_name"));
+		} finally {
+			stmt.close();
+		}
 	}
 	
 	
-	private void verifyStatement(String selectQuery, Object[][] expected) {
+	private void verifyStatement(String selectQuery, Object[][] expected) throws SQLException{
+		Statement stmt = null;
 		try {
-			Statement stmt = conn.createStatement();
+			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(selectQuery);
 			int i=0;
 			while(rs.next()) {
@@ -136,12 +145,16 @@ public class SelectQueryTest {
 		} catch(SQLException e) {
 			e.printStackTrace();
 			fail("SQLException:" + e.getMessage());
+		} finally {
+			stmt.close();
 		}
 	}
 
-	private void verifyPreparedStatement(String selectQuery, Object[] params, Object[][] expected) {
+	private void verifyPreparedStatement(String selectQuery, Object[] params, Object[][] expected)
+		throws SQLException {
+		PreparedStatement stmt = null;
 		try {
-			PreparedStatement stmt = conn.prepareStatement(selectQuery);
+			stmt = conn.prepareStatement(selectQuery);
 			for(int i=0; i<params.length; i++) {
 				stmt.setObject(i+1, params[i]);
 			}
@@ -156,62 +169,78 @@ public class SelectQueryTest {
 		} catch(SQLException e) {
 			e.printStackTrace();
 			fail("SQLException:" + e.getMessage());
+		} finally {
+			stmt.close();
 		}
 
 	}
 
 	@BeforeClass
-	public static void init() throws Exception {
-		Connection setUpConn;
+	public static void init() throws SQLException, ClassNotFoundException {
+		Connection setUpConn = null;
 		Class.forName(SolrDriver.class.getName());
 
-		setUpConn = DriverManager.getConnection("jdbc:solr:s");
-		PreparedStatement dropStmt = setUpConn.prepareStatement("DROP TABLE player");
 		try {
-			dropStmt.executeUpdate();
-		} catch(Exception ignore) {
+			setUpConn = DriverManager.getConnection("jdbc:solr:s");
+			PreparedStatement dropStmt = setUpConn.prepareStatement("DROP TABLE player");
+			try {
+				dropStmt.executeUpdate();
+			} catch(SQLException ignore) {
+			} finally {
+				dropStmt.close();
+			}
+	
+			PreparedStatement stmt = setUpConn.prepareStatement(
+					"CREATE TABLE player (player_id number, team varchar(10), player_name varchar(50), position varchar(10) ARRAY, registered_at DATE)");
+			try {
+				stmt.executeUpdate();
+			} finally {
+				stmt.close();
+			}
+	
+			PreparedStatement insStmt = setUpConn.prepareStatement("INSERT INTO player Values (?,?,?,?,?)");
+			try {
+				insStmt.setInt(1, 1);
+				insStmt.setString(2, "カープ");
+				insStmt.setString(3, "高橋慶彦");
+				insStmt.setObject(4, new String[]{"遊撃手"});
+				insStmt.setDate(5, new Date(System.currentTimeMillis()));
+				insStmt.executeUpdate();
+		
+				insStmt.setInt(1, 2);
+				insStmt.setString(2, "カープ");
+				insStmt.setString(3, "山崎隆造");
+				insStmt.setObject(4, new String[]{"遊撃手","二塁手"});
+				insStmt.setDate(5, new Date(System.currentTimeMillis()));
+				insStmt.executeUpdate();
+		
+				insStmt.setInt(1, 3);
+				insStmt.setString(2, "カープ");
+				insStmt.setString(3, "衣笠祥雄");
+				insStmt.setObject(4, new String[]{"一塁手","三塁手"});
+				insStmt.setDate(5, new Date(System.currentTimeMillis()));
+				insStmt.executeUpdate();
+		
+				insStmt.setInt(1, 4);
+				insStmt.setString(2, "カープ");
+				insStmt.setString(3, "山本浩二");
+				insStmt.setObject(4, new String[]{"外野手"});
+				insStmt.setDate(5, new Date(System.currentTimeMillis()));
+				insStmt.executeUpdate();
+		
+				insStmt.setInt(1, 5);
+				insStmt.setString(2, "阪神");
+				insStmt.setString(3, "ランディーバース");
+				insStmt.setObject(4, new String[]{"一塁手","外野手"});
+				insStmt.setDate(5, new Date(System.currentTimeMillis()));
+				insStmt.executeUpdate();
+			} finally {
+				insStmt.close();
+			}
+	
+			setUpConn.commit();
+		} finally {
+			setUpConn.close();
 		}
-
-		PreparedStatement stmt = setUpConn.prepareStatement(
-				"CREATE TABLE player (player_id number, team varchar(10), player_name varchar(50), position varchar(10) ARRAY, registered_at DATE)");
-		stmt.executeUpdate();
-
-		PreparedStatement insStmt = setUpConn.prepareStatement("INSERT INTO player Values (?,?,?,?,?)");
-		insStmt.setInt(1, 1);
-		insStmt.setString(2, "カープ");
-		insStmt.setString(3, "高橋慶彦");
-		insStmt.setObject(4, new String[]{"遊撃手"});
-		insStmt.setDate(5, new Date(System.currentTimeMillis()));
-		insStmt.executeUpdate();
-
-		insStmt.setInt(1, 2);
-		insStmt.setString(2, "カープ");
-		insStmt.setString(3, "山崎隆造");
-		insStmt.setObject(4, new String[]{"遊撃手","二塁手"});
-		insStmt.setDate(5, new Date(System.currentTimeMillis()));
-		insStmt.executeUpdate();
-
-		insStmt.setInt(1, 3);
-		insStmt.setString(2, "カープ");
-		insStmt.setString(3, "衣笠祥雄");
-		insStmt.setObject(4, new String[]{"一塁手","三塁手"});
-		insStmt.setDate(5, new Date(System.currentTimeMillis()));
-		insStmt.executeUpdate();
-
-		insStmt.setInt(1, 4);
-		insStmt.setString(2, "カープ");
-		insStmt.setString(3, "山本浩二");
-		insStmt.setObject(4, new String[]{"外野手"});
-		insStmt.setDate(5, new Date(System.currentTimeMillis()));
-		insStmt.executeUpdate();
-
-		insStmt.setInt(1, 5);
-		insStmt.setString(2, "阪神");
-		insStmt.setString(3, "ランディーバース");
-		insStmt.setObject(4, new String[]{"一塁手","外野手"});
-		insStmt.setDate(5, new Date(System.currentTimeMillis()));
-		insStmt.executeUpdate();
-
-		setUpConn.commit();
 	}
 }

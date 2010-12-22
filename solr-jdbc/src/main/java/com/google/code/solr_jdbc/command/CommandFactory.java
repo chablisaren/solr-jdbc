@@ -32,7 +32,7 @@ public class CommandFactory {
 			return new InsertCommand((Insert)statement);
 		}
 		else if (statement instanceof Delete) {
-			// TODO Delete
+			return new DeleteCommand((Delete)statement);
 		}
 		throw DbException.get(ErrorCode.SYNTAX_ERROR);
 	}
