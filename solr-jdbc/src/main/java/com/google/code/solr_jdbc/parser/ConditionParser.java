@@ -1,15 +1,12 @@
 package com.google.code.solr_jdbc.parser;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import com.google.code.solr_jdbc.SolrColumn;
-import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
-import com.google.code.solr_jdbc.message.DbException;
-import com.google.code.solr_jdbc.message.ErrorCode;
-import com.google.code.solr_jdbc.value.SolrValue;
-import com.google.code.solr_jdbc.value.ValueDate;
-import com.google.code.solr_jdbc.value.ValueDouble;
-import com.google.code.solr_jdbc.value.ValueLong;
+import org.apache.commons.lang.StringUtils;
 
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
@@ -47,28 +44,45 @@ import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
+import com.google.code.solr_jdbc.SolrColumn;
+import com.google.code.solr_jdbc.expression.Item;
+import com.google.code.solr_jdbc.expression.Parameter;
+import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
+import com.google.code.solr_jdbc.message.DbException;
+import com.google.code.solr_jdbc.message.ErrorCode;
+import com.google.code.solr_jdbc.value.ValueDate;
+import com.google.code.solr_jdbc.value.ValueDouble;
+import com.google.code.solr_jdbc.value.ValueLong;
+
 public class ConditionParser implements ExpressionVisitor {
 
 	private final StringBuilder query;
-	private int parameterSize;
+	private List<Parameter> parameters;
+	private ParseContext context = ParseContext.NONE;
 	private String tableName;
 	private final DatabaseMetaDataImpl metaData;
+	private String likeEscapeChar;
 
 	public ConditionParser(DatabaseMetaDataImpl metaData) {
 		this.metaData = metaData;
 		query = new StringBuilder();
-		parameterSize = 0;
+		parameters = new ArrayList<Parameter>();
+	}
+	
+	public ConditionParser(DatabaseMetaDataImpl metaData, List<Parameter> parameters) {
+		this(metaData);
+		this.parameters.addAll(parameters);
 	}
 
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
 
-	public int getParameterSize() {
-		return parameterSize;
+	public List<Parameter> getParameters() {
+		return parameters;
 	}
-
-	public String getQuery(SolrValue[] params) {
+	
+	public String getQuery(List<Parameter> params) {
 		String queryString;
 		if(query.length() == 0) {
 			queryString = "id:@"+tableName+".*";
@@ -76,26 +90,23 @@ public class ConditionParser implements ExpressionVisitor {
 			queryString = query.toString();
 		}
 
-		StringBuilder sb = new StringBuilder();
-		int i=0;
-		int paramIndex=0;
-		while(true) {
-			int j = queryString.indexOf("{}", i);
-			if (j < 0) break;
-			sb.append(queryString.substring(i, j));
-			sb.append(params[paramIndex++].getQueryString());
-			i = j+2;
+		Pattern pattern = Pattern.compile("\\?(\\d+)");
+		Matcher matcher = pattern.matcher(queryString);
+		StringBuffer sb = new StringBuffer();
+		while(matcher.find()) {
+			String index = matcher.group(1);
+			int paramIndex = Integer.parseInt(index);
+			String paramStr = params.get(paramIndex).getQueryString();
+			matcher.appendReplacement(sb, paramStr);
 		}
-		if(i<queryString.length()) {
-			sb.append(queryString.substring(i));
-		}
+		matcher.appendTail(sb);
 
 		return sb.toString();
 	}
 
 	@Override
 	public void visit(SubSelect arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "subquery");
 	}
 
 	@Override
@@ -104,19 +115,26 @@ public class ConditionParser implements ExpressionVisitor {
 	}
 
 	@Override
-	public void visit(Function arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+	public void visit(Function func) {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, func.getName());
 	}
 
 	@Override
 	public void visit(InverseExpression arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "-");
 	}
 
 	@Override
 	public void visit(JdbcParameter ph) {
-		parameterSize += 1;
- 		query.append("{}");
+		Parameter p = new Parameter(parameters.size());
+		if(context == ParseContext.LIKE) {
+			p.setNeedsLikeEscape();
+			if(StringUtils.isNotBlank(likeEscapeChar)) {
+				p.setLikeEscapeChar(likeEscapeChar);
+			}
+		}
+		parameters.add(p);
+ 		query.append("?").append(p.getIndex());
 	}
 
 	@Override
@@ -160,22 +178,22 @@ public class ConditionParser implements ExpressionVisitor {
 
 	@Override
 	public void visit(Addition arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "+");
 	}
 
 	@Override
 	public void visit(Division arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "/");
 	}
 
 	@Override
 	public void visit(Multiplication arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "*");
 	}
 
 	@Override
 	public void visit(Subtraction arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "-");
 	}
 
 	@Override
@@ -194,78 +212,97 @@ public class ConditionParser implements ExpressionVisitor {
 
 	@Override
 	public void visit(Between expr) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "between");
 	}
 
 	@Override
 	public void visit(EqualsTo expr) {
+		context = ParseContext.EQUAL;
 		expr.getLeftExpression().accept(this);
 		query.append(":");
 		expr.getRightExpression().accept(this);
+		context = ParseContext.NONE;
 	}
 
 	@Override
 	public void visit(GreaterThan expr) {
+		context = ParseContext.GREATER_THAN;
 		expr.getLeftExpression().accept(this);
 		query.append(":{");
 		expr.getRightExpression().accept(this);
 		query.append(" TO *} ");
+		context = ParseContext.NONE;
 	}
 
 	@Override
 	public void visit(GreaterThanEquals expr) {
+		context = ParseContext.GREATER_THAN_EQUAL;
 		expr.getLeftExpression().accept(this);
 		query.append(":[");
 		expr.getRightExpression().accept(this);
 		query.append(" TO *] ");
+		context = ParseContext.NONE;
 	}
 
 	@Override
 	public void visit(InExpression expr) {
+		context = ParseContext.IN;
 		expr.getLeftExpression().accept(this);
 		query.append(":(");
-		ExpressionParser exprParser = new ExpressionParser();
-		expr.getItemsList().accept(exprParser);
-		for(SolrValue val : exprParser.getParameters()) {
-			if(val == null) {
-				query.append("{}");
+		ItemListParser itemListParser = new ItemListParser(parameters);
+		expr.getItemsList().accept(itemListParser);
+		parameters = itemListParser.getParameters();
+
+		for(Item item : itemListParser.getItemList()) {
+			if(item instanceof Parameter) {
+				query.append("?").append(((Parameter)item).getIndex());
 			} else {
-				query.append("\"" + val.getQueryString() + "\"");
+				query.append(item.getValue().getQueryString()).append(" ");
 			}
 		}
-		parameterSize += exprParser.getParameterSize();
 		query.append(") ");
+		context = ParseContext.NONE;
 	}
 
 	@Override
 	public void visit(IsNullExpression arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "is null");
 	}
 
 	@Override
 	public void visit(LikeExpression expr) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		context = ParseContext.LIKE;
+		expr.getLeftExpression().accept(this);
+		query.append(":");
+		likeEscapeChar = expr.getEscape();
+		expr.getRightExpression().accept(this);
+		likeEscapeChar = null;
+		context = ParseContext.NONE;
 	}
 
 	@Override
 	public void visit(MinorThan expr) {
+		context = ParseContext.MINOR_THAN;
 		expr.getLeftExpression().accept(this);
 		query.append(":{* TO ");
 		expr.getRightExpression().accept(this);
 		query.append("}");
+		context = ParseContext.NONE;
 	}
 
 	@Override
 	public void visit(MinorThanEquals expr) {
+		context = ParseContext.MINOR_THAN_EQUAL;
 		expr.getLeftExpression().accept(this);
 		query.append(":[* TO ");
 		expr.getRightExpression().accept(this);
 		query.append("]");
+		context = ParseContext.NONE;
 	}
 
 	@Override
 	public void visit(NotEqualsTo arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "!=");
 	}
 
 	@Override
@@ -279,27 +316,27 @@ public class ConditionParser implements ExpressionVisitor {
 
 	@Override
 	public void visit(CaseExpression arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "case");
 	}
 
 	@Override
 	public void visit(WhenClause arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "when");
 	}
 
 	@Override
 	public void visit(ExistsExpression arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "exists");
 	}
 
 	@Override
 	public void visit(AllComparisonExpression arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "all");
 	}
 
 	@Override
 	public void visit(AnyComparisonExpression arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "any");
 	}
 
 

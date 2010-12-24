@@ -24,13 +24,13 @@ import net.sf.jsqlparser.statement.select.Union;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.impl.ResultSetMetaDataImpl;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.parser.ConditionParser;
 import com.google.code.solr_jdbc.parser.SelectItemFinder;
-import com.google.code.solr_jdbc.value.SolrValue;
 
 
 public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsListVisitor{
@@ -42,17 +42,12 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 	private final DatabaseMetaDataImpl metaData;
 	private final List<String> selectColumns;
 	private ResultSetMetaDataImpl rsMetaData;
-	private int parameterSize;
 	private boolean hasGroupBy = false;
 
 	public SolrSelectVisitor(DatabaseMetaDataImpl metaData) {
 		this.selectColumns = new ArrayList<String>();
 		this.solrOptions = new HashMap<String, String>();
 		this.metaData = metaData;
-	}
-
-	public int getParameterSize() {
-		return parameterSize;
 	}
 
 	public String getTableName() {
@@ -70,7 +65,7 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 		return rsMetaData;
 	}
 
-	public String getQuery(SolrValue[] params) {
+	public String getQuery(List<Parameter> params) {
 		String queryString;
 		if(conditionParser == null) {
 			// select all records if there is no WHERE clause.
@@ -82,6 +77,12 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 		return queryString;
 	}
 
+	public List<Parameter> getParameters() {
+		if(conditionParser == null) {
+			return new ArrayList<Parameter>();
+		}
+		return conditionParser.getParameters();
+	}
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(PlainSelect plainSelect) {
@@ -129,9 +130,6 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 			solrOptions.put("start", "0");
 			solrOptions.put("rows", "10000");
 		}
-		
-		if(conditionParser != null)
-			parameterSize = conditionParser.getParameterSize();
 	}
 
 	private void parseGroupBy(List<Column> groupByColumns) {

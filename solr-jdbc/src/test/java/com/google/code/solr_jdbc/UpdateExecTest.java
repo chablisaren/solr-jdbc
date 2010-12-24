@@ -1,5 +1,6 @@
 package com.google.code.solr_jdbc;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -31,11 +32,29 @@ public class UpdateExecTest {
 
 	@Test
 	public void update() throws SQLException {
-		Statement stmt = conn.createStatement();
+		PreparedStatement stmt = conn.prepareStatement("UPDATE player SET player_name=?, position=? WHERE player_id = ?");
+		Statement assertStatement = null;
 		try {
+			stmt.setString(1, "小早川毅彦");
+			String[] position = {"一塁手"}; 
+			stmt.setObject(2, position);
+			stmt.setInt(3, 5);
+			stmt.executeUpdate();
 			
+			conn.commit();
+			
+			assertStatement = conn.createStatement();
+			ResultSet rs1 = assertStatement.executeQuery("SELECT * FROM player WHERE player_id=5");
+			assertTrue("1件だけ取得できる", rs1.next());
+			assertEquals("小早川毅彦", rs1.getString("player_name"));
+			Array array = rs1.getArray("position");
+			Object[] resultPosition = (Object[])array.getArray();
+			assertEquals("一塁手", resultPosition[0]);
 		} finally {
 			stmt.close();
+			if(assertStatement != null) {
+				assertStatement.close();
+			}
 		}
 	}
 	

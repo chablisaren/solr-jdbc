@@ -88,6 +88,16 @@ public class SelectQueryTest {
 	}
 
 	@Test
+	public void testLike() throws SQLException {
+		Object[][] expected = {{"衣笠祥雄"}};
+		Object[] params = {"衣笠%"};
+		verifyPreparedStatement(
+				"SELECT player_name FROM player WHERE player_name like ?",
+				params,
+				expected);
+	}
+
+	@Test
 	public void testStatementTableNotFound() {
 		try {
 			conn.prepareStatement("select * from prayer");
@@ -107,7 +117,8 @@ public class SelectQueryTest {
 		} catch (SQLException e) {
 			assertEquals("ColumnNotFound", ErrorCode.COLUMN_NOT_FOUND, e.getErrorCode());
 		} finally {
-			stmt.close();
+			if(stmt != null)
+				stmt.close();
 		}
 	}
 
@@ -127,7 +138,6 @@ public class SelectQueryTest {
 			stmt.close();
 		}
 	}
-	
 	
 	private void verifyStatement(String selectQuery, Object[][] expected) throws SQLException{
 		Statement stmt = null;
@@ -166,11 +176,13 @@ public class SelectQueryTest {
 				}
 				i+=1;
 			}
+			assertEquals("件数が正しい", expected.length, i);
 		} catch(SQLException e) {
 			e.printStackTrace();
 			fail("SQLException:" + e.getMessage());
 		} finally {
-			stmt.close();
+			if(stmt != null)
+				stmt.close();
 		}
 
 	}
@@ -186,6 +198,7 @@ public class SelectQueryTest {
 			try {
 				dropStmt.executeUpdate();
 			} catch(SQLException ignore) {
+				ignore.printStackTrace();
 			} finally {
 				dropStmt.close();
 			}

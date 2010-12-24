@@ -10,6 +10,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 
+import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
@@ -34,8 +35,15 @@ public class DeleteCommand extends Command {
 
 	@Override
 	public int executeUpdate() {
-		List<SolrValue> queryParams = parameters.subList(0, parameters.size());
-		SolrQuery query = new SolrQuery(conditionParser.getQuery(queryParams.toArray(new SolrValue[0])));
+		String queryString;
+		if(conditionParser == null) {
+			// select all records if there is no WHERE clause.
+			queryString = "id:@"+delStmt.getTable().getName()+".*";
+		} else {
+			queryString = conditionParser.getQuery(parameters);
+		}
+
+		SolrQuery query = new SolrQuery(queryString);
 		UpdateResponse response = null;
 		try {
 			 response = conn.getSolrServer().deleteByQuery(query.getQuery());
@@ -62,13 +70,14 @@ public class DeleteCommand extends Command {
 		} catch (SQLException e) {
 			throw DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error");
 		}
-		String tableName = delStmt.getTable().getName();
 
 		// Where句の解析
-		conditionParser = new ConditionParser((DatabaseMetaDataImpl)metaData);
-		conditionParser.setTableName(tableName);
-		delStmt.getWhere().accept(conditionParser);
-		initParameters(conditionParser.getParameterSize());
+		if(delStmt.getWhere() != null) {
+			conditionParser = new ConditionParser((DatabaseMetaDataImpl)metaData);
+			conditionParser.setTableName(delStmt.getTable().getName());
+			delStmt.getWhere().accept(conditionParser);
+			parameters = getParameters();
+		}
 	}
 
 }

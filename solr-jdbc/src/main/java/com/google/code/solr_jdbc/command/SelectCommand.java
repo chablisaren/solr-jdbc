@@ -10,6 +10,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
 import com.google.code.solr_jdbc.SolrSelectVisitor;
+import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.impl.DefaultResultSetImpl;
 import com.google.code.solr_jdbc.impl.FacetResultSetImpl;
@@ -36,12 +37,12 @@ public class SelectCommand extends Command {
 		DatabaseMetaDataImpl metaData= this.conn.getMetaDataImpl();
 		selectVisitor = new SolrSelectVisitor(metaData);
 		select.getSelectBody().accept(selectVisitor);
-		initParameters(selectVisitor.getParameterSize());
+		parameters = selectVisitor.getParameters();
 	}
 
 	@Override
 	public ResultSet executeQuery() {
-		SolrQuery query = new SolrQuery(selectVisitor.getQuery(parameters.toArray(new SolrValue[0])));
+		SolrQuery query = new SolrQuery(selectVisitor.getQuery(parameters));
 		Map<String,String> options = selectVisitor.getSolrOptions();
 		for(Map.Entry<String, String> entry:options.entrySet()) {
 			query.set(entry.getKey(), entry.getValue());

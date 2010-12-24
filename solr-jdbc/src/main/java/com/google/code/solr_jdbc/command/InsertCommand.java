@@ -11,18 +11,17 @@ import net.sf.jsqlparser.statement.insert.Insert;
 import org.apache.solr.common.SolrInputDocument;
 
 import com.google.code.solr_jdbc.SolrColumn;
+import com.google.code.solr_jdbc.expression.Item;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
-import com.google.code.solr_jdbc.parser.ExpressionParser;
+import com.google.code.solr_jdbc.parser.ItemListParser;
 import com.google.code.solr_jdbc.util.SolrDocumentUtil;
-import com.google.code.solr_jdbc.value.SolrValue;
-
 
 public class InsertCommand extends Command {
 
 	private final Insert insStmt;
-	private ExpressionParser expressionParser;
+	private List<Item> itemList;
 
 	public InsertCommand(Insert stmt) {
 		this.insStmt = stmt;
@@ -32,12 +31,13 @@ public class InsertCommand extends Command {
 	public boolean isQuery() {
 		return false;
 	}
-	
+
 	@Override
 	public void parse() {
-		expressionParser = new ExpressionParser();
-		insStmt.getItemsList().accept(expressionParser);
-		initParameters(expressionParser.getParameterSize());
+		ItemListParser itemListParser = new ItemListParser();
+		insStmt.getItemsList().accept(itemListParser);
+		parameters = itemListParser.getParameters();
+		itemList = itemListParser.getItemList();
 	}
 
 	@Override
@@ -50,49 +50,41 @@ public class InsertCommand extends Command {
 		DatabaseMetaDataImpl metaData = this.conn.getMetaDataImpl();
 		String tableName = insStmt.getTable().getName();
 		List<SolrColumn> columns = metaData.getSolrColumns(tableName);
-		if(columns == null)
+		if (columns == null)
 			throw DbException.get(ErrorCode.TABLE_OR_VIEW_NOT_FOUND, tableName);
-		
+
 		if (insStmt.getColumns() != null) {
 			columns = new ArrayList<SolrColumn>();
-			for(Column column : (List<Column>)insStmt.getColumns()) {
-				SolrColumn solrColumn = metaData.getSolrColumn(tableName, column.getColumnName());
-				if(solrColumn == null)
-					throw DbException.get(ErrorCode.COLUMN_NOT_FOUND, column.getColumnName());
+			for (Column column : (List<Column>) insStmt.getColumns()) {
+				SolrColumn solrColumn = metaData.getSolrColumn(tableName,
+						column.getColumnName());
+				if (solrColumn == null)
+					throw DbException.get(ErrorCode.COLUMN_NOT_FOUND, column
+							.getColumnName());
 				columns.add(solrColumn);
 			}
 		}
 
-		List<SolrValue> insParams = expressionParser.getParameters();
-
-		if (columns.size() != insParams.size()) {
+		if (columns.size() != parameters.size()) {
 			throw DbException.get(ErrorCode.COLUMN_COUNT_DOES_NOT_MATCH);
 		}
 
-		bind(insParams);
-
 		SolrInputDocument doc = new SolrInputDocument();
-		for(int i=0; i<columns.size(); i++) {
-			SolrDocumentUtil.setValue(doc, columns.get(i).getSolrColumnName(), insParams.get(i));
+		for (int i = 0; i < columns.size(); i++) {
+			Item item = itemList.get(i);
+			SolrDocumentUtil.setValue(doc, columns.get(i).getSolrColumnName(),
+					item.getValue());
 		}
-		doc.setField("id", "@"+tableName+"."+UUID.randomUUID().toString());
+		doc
+				.setField("id", "@" + tableName + "."
+						+ UUID.randomUUID().toString());
 		try {
 			conn.getSolrServer().add(doc);
 		} catch (Exception e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error");
+			throw DbException.get(ErrorCode.GENERAL_ERROR, e,
+					"Solr Server Error");
 		}
 
 		return doc.size();
 	}
-
-	private void bind(List<SolrValue> params) {
-		int bindParamsIndex = 0;
-		List<SolrValue> bindParams = getParameters();
-		for(int i=0; i<params.size(); i++) {
-			if(params.get(i) == null) {
-				params.set(i, bindParams.get(bindParamsIndex++));
-			}
-		}
-	}
-
 }
