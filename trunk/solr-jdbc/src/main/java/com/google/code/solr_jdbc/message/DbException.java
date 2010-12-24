@@ -88,7 +88,7 @@ public class DbException extends RuntimeException {
         return get(ErrorCode.EXCEPTION_IN_FUNCTION, t, message);
     }
 
-	public static Exception getInvalidValueException(String value, String param) {
+	public static DbException getInvalidValueException(String value, String param) {
 		return get(ErrorCode.INVALID_VALUE, value, param);
 	}
 

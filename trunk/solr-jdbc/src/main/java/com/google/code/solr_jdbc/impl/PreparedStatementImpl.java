@@ -28,6 +28,7 @@ import java.util.List;
 
 import com.google.code.solr_jdbc.command.Command;
 import com.google.code.solr_jdbc.command.CommandFactory;
+import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.value.DataType;
@@ -70,7 +71,7 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 	@Override
 	public void addBatch() throws SQLException {
 		checkClosed();
-		List<SolrValue> parameters = command.getParameters();
+		List<Parameter> parameters = command.getParameters();
 		if (batchParameters == null) {
 			batchParameters = new ArrayList<SolrValue[]>();
 		}
@@ -79,7 +80,7 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 
 	@Override
 	public void clearParameters() throws SQLException {
-		List<SolrValue> parameters = command.getParameters();
+		List<Parameter> parameters = command.getParameters();
 		for(int i=0; i<parameters.size(); i++) {
 			parameters.set(i, null);
 		}
@@ -445,9 +446,10 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 		int[] result = new int[batchParameters.size()];
 		for (int i=0; i < batchParameters.size(); i++) {
 			SolrValue[] set = batchParameters.get(i);
-			List<SolrValue> parameters = command.getParameters();
+			List<Parameter> parameters = command.getParameters();
 			for (int j=0; j < set.length; j++) {
-				parameters.set(j, set[j]);
+				Parameter param = parameters.get(j);
+				param.setValue(set[j]);
 			}
 			result[i] = executeUpdate();
 		}
@@ -456,34 +458,38 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 
 	@Override
 	public ResultSet executeQuery(String arg0) throws SQLException {
-		throw new SQLFeatureNotSupportedException();
+		throw DbException.get(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT);
 	}
 
 	@Override
 	public int executeUpdate(String arg0) throws SQLException {
-		throw new SQLFeatureNotSupportedException();
+		throw DbException.get(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT);
 	}
 
 	@Override
 	public int executeUpdate(String arg0, int arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException();
+		throw DbException.get(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT);
 	}
 
 	@Override
 	public int executeUpdate(String arg0, int[] arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException();
+		throw DbException.get(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT);
 	}
 
 	@Override
 	public int executeUpdate(String arg0, String[] arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException();
+		throw DbException.get(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT);
 	}
 
 	private void setParameter(int parameterIndex, SolrValue value) throws SQLException {
 		checkClosed();
 		parameterIndex--;
-		List<SolrValue> parameters = command.getParameters();
-		parameters.set(parameterIndex, value);
+		List<Parameter> parameters = command.getParameters();
+		if(parameterIndex < 0 || parameterIndex >= parameters.size()) {
+			throw DbException.getInvalidValueException("parameterIndex", String.valueOf(parameterIndex+1));
+		}
+		Parameter param = parameters.get(parameterIndex);
+		param.setValue(value);
 	}
 
 }

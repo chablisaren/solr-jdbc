@@ -1,8 +1,6 @@
 package com.google.code.solr_jdbc.command;
 
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,24 +19,27 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 
 import com.google.code.solr_jdbc.SolrColumn;
+import com.google.code.solr_jdbc.expression.Item;
+import com.google.code.solr_jdbc.expression.Literal;
+import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.parser.ConditionParser;
 import com.google.code.solr_jdbc.parser.ExpressionParser;
 import com.google.code.solr_jdbc.util.SolrDocumentUtil;
-import com.google.code.solr_jdbc.value.SolrValue;
 
 
 public class UpdateCommand extends Command {
 	private final Update updStmt;
-	private ExpressionParser expressionParser;
 	private ConditionParser conditionParser;
+	private List<Item> setItemList;
 
 	/** UPDATE文でSET句で指定されているカラム */
 	private final Map<String, Integer> solrColumnNames;
 
 	public UpdateCommand(Update stmt) {
+		this.parameters = new ArrayList<Parameter>();
 		this.updStmt = stmt;
 		solrColumnNames = new HashMap<String, Integer>();
 	}
@@ -58,21 +59,17 @@ public class UpdateCommand extends Command {
 	 */
 	@Override
 	public int executeUpdate() {
-		List<SolrValue> queryParams = parameters.subList(expressionParser.getParameterSize(), parameters.size());
-		SolrQuery query = new SolrQuery(conditionParser.getQuery(queryParams.toArray(new SolrValue[0])));
+		SolrQuery query = new SolrQuery(conditionParser.getQuery(parameters));
 		QueryResponse response = null;
 		try {
 			response = conn.getSolrServer().query(query);
 		} catch (SolrServerException e) {
-			throw DbException.get(ErrorCode.IO_EXCEPTION, e);
+			throw DbException.get(ErrorCode.IO_EXCEPTION, e, e.getMessage());
 		}
 		// 対象件数が0件の場合は更新を行わずに0を返す
 		if (response.getResults().getNumFound() == 0) {
 			return 0;
 		}
-
-		List<SolrValue> updParams = expressionParser.getParameters();
-		bind(updParams);
 
 		SolrDocumentList docList = response.getResults();
 		List<SolrInputDocument> inDocs = new ArrayList<SolrInputDocument>();
@@ -85,7 +82,7 @@ public class UpdateCommand extends Command {
 			for(String fieldName : doc.getFieldNames()) {
 				// UPDATEのSET句に含まれるカラムは、その値をセットする
 				if (solrColumnNames.containsKey(fieldName)) {
-					SolrDocumentUtil.setValue(inDoc, fieldName, updParams.get(columnIndex++));
+					SolrDocumentUtil.setValue(inDoc, fieldName, setItemList.get(columnIndex++).getValue());
 				}
 				// そうでない場合は、SELECTしてきた値をそのままセットする
 				else {
@@ -112,34 +109,31 @@ public class UpdateCommand extends Command {
 		if(metaData.getSolrColumns(tableName) == null)
 			throw DbException.get(ErrorCode.TABLE_OR_VIEW_NOT_FOUND, tableName);
 
+		// SET句の解析
+		setItemList = new ArrayList<Item>();
+		ExpressionParser expressionParser = new ExpressionParser();
+		for(Expression expr : (List<Expression>)updStmt.getExpressions()) {
+			expr.accept(expressionParser);
+			if (expressionParser.isParameter()) {
+				Parameter p = new Parameter(parameters.size());
+				parameters.add(p);
+				setItemList.add(p);
+			} else {
+				setItemList.add(new Literal(expressionParser.getValue()));
+			}
+			
+		}
+
 		// Where句の解析
-		conditionParser = new ConditionParser((DatabaseMetaDataImpl)metaData);
+		conditionParser = new ConditionParser((DatabaseMetaDataImpl)metaData, parameters);
 		conditionParser.setTableName(tableName);
 		updStmt.getWhere().accept(conditionParser);
+		parameters = conditionParser.getParameters();
 
 		for(Column column : (List<Column>)updStmt.getColumns()) {
 			SolrColumn solrColumn =((DatabaseMetaDataImpl)metaData).getSolrColumn(tableName, column.getColumnName());
 			solrColumnNames.put(solrColumn.getSolrColumnName(), 1);
 		}
 
-		// SET句の解析
-		expressionParser = new ExpressionParser();
-		for(Expression expr : (List<Expression>)updStmt.getExpressions()) {
-			expr.accept(expressionParser);
-		}
-
-		initParameters(conditionParser.getParameterSize() +
-				expressionParser.getParameterSize());
 	}
-
-	private void bind(List<SolrValue> params) {
-		int bindParamsIndex = 0;
-		List<SolrValue> bindParams = getParameters();
-		for(int i=0; i<params.size(); i++) {
-			if(params.get(i) == null) {
-				params.set(i, bindParams.get(bindParamsIndex++));
-			}
-		}
-	}
-
 }
