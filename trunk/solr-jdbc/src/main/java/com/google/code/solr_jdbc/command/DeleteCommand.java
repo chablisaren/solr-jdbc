@@ -4,21 +4,17 @@ import java.io.IOException;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+
+import net.sf.jsqlparser.statement.delete.Delete;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.client.solrj.response.QueryResponse;
 
-import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.parser.ConditionParser;
-import com.google.code.solr_jdbc.value.SolrValue;
-
-
-import net.sf.jsqlparser.statement.delete.Delete;
 
 public class DeleteCommand extends Command {
 	private final Delete delStmt;
@@ -36,6 +32,7 @@ public class DeleteCommand extends Command {
 	@Override
 	public int executeUpdate() {
 		String queryString;
+		long num = 0;
 		if(conditionParser == null) {
 			// select all records if there is no WHERE clause.
 			queryString = "id:@"+delStmt.getTable().getName()+".*";
@@ -44,16 +41,25 @@ public class DeleteCommand extends Command {
 		}
 
 		SolrQuery query = new SolrQuery(queryString);
-		UpdateResponse response = null;
+
 		try {
-			 response = conn.getSolrServer().deleteByQuery(query.getQuery());
+			// We don't need to fetch rows.
+			query.set("rows", "0");
+			QueryResponse response = conn.getSolrServer().query(query);
+			num = response.getResults().getNumFound();
 		} catch (SolrServerException e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error");
-		} catch (IOException e) {
-			throw DbException.get(ErrorCode.IO_EXCEPTION, e);
+			throw DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error:"+e.getMessage());
 		}
-		// TODO 更新件数を返す
-		return 0;
+
+		try {
+			conn.getSolrServer().deleteByQuery(query.getQuery());
+		} catch (SolrServerException e) {
+			throw DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error:"+e.getMessage());
+		} catch (IOException e) {
+			throw DbException.get(ErrorCode.IO_EXCEPTION, e, e.getMessage());
+		}
+
+		return (int)num;
 	}
 
 	@Override
@@ -68,7 +74,7 @@ public class DeleteCommand extends Command {
 		try {
 			metaData= this.conn.getMetaData();
 		} catch (SQLException e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error");
+			throw DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error:"+e.getMessage());
 		}
 
 		// Where句の解析

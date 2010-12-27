@@ -255,19 +255,19 @@ public abstract class SolrConnection implements Connection {
 
 	@Override
 	public CallableStatement prepareCall(String sql) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "prepareCall");
 	}
 
 	@Override
 	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency)
 			throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "prepareCall");
 	}
 
 	@Override
 	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
 			int resultSetHoldability) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "prepareCall");
 	}
 
 	@Override
