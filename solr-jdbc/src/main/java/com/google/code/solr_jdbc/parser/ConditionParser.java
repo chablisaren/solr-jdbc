@@ -58,10 +58,11 @@ public class ConditionParser implements ExpressionVisitor {
 
 	private final StringBuilder query;
 	private List<Parameter> parameters;
-	private ParseContext context = ParseContext.NONE;
 	private String tableName;
 	private final DatabaseMetaDataImpl metaData;
 	private String likeEscapeChar;
+	private ParseContext context = ParseContext.NONE;
+	private SolrColumn currentColumn = null;
 
 	public ConditionParser(DatabaseMetaDataImpl metaData) {
 		this.metaData = metaData;
@@ -133,6 +134,7 @@ public class ConditionParser implements ExpressionVisitor {
 				p.setLikeEscapeChar(likeEscapeChar);
 			}
 		}
+		p.setColumn(currentColumn);
 		parameters.add(p);
  		query.append("?").append(p.getIndex());
 	}
@@ -222,6 +224,7 @@ public class ConditionParser implements ExpressionVisitor {
 		query.append(":");
 		expr.getRightExpression().accept(this);
 		context = ParseContext.NONE;
+		currentColumn = null;
 	}
 
 	@Override
@@ -232,6 +235,7 @@ public class ConditionParser implements ExpressionVisitor {
 		expr.getRightExpression().accept(this);
 		query.append(" TO *} ");
 		context = ParseContext.NONE;
+		currentColumn = null;
 	}
 
 	@Override
@@ -242,6 +246,7 @@ public class ConditionParser implements ExpressionVisitor {
 		expr.getRightExpression().accept(this);
 		query.append(" TO *] ");
 		context = ParseContext.NONE;
+		currentColumn = null;
 	}
 
 	@Override
@@ -262,6 +267,7 @@ public class ConditionParser implements ExpressionVisitor {
 		}
 		query.append(") ");
 		context = ParseContext.NONE;
+		currentColumn = null;
 	}
 
 	@Override
@@ -278,6 +284,7 @@ public class ConditionParser implements ExpressionVisitor {
 		expr.getRightExpression().accept(this);
 		likeEscapeChar = null;
 		context = ParseContext.NONE;
+		currentColumn = null;
 	}
 
 	@Override
@@ -288,6 +295,7 @@ public class ConditionParser implements ExpressionVisitor {
 		expr.getRightExpression().accept(this);
 		query.append("}");
 		context = ParseContext.NONE;
+		currentColumn = null;
 	}
 
 	@Override
@@ -298,6 +306,7 @@ public class ConditionParser implements ExpressionVisitor {
 		expr.getRightExpression().accept(this);
 		query.append("]");
 		context = ParseContext.NONE;
+		currentColumn = null;
 	}
 
 	@Override
@@ -312,6 +321,7 @@ public class ConditionParser implements ExpressionVisitor {
 			throw DbException.get(ErrorCode.COLUMN_NOT_FOUND, column.getColumnName());
 		}
 		query.append(solrColumn.getSolrColumnName());
+		currentColumn = solrColumn;
 	}
 
 	@Override

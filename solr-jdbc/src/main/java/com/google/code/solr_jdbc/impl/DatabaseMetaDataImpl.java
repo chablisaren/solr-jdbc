@@ -119,39 +119,33 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	@Override
 	public ResultSet getBestRowIdentifier(String s, String s1, String s2,
 			int i, boolean flag) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBestRowIdentifier");
 	}
 
 	@Override
 	public String getCatalogSeparator() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getCatalogSeparator");
 	}
 
 	@Override
 	public String getCatalogTerm() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getCatalogTerm");
 	}
 
 	@Override
 	public ResultSet getCatalogs() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getCatalogs");
 	}
 
 	@Override
 	public ResultSet getClientInfoProperties() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getClientInfoProperties");
 	}
 
 	@Override
 	public ResultSet getColumnPrivileges(String s, String s1, String s2,
 			String s3) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getColumnPrivileges");
 	}
 
 	@Override
@@ -196,32 +190,28 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	@Override
 	public ResultSet getCrossReference(String s, String s1, String s2,
 			String s3, String s4, String s5) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getDatabaseMajorVersion() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getDatabaseMinorVersion() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getCrossReference");
 	}
 
 	@Override
 	public String getDatabaseProductName() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return "solr";
 	}
 
 	@Override
+	public int getDatabaseMajorVersion() throws SQLException {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getDatabaseMajorVersion");
+	}
+
+	@Override
+	public int getDatabaseMinorVersion() throws SQLException {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getDatabaseMinorVersion");
+	}
+
+
+	@Override
 	public String getDatabaseProductVersion() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getDatabaseProductVersion");
 	}
 
 	@Override
@@ -232,59 +222,50 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public int getDriverMajorVersion() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public int getDriverMinorVersion() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 1;
 	}
 
 	@Override
 	public String getDriverName() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return "solr-jdbc";
 	}
 
 	@Override
 	public String getDriverVersion() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return "0.1.0";
 	}
 
 	@Override
 	public ResultSet getExportedKeys(String s, String s1, String s2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getExportedKeys");
 	}
 
 	@Override
 	public String getExtraNameCharacters() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getExtraNameCharacters");
 	}
 
 	@Override
 	public ResultSet getFunctionColumns(String s, String s1, String s2,
 			String s3) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getFunctionColumns");
 	}
 
 	@Override
 	public ResultSet getFunctions(String s, String s1, String s2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getFunctions");
 	}
 
 	@Override
 	public String getIdentifierQuoteString() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getFunctionColumns");
 	}
 
 	@Override
@@ -315,104 +296,91 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public int getJDBCMajorVersion() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return 2;
 	}
 
 	@Override
 	public int getJDBCMinorVersion() throws SQLException {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public int getMaxBinaryLiteralLength() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getMaxBinaryLiteralLength");
 	}
 
 	@Override
 	public int getMaxCatalogNameLength() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getMaxCatalogNameLength");
 	}
 
 	@Override
 	public int getMaxCharLiteralLength() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getMaxCharLiteralLength");
 	}
 
 	@Override
 	public int getMaxColumnNameLength() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getMaxColumnNameLength");
 	}
 
+	/**
+	 * SolrのFacetの仕様のため、1を返す.
+	 * 
+	 */
 	@Override
 	public int getMaxColumnsInGroupBy() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return 1;
 	}
 
 	@Override
 	public int getMaxColumnsInIndex() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return 255;
 	}
 
 	@Override
 	public int getMaxColumnsInOrderBy() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return 255;
 	}
 
 	@Override
 	public int getMaxColumnsInSelect() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return 255;
 	}
 
 	@Override
 	public int getMaxColumnsInTable() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return 255;
 	}
 
 	@Override
 	public int getMaxConnections() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return 255;
 	}
 
 	@Override
 	public int getMaxCursorNameLength() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getMaxCursorNameLength");
 	}
 
 	@Override
 	public int getMaxIndexLength() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getMaxIndexLength");
 	}
 
 	@Override
 	public int getMaxProcedureNameLength() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getMaxProcedureNameLength");
 	}
 
 	@Override
 	public int getMaxRowSize() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return 0; // No limitation
 	}
 
 	@Override
 	public int getMaxSchemaNameLength() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return 0; // No limitation
 	}
 
 	@Override
@@ -441,14 +409,12 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public int getMaxUserNameLength() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return 0; // No limitation
 	}
 
 	@Override
 	public String getNumericFunctions() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getNumericFunctions");
 	}
 
 	@Override
@@ -478,108 +444,96 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	@Override
 	public ResultSet getProcedureColumns(String s, String s1, String s2,
 			String s3) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getProcedureColumns");
 	}
 
 	@Override
 	public String getProcedureTerm() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getProcedureTerm");
 	}
 
 	@Override
 	public ResultSet getProcedures(String s, String s1, String s2)
-			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throws SQLException {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getProcedureTerm");
 	}
 
 	@Override
 	public int getResultSetHoldability() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ResultSet.HOLD_CURSORS_OVER_COMMIT;
 	}
 
 	@Override
 	public RowIdLifetime getRowIdLifetime() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return RowIdLifetime.ROWID_UNSUPPORTED;
 	}
 
 	@Override
 	public String getSQLKeywords() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getSQLKeywords");
 	}
 
 	@Override
 	public int getSQLStateType() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return sqlStateXOpen;
 	}
 
 	@Override
 	public String getSchemaTerm() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return "schema";
 	}
 
 	@Override
 	public ResultSet getSchemas() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getSchemas");
 	}
 
 	@Override
 	public ResultSet getSchemas(String s, String s1) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getSchemas");
 	}
 
 	@Override
 	public String getSearchStringEscape() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return "%";
 	}
 
 	@Override
 	public String getStringFunctions() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getStringFunctions");
 	}
 
 	@Override
 	public ResultSet getSuperTables(String s, String s1, String s2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getSuperTables");
 	}
 
 	@Override
 	public ResultSet getSuperTypes(String s, String s1, String s2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getSuperTypes");
 	}
 
 	@Override
 	public String getSystemFunctions() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getSystemFunctions");
 	}
 
 	@Override
 	public ResultSet getTablePrivileges(String s, String s1, String s2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getTablePrivileges");
 	}
 
 	@Override
 	public ResultSet getTableTypes() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		String[] columns = {"TABLE_TYPE"};
+		CollectionResultSet rs = new CollectionResultSet();
+		rs.setColumns(Arrays.asList(columns));
+		Object[] record = {"TABLE"}; 
+		rs.add(Arrays.asList(record));
+		return rs;
 	}
 
 	@Override
@@ -607,40 +561,34 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public String getTimeDateFunctions() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return "";
 	}
 
 	@Override
 	public ResultSet getTypeInfo() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getTypeInfo");
 	}
 
 	@Override
 	public ResultSet getUDTs(String s, String s1, String s2, int[] ai)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getUDTs");
 	}
 
 	@Override
 	public String getURL() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getURL");
 	}
 
 	@Override
 	public String getUserName() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getUserName");
 	}
 
 	@Override
 	public ResultSet getVersionColumns(String s, String s1, String s2)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getVersionColumns");
 	}
 
 	@Override

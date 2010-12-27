@@ -9,19 +9,17 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
-import com.google.code.solr_jdbc.SolrSelectVisitor;
-import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.impl.DefaultResultSetImpl;
 import com.google.code.solr_jdbc.impl.FacetResultSetImpl;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
-import com.google.code.solr_jdbc.value.SolrValue;
+import com.google.code.solr_jdbc.parser.SelectParser;
 
 
 public class SelectCommand extends Command {
 	private final Select select;
-	private SolrSelectVisitor selectVisitor;
+	private SelectParser selectParser;
 
 	public SelectCommand(Select statement) {
 		this.select = statement;
@@ -35,15 +33,15 @@ public class SelectCommand extends Command {
 	@Override
 	public void parse() {
 		DatabaseMetaDataImpl metaData= this.conn.getMetaDataImpl();
-		selectVisitor = new SolrSelectVisitor(metaData);
-		select.getSelectBody().accept(selectVisitor);
-		parameters = selectVisitor.getParameters();
+		selectParser = new SelectParser(metaData);
+		select.getSelectBody().accept(selectParser);
+		parameters = selectParser.getParameters();
 	}
 
 	@Override
 	public ResultSet executeQuery() {
-		SolrQuery query = new SolrQuery(selectVisitor.getQuery(parameters));
-		Map<String,String> options = selectVisitor.getSolrOptions();
+		SolrQuery query = new SolrQuery(selectParser.getQuery(parameters));
+		Map<String,String> options = selectParser.getSolrOptions();
 		for(Map.Entry<String, String> entry:options.entrySet()) {
 			query.set(entry.getKey(), entry.getValue());
 		}
@@ -51,13 +49,14 @@ public class SelectCommand extends Command {
 		QueryResponse response;
 		try {
 			response = conn.getSolrServer().query(query);
-			if(selectVisitor.hasGroupBy()) {
-				rs = new FacetResultSetImpl(response, selectVisitor.getResultSetMetaData());
+			if(selectParser.hasGroupBy()) {
+				rs = new FacetResultSetImpl(response, selectParser.getResultSetMetaData());
 			} else {
-				rs = new DefaultResultSetImpl(response.getResults(), selectVisitor.getResultSetMetaData());
+				rs = new DefaultResultSetImpl(response.getResults(), selectParser.getResultSetMetaData());
 			}
 		} catch (SolrServerException e) {
-			DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error");
+			throw DbException.get(ErrorCode.GENERAL_ERROR, e,
+					"Solr Server Error:" + e.getMessage());
 		}
 
 		return rs;

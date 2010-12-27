@@ -96,6 +96,24 @@ public class SelectQueryTest {
 				params,
 				expected);
 	}
+	
+	@Test
+	public void testLikeForText() throws SQLException {
+		Object[][] expected = {{"高橋慶彦"}};
+		Object[] params = {"%三拍子%"};
+		verifyPreparedStatement(
+				"SELECT player_name FROM player WHERE comment like ?",
+				params,
+				expected);
+	}
+	
+	@Test
+	public void testBoolean() throws SQLException {
+		Object[][] expected = {{"山本浩二"}, {"ランディーバース"}};
+		Object[] params = {true};
+		verifyPreparedStatement("SELECT player_name FROM player WHERE was_homerun_king=?",
+				params, expected);
+	}
 
 	@Test
 	public void testStatementTableNotFound() {
@@ -204,48 +222,61 @@ public class SelectQueryTest {
 			}
 	
 			PreparedStatement stmt = setUpConn.prepareStatement(
-					"CREATE TABLE player (player_id number, team varchar(10), player_name varchar(50), position varchar(10) ARRAY, registered_at DATE)");
+					"CREATE TABLE player (player_id number, team varchar(10), "
+					+ " player_name varchar(50), position varchar(10) ARRAY, "
+					+ " was_homerun_king boolean, comment TEXT,"
+					+ " registered_at DATE)");
 			try {
 				stmt.executeUpdate();
 			} finally {
 				stmt.close();
 			}
 	
-			PreparedStatement insStmt = setUpConn.prepareStatement("INSERT INTO player Values (?,?,?,?,?)");
+			PreparedStatement insStmt = setUpConn.prepareStatement("INSERT INTO player Values (?,?,?,?,?,?,?)");
 			try {
 				insStmt.setInt(1, 1);
 				insStmt.setString(2, "カープ");
 				insStmt.setString(3, "高橋慶彦");
 				insStmt.setObject(4, new String[]{"遊撃手"});
-				insStmt.setDate(5, new Date(System.currentTimeMillis()));
+				insStmt.setBoolean(5, false);
+				insStmt.setString(6, "走攻守の三拍子そろった切込隊長");
+				insStmt.setDate(7, new Date(System.currentTimeMillis()));
 				insStmt.executeUpdate();
 		
 				insStmt.setInt(1, 2);
 				insStmt.setString(2, "カープ");
 				insStmt.setString(3, "山崎隆造");
 				insStmt.setObject(4, new String[]{"遊撃手","二塁手"});
-				insStmt.setDate(5, new Date(System.currentTimeMillis()));
+				insStmt.setBoolean(5, false);
+				insStmt.setString(6, "ベストナイン3回、ゴールデングラブ賞4回");
+				insStmt.setDate(7, new Date(System.currentTimeMillis()));
 				insStmt.executeUpdate();
 		
 				insStmt.setInt(1, 3);
 				insStmt.setString(2, "カープ");
 				insStmt.setString(3, "衣笠祥雄");
 				insStmt.setObject(4, new String[]{"一塁手","三塁手"});
-				insStmt.setDate(5, new Date(System.currentTimeMillis()));
+				insStmt.setBoolean(5, false);
+				insStmt.setString(6, "鉄人。国民栄誉賞");
+				insStmt.setDate(7, new Date(System.currentTimeMillis()));
 				insStmt.executeUpdate();
 		
 				insStmt.setInt(1, 4);
 				insStmt.setString(2, "カープ");
 				insStmt.setString(3, "山本浩二");
 				insStmt.setObject(4, new String[]{"外野手"});
-				insStmt.setDate(5, new Date(System.currentTimeMillis()));
+				insStmt.setBoolean(5, true);
+				insStmt.setString(6, "ミスター赤ヘル");
+				insStmt.setDate(7, new Date(System.currentTimeMillis()));
 				insStmt.executeUpdate();
 		
 				insStmt.setInt(1, 5);
 				insStmt.setString(2, "阪神");
 				insStmt.setString(3, "ランディーバース");
 				insStmt.setObject(4, new String[]{"一塁手","外野手"});
-				insStmt.setDate(5, new Date(System.currentTimeMillis()));
+				insStmt.setBoolean(5, true);
+				insStmt.setString(6, "三冠王");
+				insStmt.setDate(7, new Date(System.currentTimeMillis()));
 				insStmt.executeUpdate();
 			} finally {
 				insStmt.close();

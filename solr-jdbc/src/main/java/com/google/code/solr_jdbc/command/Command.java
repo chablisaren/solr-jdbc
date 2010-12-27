@@ -1,12 +1,10 @@
 package com.google.code.solr_jdbc.command;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.impl.SolrConnection;
-import com.google.code.solr_jdbc.value.SolrValue;
 
 
 public abstract class Command {

@@ -102,6 +102,7 @@ public class UpdateCommand extends Command {
 		return inDocs.size();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void parse() {
 		DatabaseMetaDataImpl metaData= this.conn.getMetaDataImpl();

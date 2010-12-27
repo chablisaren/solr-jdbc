@@ -26,6 +26,9 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.google.code.solr_jdbc.message.DbException;
+import com.google.code.solr_jdbc.message.ErrorCode;
+
 public class CollectionResultSet implements ResultSet{
 	private int recordIndex;
 	private final List<List<Object>> data;
@@ -961,78 +964,66 @@ public class CollectionResultSet implements ResultSet{
 
 	@Override
 	public void updateDouble(int i, double d) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateDouble");
 	}
 
 	@Override
 	public void updateDouble(String s, double d) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateDouble");
 	}
 
 	@Override
 	public void updateFloat(int i, float f) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateFloat");
 	}
 
 	@Override
 	public void updateFloat(String s, float f) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateFloat");
 	}
 
 	@Override
 	public void updateInt(int i, int j) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateInt");
 	}
 
 	@Override
 	public void updateInt(String s, int i) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateInt");
 	}
 
 	@Override
 	public void updateLong(int i, long l) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateLong");
 	}
 
 	@Override
 	public void updateLong(String s, long l) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateLong");
 	}
 
 	@Override
 	public void updateNCharacterStream(int i, Reader reader)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateNCharacterStream");
 	}
 
 	@Override
 	public void updateNCharacterStream(String s, Reader reader)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateNCharacterStream");
 	}
 
 	@Override
 	public void updateNCharacterStream(int i, Reader reader, long l)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateNCharacterStream");
 	}
 
 	@Override
 	public void updateNCharacterStream(String s, Reader reader, long l)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateNCharacterStream");
 	}
 
 	@Override

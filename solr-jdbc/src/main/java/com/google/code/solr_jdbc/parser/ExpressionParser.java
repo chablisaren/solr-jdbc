@@ -117,26 +117,22 @@ public class ExpressionParser implements ExpressionVisitor {
 
 	@Override
 	public void visit(Addition arg0) {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "+");
 	}
 
 	@Override
 	public void visit(Division arg0) {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "/");
 	}
 
 	@Override
 	public void visit(Multiplication arg0) {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "*");
 	}
 
 	@Override
 	public void visit(Subtraction arg0) {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "-");
 	}
 
 	@Override

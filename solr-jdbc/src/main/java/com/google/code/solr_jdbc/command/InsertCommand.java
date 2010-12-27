@@ -45,6 +45,7 @@ public class InsertCommand extends Command {
 		throw DbException.get(ErrorCode.METHOD_ONLY_ALLOWED_FOR_QUERY);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public int executeUpdate() {
 		DatabaseMetaDataImpl metaData = this.conn.getMetaDataImpl();
