@@ -38,6 +38,8 @@ public abstract class AbstractResultSet implements ResultSet {
 	protected int docIndex = -1;
 	protected ResultSetMetaDataImpl metaData;
 	protected boolean isClosed = false;
+	protected StatementImpl statement;
+	private boolean wasNull;
 
 	@Override
 	public boolean absolute(int i) throws SQLException {
@@ -79,7 +81,7 @@ public abstract class AbstractResultSet implements ResultSet {
 
 	@Override
 	public void deleteRow() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "deleteRow");
 	}
 
 	@Override
@@ -93,6 +95,69 @@ public abstract class AbstractResultSet implements ResultSet {
 		checkClosed();
 		docIndex = 0;
 		return true;
+	}
+
+	@Override
+	public boolean last() throws SQLException {
+		// TODO TYPE_FORWARD_ONLYのときはSQLExceptionをだす
+		docIndex = docList.size() - 1;
+		return true;
+	}
+
+	@Override
+	public boolean next() throws SQLException {
+		checkClosed();
+	
+		docIndex +=1;
+		if (docIndex >= docList.size()) {
+			docIndex = docList.size();
+			return false;
+		}
+	
+		return true;
+	}
+
+	@Override
+	public boolean previous() throws SQLException {
+		// TODO スクロールが不可能な場合はSQLException
+		checkClosed();
+		
+		docIndex -= 1;
+		if (docIndex < 0) {
+			docIndex = 0;
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean isAfterLast() throws SQLException {
+		return (docIndex >= docList.size());
+	}
+
+	@Override
+	public boolean isBeforeFirst() throws SQLException {
+		return (docIndex < 0);
+	}
+
+	@Override
+	public boolean isClosed() throws SQLException {
+		return isClosed;
+	}
+
+	@Override
+	public boolean isFirst() throws SQLException {
+		return docIndex == 0;
+	}
+
+	@Override
+	public boolean isLast() throws SQLException {
+		return docIndex == docList.size() - 1;
+	}
+
+	@Override
+	public ResultSetMetaData getMetaData() throws SQLException {
+		return metaData;
 	}
 
 	@Override
@@ -138,40 +203,40 @@ public abstract class AbstractResultSet implements ResultSet {
 	public BigDecimal getBigDecimal(int columnIndex, int j) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED); 
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBigDecimal"); 
 	}
 
 	@Override
 	public BigDecimal getBigDecimal(String s, int i) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED); 
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBigDecimal"); 
 	}
 
 	@Override
 	public InputStream getBinaryStream(int i) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED); 
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBinaryStream"); 
 	}
 
 	@Override
 	public InputStream getBinaryStream(String s) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED); 
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBinaryStream"); 
 	}
 
 	@Override
 	public Blob getBlob(int i) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED); 
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBlob");
 	}
 
 	@Override
 	public Blob getBlob(String s) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED); 
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBlob"); 
 	}
 
 	@Override
@@ -192,70 +257,56 @@ public abstract class AbstractResultSet implements ResultSet {
 	public byte getByte(int i) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getByte");
 	}
 
 	@Override
 	public byte getByte(String s) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getByte");
 	}
 
 	@Override
 	public byte[] getBytes(int i) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBytes");
 	}
 
 	@Override
 	public byte[] getBytes(String s) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBytes");
 	}
 
 	@Override
 	public Reader getCharacterStream(int i) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getCharacterStream");
 	}
 
 	@Override
 	public Reader getCharacterStream(String s) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getCharacterStream");
 	}
 
 	@Override
 	public Clob getClob(int i) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getClob");
 	}
 
 	@Override
 	public Clob getClob(String s) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
-	}
-
-	@Override
-	public int getConcurrency() throws SQLException {
-		checkClosed();
-		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
-	}
-
-	@Override
-	public String getCursorName() throws SQLException {
-		checkClosed();
-		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getClob");
 	}
 
 	@Override
@@ -276,7 +327,6 @@ public abstract class AbstractResultSet implements ResultSet {
 	public Date getDate(int columnIndex, Calendar calendar) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		//TODO
 		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
@@ -284,7 +334,6 @@ public abstract class AbstractResultSet implements ResultSet {
 	public Date getDate(String columnLabel, Calendar calendar) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		// TODO Auto-generated method stub
 		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
 	}
 
@@ -303,18 +352,6 @@ public abstract class AbstractResultSet implements ResultSet {
 	}
 
 	@Override
-	public int getFetchDirection() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getFetchSize() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public float getFloat(int columnIndex) throws SQLException {
 		checkClosed();
 		checkAvailable();
@@ -326,12 +363,6 @@ public abstract class AbstractResultSet implements ResultSet {
 		checkClosed();
 		checkAvailable();
 		return (float)get(columnLabel).getDouble();
-	}
-
-	@Override
-	public int getHoldability() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 	@Override
@@ -360,11 +391,6 @@ public abstract class AbstractResultSet implements ResultSet {
 		checkClosed();
 		checkAvailable();
 		return (long)get(columnLabel).getInt();
-	}
-
-	@Override
-	public ResultSetMetaData getMetaData() throws SQLException {
-		return metaData;
 	}
 
 	@Override
@@ -505,8 +531,7 @@ public abstract class AbstractResultSet implements ResultSet {
 
 	@Override
 	public Statement getStatement() throws SQLException {
-		// TODO 
-		return null;
+		return statement;
 	}
 
 	@Override
@@ -569,8 +594,7 @@ public abstract class AbstractResultSet implements ResultSet {
 	public Timestamp getTimestamp(int i, Calendar calendar) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		// TODO
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getTimetamp");
 	}
 
 	@Override
@@ -578,132 +602,124 @@ public abstract class AbstractResultSet implements ResultSet {
 			throws SQLException {
 		checkClosed();
 		checkAvailable();
-		// TODO
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
-	}
-
-	@Override
-	public int getType() throws SQLException {
-		// TODO
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getTimestamp");
 	}
 
 	@Override
 	public URL getURL(int columnIndex) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getURL");
 	}
 
 	@Override
 	public URL getURL(String columnLabel) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getURL");
 	}
 
 	@Override
 	public InputStream getUnicodeStream(int columnIndex) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getUnicodeStream");
 	}
 
 	@Override
 	public InputStream getUnicodeStream(String columnLabel) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getUnicodeStream");
+	}
+
+	@Override
+	public int getType() throws SQLException {
+		checkClosed();
+		return (statement==null) ? ResultSet.TYPE_FORWARD_ONLY : statement.resultSetType;
+	}
+
+
+	@Override
+	public int getConcurrency() throws SQLException {
+		checkClosed();
+		return ResultSet.CONCUR_READ_ONLY;
+	}
+
+	@Override
+	public String getCursorName() throws SQLException {
+		checkClosed();
+		checkAvailable();
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getCursorName");
+	}
+
+	@Override
+	public void setFetchDirection(int fetchDirection) throws SQLException {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setFetchDirection");
+	
+	}
+
+	@Override
+	public int getFetchDirection() throws SQLException {
+		checkClosed();
+		return ResultSet.FETCH_FORWARD;
+	}
+
+	@Override
+	public void setFetchSize(int fetchSize) throws SQLException {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setFetchSize");
+	}
+
+	@Override
+	public int getFetchSize() throws SQLException {
+		return 0;
+	}
+
+	@Override
+	public int getHoldability() throws SQLException {
+		checkClosed();
+		if(statement == null || statement.getConnection() == null) {
+			return ResultSet.HOLD_CURSORS_OVER_COMMIT;
+		}
+		return statement.getConnection().getHoldability();
 	}
 
 	@Override
 	public SQLWarning getWarnings() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getWarnings");
 	}
 
 	@Override
 	public void insertRow() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
-	}
-
-	@Override
-	public boolean isAfterLast() throws SQLException {
-		return (docIndex >= docList.size());
-	}
-
-	@Override
-	public boolean isBeforeFirst() throws SQLException {
-		return (docIndex < 0);
-	}
-
-	@Override
-	public boolean isClosed() throws SQLException {
-		return isClosed;
-	}
-
-	@Override
-	public boolean isFirst() throws SQLException {
-		return docIndex == 0;
-	}
-
-	@Override
-	public boolean isLast() throws SQLException {
-		return docIndex == docList.size() - 1;
-	}
-
-	@Override
-	public boolean last() throws SQLException {
-		// TODO TYPE_FORWARD_ONLYのときはSQLExceptionをだす
-		docIndex = docList.size() - 1;
-		return true;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "insertRow");
 	}
 
 	@Override
 	public void moveToCurrentRow() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "moveToCurrentRow");
 	}
 
 	@Override
 	public void moveToInsertRow() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
-	}
-
-	@Override
-	public boolean next() throws SQLException {
-		checkClosed();
-
-		docIndex +=1;
-		if (docIndex >= docList.size()) {
-			docIndex = docList.size();
-			return false;
-		}
-
-		return true;
-	}
-
-	@Override
-	public boolean previous() throws SQLException {
-		// TODO スクロールが不可能な場合はSQLException
-		checkClosed();
-		
-		docIndex -= 1;
-		if (docIndex < 0) {
-			docIndex = 0;
-			return false;
-		}
-		return true;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "moveToInsertRow");
 	}
 
 	@Override
 	public void refreshRow() throws SQLException {
-		// TODO Auto-generated method stub
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "refreshRow");
 
 	}
 
 	@Override
-	public boolean relative(int i) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean relative(int rowCount) throws SQLException {
+		checkClosed();
+		int row = docIndex + rowCount + 1;
+		if (row < 0) {
+			row = 0;
+		} else if (row > docList.size()) {
+			row = docList.size() + 1;
+		}
+		return absolute(row);
 	}
 
 	@Override
@@ -719,18 +735,6 @@ public abstract class AbstractResultSet implements ResultSet {
 	@Override
 	public boolean rowUpdated() throws SQLException {
 		return false;
-	}
-
-	@Override
-	public void setFetchDirection(int i) throws SQLException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setFetchSize(int i) throws SQLException {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -1127,72 +1131,69 @@ public abstract class AbstractResultSet implements ResultSet {
 
 	@Override
 	public void updateSQLXML(int i, SQLXML sqlxml) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateSQLXML");
 	}
 
 	@Override
 	public void updateSQLXML(String s, SQLXML sqlxml) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateSQLXML");
 	}
 
 	@Override
 	public void updateShort(int i, short word0) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateShort");
 	}
 
 	@Override
 	public void updateShort(String s, short word0) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateShort");
 	}
 
 	@Override
 	public void updateString(int i, String s) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateString");
 	}
 
 	@Override
 	public void updateString(String s, String s1) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateString");
 	}
 
 	@Override
 	public void updateTime(int i, Time time) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateTime");
 	}
 
 	@Override
 	public void updateTime(String s, Time time) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateTime");
 	}
 
 	@Override
 	public void updateTimestamp(int i, Timestamp timestamp) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateTimestamp");
 	}
 
 	@Override
 	public void updateTimestamp(String s, Timestamp timestamp)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "updateTimestamp");
 	}
 
 	@Override
 	public boolean wasNull() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		checkClosed();
+		return wasNull;
 	}
 
 	@Override
 	public boolean isWrapperFor(Class<?> arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "isWrapperFor");
 	}
 
 	@Override
 	public <T> T unwrap(Class<T> arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "unwrap");
 	}
 
 	private SolrValue get(int columnIndex) throws SQLException{
@@ -1211,7 +1212,9 @@ public abstract class AbstractResultSet implements ResultSet {
 			x = objs.toArray();
 		}
 
-		return DataType.convertToValue(x);
+		SolrValue value = DataType.convertToValue(x);
+		wasNull = (value == ValueNull.INSTANCE);
+		return value;
 	}
 
 	private SolrValue get(String columnLabel) throws SQLException {

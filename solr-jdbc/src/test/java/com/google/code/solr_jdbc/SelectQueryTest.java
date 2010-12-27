@@ -115,6 +115,21 @@ public class SelectQueryTest {
 				params, expected);
 	}
 
+	/**
+	 * メタキャラクタを含んだクエリのテスト
+	 * エラーにならないこと
+	 * 
+	 * @throws SQLException
+	 */
+	@Test
+	public void testQueryContainsMetachar() throws SQLException {
+		Object[][] expected = {};
+		Object[] params = {";&?"};
+
+		verifyPreparedStatement("SELECT player_name FROM player WHERE player_name=?",
+				params, expected);
+	}
+
 	@Test
 	public void testStatementTableNotFound() {
 		try {
@@ -126,6 +141,7 @@ public class SelectQueryTest {
 
 	}
 
+	
 	@Test
 	public void testStatementColumnNotFound() throws SQLException {
 		PreparedStatement stmt = null;

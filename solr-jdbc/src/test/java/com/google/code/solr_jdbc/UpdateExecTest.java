@@ -59,6 +59,38 @@ public class UpdateExecTest {
 	}
 	
 	@Test
+	public void updateContainsMetachar() throws SQLException {
+		PreparedStatement stmt = conn.prepareStatement("UPDATE player SET player_name=? WHERE player_id = ?");
+		Statement assertStatement = null;
+		try {
+			stmt.setString(1, "&;:?");
+			stmt.setInt(2, 5);
+			assertEquals("1件更新される", 1, stmt.executeUpdate());
+			
+			
+			conn.commit();
+			
+			assertStatement = conn.createStatement();
+			ResultSet rs1 = assertStatement.executeQuery("SELECT * FROM player WHERE player_id=5");
+			assertTrue("1件だけ取得できる", rs1.next());
+			assertEquals("&;:?", rs1.getString("player_name"));
+		} finally {
+			stmt.close();
+			
+			if(assertStatement != null) {
+				assertStatement.close();
+			}
+			
+			PreparedStatement undoStmt = conn.prepareStatement("UPDATE player SET player_name=? WHERE player_name=5");
+			undoStmt.setString(1, "ランディバース");
+			undoStmt.executeUpdate();
+			conn.commit();
+			undoStmt.close();
+		}
+		
+	}
+	
+	@Test
 	public void delete() throws SQLException {
 		Statement stmt = conn.createStatement();
 		try {

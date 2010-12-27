@@ -11,7 +11,6 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.ColumnIndex;
 import net.sf.jsqlparser.statement.select.ColumnReferenceVisitor;
-import net.sf.jsqlparser.statement.select.Distinct;
 import net.sf.jsqlparser.statement.select.FromItemVisitor;
 import net.sf.jsqlparser.statement.select.Limit;
 import net.sf.jsqlparser.statement.select.OrderByElement;
@@ -112,12 +111,6 @@ public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVi
 		if (groupByColumns != null) {
 			parseGroupBy(groupByColumns);
 			hasGroupBy = true;
-		}
-
-		// Distinct
-		Distinct distinct = plainSelect.getDistinct();
-		if(distinct != null) {
-			List<Distinct> distinctItems = distinct.getOnSelectItems();
 		}
 		
 		// Limitの解析

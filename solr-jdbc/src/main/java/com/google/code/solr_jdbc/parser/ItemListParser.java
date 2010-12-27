@@ -3,17 +3,16 @@ package com.google.code.solr_jdbc.parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
+import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitor;
+import net.sf.jsqlparser.statement.select.SubSelect;
+
 import com.google.code.solr_jdbc.expression.Item;
 import com.google.code.solr_jdbc.expression.Literal;
 import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
-import com.google.code.solr_jdbc.value.SolrValue;
-
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitor;
-import net.sf.jsqlparser.statement.select.SubSelect;
 
 public class ItemListParser implements ItemsListVisitor{
 	private List<Parameter> parameters;
@@ -35,6 +34,7 @@ public class ItemListParser implements ItemsListVisitor{
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(ExpressionList expressionList) {
 		ExpressionParser expressionParser = new ExpressionParser();
