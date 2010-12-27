@@ -20,14 +20,12 @@ public class ValueBoolean extends SolrValue {
 	}
 	@Override
 	public String getQueryString() {
-		// TODO Auto-generated method stub
-		return null;
+		return value.toString();
 	}
 
 	@Override
 	public String getString() {
-		// TODO Auto-generated method stub
-		return null;
+		return value.toString();
 	}
 
 	@Override

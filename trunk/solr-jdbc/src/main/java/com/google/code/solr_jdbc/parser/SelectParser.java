@@ -1,4 +1,4 @@
-package com.google.code.solr_jdbc;
+package com.google.code.solr_jdbc.parser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,16 +24,15 @@ import net.sf.jsqlparser.statement.select.Union;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.google.code.solr_jdbc.SolrColumn;
 import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.impl.ResultSetMetaDataImpl;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
-import com.google.code.solr_jdbc.parser.ConditionParser;
-import com.google.code.solr_jdbc.parser.SelectItemFinder;
 
 
-public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsListVisitor{
+public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVisitor{
 
 	private ConditionParser conditionParser;
 	
@@ -44,7 +43,7 @@ public class SolrSelectVisitor implements SelectVisitor, FromItemVisitor, ItemsL
 	private ResultSetMetaDataImpl rsMetaData;
 	private boolean hasGroupBy = false;
 
-	public SolrSelectVisitor(DatabaseMetaDataImpl metaData) {
+	public SelectParser(DatabaseMetaDataImpl metaData) {
 		this.selectColumns = new ArrayList<String>();
 		this.solrOptions = new HashMap<String, String>();
 		this.metaData = metaData;

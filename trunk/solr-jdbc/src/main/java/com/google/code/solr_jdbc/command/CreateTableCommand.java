@@ -41,6 +41,7 @@ public class CreateTableCommand extends Command{
 		throw DbException.get(ErrorCode.METHOD_ONLY_ALLOWED_FOR_QUERY);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public int executeUpdate() {
 		String tableName = createTable.getTable().getName();
