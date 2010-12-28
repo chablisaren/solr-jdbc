@@ -1,6 +1,6 @@
 package com.google.code.solr_jdbc.command;
 
-import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Map;
 
 import net.sf.jsqlparser.statement.select.Select;
@@ -9,6 +9,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
+import com.google.code.solr_jdbc.expression.Parameter;
+import com.google.code.solr_jdbc.impl.AbstractResultSet;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.impl.DefaultResultSetImpl;
 import com.google.code.solr_jdbc.impl.FacetResultSetImpl;
@@ -23,6 +25,7 @@ public class SelectCommand extends Command {
 
 	public SelectCommand(Select statement) {
 		this.select = statement;
+		this.parameters = new ArrayList<Parameter>();
 	}
 
 	@Override
@@ -39,13 +42,13 @@ public class SelectCommand extends Command {
 	}
 
 	@Override
-	public ResultSet executeQuery() {
+	public AbstractResultSet executeQuery() {
 		SolrQuery query = new SolrQuery(selectParser.getQuery(parameters));
 		Map<String,String> options = selectParser.getSolrOptions();
 		for(Map.Entry<String, String> entry:options.entrySet()) {
 			query.set(entry.getKey(), entry.getValue());
 		}
-		ResultSet rs = null;
+		AbstractResultSet rs = null;
 		QueryResponse response;
 		try {
 			response = conn.getSolrServer().query(query);

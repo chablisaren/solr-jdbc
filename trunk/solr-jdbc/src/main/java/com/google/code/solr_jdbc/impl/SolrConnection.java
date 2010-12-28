@@ -26,7 +26,11 @@ import com.google.code.solr_jdbc.message.ErrorCode;
 
 
 
-
+/**
+ * implements Connection
+ * 
+ * @author kawasima
+ */
 public abstract class SolrConnection implements Connection {
 	private SolrServer solrServer;
 	private DatabaseMetaDataImpl metaData;
@@ -35,7 +39,7 @@ public abstract class SolrConnection implements Connection {
 	private int holdability = ResultSet.HOLD_CURSORS_OVER_COMMIT;
 	private boolean autoCommit = false;
 	private String catalog;
-	private Statement executingStatement;
+	protected Statement executingStatement;
 
 	protected SolrConnection(String serverUrl) {
 
@@ -185,13 +189,13 @@ public abstract class SolrConnection implements Connection {
 
 	@Override
 	public int getTransactionIsolation() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return Connection.TRANSACTION_READ_COMMITTED;
 	}
 
 	@Override
 	public void setTransactionIsolation(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setTransaction")
+			.getSQLException();
 	}
 
 
@@ -203,20 +207,20 @@ public abstract class SolrConnection implements Connection {
 
 	@Override
 	public void setReadOnly(boolean arg0) throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setReadOnly")
+			.getSQLException();
 	}
 
 	@Override
 	public Savepoint setSavepoint() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setSavepoint")
+			.getSQLException();
 	}
 
 	@Override
 	public Savepoint setSavepoint(String arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setSavepoint")
+			.getSQLException();
 	}
 	
 	@Override
@@ -226,7 +230,7 @@ public abstract class SolrConnection implements Connection {
 	}
 
 	@Override
-	public void setTypeMap(Map<String, Class<?>> arg0) throws SQLException {
+	public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
 		// do nothing
 	}
 
@@ -242,32 +246,33 @@ public abstract class SolrConnection implements Connection {
 	}
 
 	@Override
-	public boolean isValid(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isValid(int timeout) throws SQLException {
+		return isClosed();
 	}
 
 	@Override
-	public String nativeSQL(String arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+	public String nativeSQL(String sql) throws SQLException {
+		return sql;
 	}
 
 	@Override
 	public CallableStatement prepareCall(String sql) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "prepareCall");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "prepareCall")
+			.getSQLException();
 	}
 
 	@Override
 	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency)
 			throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "prepareCall");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "prepareCall")
+			.getSQLException();
 	}
 
 	@Override
 	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
 			int resultSetHoldability) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "prepareCall");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "prepareCall")
+			.getSQLException();
 	}
 
 	@Override
@@ -301,51 +306,73 @@ public abstract class SolrConnection implements Connection {
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(String arg0, int arg1, int arg2)
+	public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		checkClosed();
+		PreparedStatementImpl stmt;
+		try {
+			stmt = new PreparedStatementImpl(this, sql, resultSetType, resultSetConcurrency);
+		} catch(DbException e) {
+			throw e.getSQLException();
+		}
+		return stmt;
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(String arg0, int resultSetType, int resultSetConcurrency,
+	public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency,
 			int resultSetHoldability) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		checkClosed();
+		PreparedStatementImpl stmt;
+		try {
+			stmt = new PreparedStatementImpl(this, sql, resultSetType, resultSetConcurrency);
+		} catch(DbException e) {
+			throw e.getSQLException();
+		}
+		return stmt;
 	}
 
 	@Override
-	public void releaseSavepoint(Savepoint arg0) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void releaseSavepoint(Savepoint savepoint) throws SQLException {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "releaseSavepoint")
+			.getSQLException();
 	}
 
 	@Override
 	public void rollback() throws SQLException {
-		// TODO Auto-generated method stub
-
+		try {
+			solrServer.rollback();
+		} catch (Exception e) {
+			throw new SQLException(e);
+		}
 	}
 
 	@Override
-	public void rollback(Savepoint arg0) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void rollback(Savepoint savePoint) throws SQLException {
+		this.rollback();
 	}
 
 	@Override
-	public boolean isWrapperFor(Class<?> arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isWrapperFor(Class<?> iface) throws SQLException {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "isWrapperFor");
 	}
 
 	@Override
 	public <T> T unwrap(Class<T> arg0) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "unwrap");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "unwrap")
+			.getSQLException();
 	}
+
+	public abstract void setQueryTimeout(int second);
+	
+	public abstract int getQueryTimeout();
 
 	protected void checkClosed() throws SQLException {
 		if (isClosed) {
-			throw new SQLException("Already closed.");
+			throw DbException.get(ErrorCode.OBJECT_CLOSED, "Connection");
 		}
+	}
+	
+	protected void setExecutingStatement(Statement statement) {
+		this.executingStatement = statement;
 	}
 }

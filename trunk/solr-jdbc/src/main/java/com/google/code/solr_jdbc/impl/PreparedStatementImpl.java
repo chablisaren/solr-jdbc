@@ -52,7 +52,6 @@ import net.sf.jsqlparser.statement.Statement;
 public class PreparedStatementImpl extends StatementImpl implements PreparedStatement {
 	private Statement statement;
 	private List<SolrValue[]> batchParameters;
-	private ResultSetMetaData rsMetaData;
 	private Command command;
 
 	protected PreparedStatementImpl(SolrConnection conn, String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
@@ -72,30 +71,52 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 	public void addBatch() throws SQLException {
 		checkClosed();
 		List<Parameter> parameters = command.getParameters();
+		int size = parameters.size();
+		SolrValue[] set = new SolrValue[size];
+		for (int i=0; i<size; i++) {
+			Parameter param = parameters.get(i);
+			set[i] = param.getValue();
+		}
 		if (batchParameters == null) {
 			batchParameters = new ArrayList<SolrValue[]>();
 		}
-		batchParameters.add(parameters.toArray(new SolrValue[0]));
+		batchParameters.add(set);
 	}
 
 	@Override
 	public void clearParameters() throws SQLException {
 		List<Parameter> parameters = command.getParameters();
-		for(int i=0; i<parameters.size(); i++) {
-			parameters.set(i, null);
+		for(int i=0, size=parameters.size(); i<size; i++) {
+			Parameter param = parameters.get(i);
+			param.setValue(null);
 		}
 	}
 
 	@Override
 	public boolean execute() throws SQLException {
-		return false;
+		checkClosed();
+		boolean returnsResultSet;
+		try {
+			if(command.isQuery()) {
+				returnsResultSet = true;
+				resultSet = command.executeQuery();
+			} else {
+				returnsResultSet = false;
+				updateCount = command.executeUpdate();
+			}
+		} catch(DbException e) {
+			throw e.getSQLException();
+		}
+		return returnsResultSet;
 	}
 
 	@Override
 	public ResultSet executeQuery() throws SQLException {
 		checkClosed();
 		try {
-			return command.executeQuery();
+			resultSet = command.executeQuery();
+			
+			return resultSet;
 		} catch (DbException e) {
 			throw e.getSQLException();
 		}
@@ -113,7 +134,11 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 
 	@Override
 	public ResultSetMetaData getMetaData() throws SQLException {
-		return rsMetaData;
+		checkClosed();
+		if(resultSet == null) {
+			return null;
+		}
+		return resultSet.getMetaData();
 	}
 
 	@Override
@@ -407,33 +432,38 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 
 	@Override
 	public void addBatch(String sql) throws SQLException {
-		throw DbException.get(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT).getSQLException();
+		throw DbException.get(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, "addBatch")
+			.getSQLException();
 	}
 
 	@Override
 	public void clearBatch() throws SQLException {
-		// TODO Auto-generated method stub
-
+		checkClosed();
+		batchParameters = null;
 	}
 
 	@Override
-	public boolean execute(String arg0) throws SQLException {
-		throw new SQLFeatureNotSupportedException();
+	public boolean execute(String sql) throws SQLException {
+		throw DbException.get(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, "execute")
+			.getSQLException();
 	}
 
 	@Override
-	public boolean execute(String arg0, int arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException();
+	public boolean execute(String sql, int arg1) throws SQLException {
+		throw DbException.get(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, "execute")
+			.getSQLException();
 	}
 
 	@Override
-	public boolean execute(String arg0, int[] arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException();
+	public boolean execute(String sql, int[] arg1) throws SQLException {
+		throw DbException.get(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, "execute")
+			.getSQLException();
 	}
 
 	@Override
-	public boolean execute(String arg0, String[] arg1) throws SQLException {
-		throw new SQLFeatureNotSupportedException();
+	public boolean execute(String sql, String[] arg1) throws SQLException {
+		throw DbException.get(ErrorCode.METHOD_NOT_ALLOWED_FOR_PREPARED_STATEMENT, "execute")
+			.getSQLException();
 	}
 
 	// TODO 実際にサーバに投げるのをまとめてやるように修正する

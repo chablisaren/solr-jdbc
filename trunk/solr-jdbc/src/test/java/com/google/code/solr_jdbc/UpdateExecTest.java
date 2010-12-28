@@ -121,6 +121,47 @@ public class UpdateExecTest {
 		}
 	}
 	
+	@Test
+	public void batchUpdate() throws SQLException {
+		PreparedStatement stmt = conn.prepareStatement(
+				"UPDATE player SET player_name=? WHERE player_id=?");
+		try {
+			stmt.setString(1, "東出");
+			stmt.setInt(2, 1);
+			stmt.addBatch();
+			stmt.setString(1, "梵");
+			stmt.setInt(2, 2);
+			stmt.addBatch();
+			stmt.setString(1, "赤松");
+			stmt.setInt(2, 3);
+			stmt.addBatch();
+			int[] result = stmt.executeBatch();
+			conn.commit();
+		} finally {
+			stmt.close();
+		}
+		
+		PreparedStatement assertStmt = conn.prepareStatement(
+				"SELECT player_name FROM player WHERE player_id=?");
+		try {
+			ResultSet rs;
+			assertStmt.setInt(1, 1);
+			rs = assertStmt.executeQuery();
+			assertTrue(rs.next());
+			assertEquals("東出",rs.getString("player_name"));
+			assertStmt.setInt(1, 2);
+			rs = assertStmt.executeQuery();
+			assertTrue(rs.next());
+			assertEquals("梵",rs.getString("player_name"));
+			assertStmt.setInt(1, 3);
+			rs = assertStmt.executeQuery();
+			assertTrue(rs.next());
+			assertEquals("赤松",rs.getString("player_name"));
+		} finally {
+			assertStmt.close();
+		}
+	}
+	
 	@BeforeClass
 	public static void init() throws SQLException, ClassNotFoundException {
 		Connection setUpConn = null;

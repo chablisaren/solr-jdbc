@@ -1,6 +1,5 @@
 package com.google.code.solr_jdbc.command;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,6 +21,7 @@ import com.google.code.solr_jdbc.SolrColumn;
 import com.google.code.solr_jdbc.expression.Item;
 import com.google.code.solr_jdbc.expression.Literal;
 import com.google.code.solr_jdbc.expression.Parameter;
+import com.google.code.solr_jdbc.impl.AbstractResultSet;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
@@ -39,8 +39,8 @@ public class UpdateCommand extends Command {
 	private final Map<String, Integer> solrColumnNames;
 
 	public UpdateCommand(Update stmt) {
-		this.parameters = new ArrayList<Parameter>();
 		this.updStmt = stmt;
+		this.parameters = new ArrayList<Parameter>();
 		solrColumnNames = new HashMap<String, Integer>();
 	}
 
@@ -50,7 +50,7 @@ public class UpdateCommand extends Command {
 	}
 	
 	@Override
-	public ResultSet executeQuery() {
+	public AbstractResultSet executeQuery() {
 		throw DbException.get(ErrorCode.METHOD_ONLY_ALLOWED_FOR_QUERY);
 	}
 

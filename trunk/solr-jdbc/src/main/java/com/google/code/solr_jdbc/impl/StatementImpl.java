@@ -1,6 +1,7 @@
 package com.google.code.solr_jdbc.impl;
 
 import java.io.StringReader;
+import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,6 +20,9 @@ import com.google.code.solr_jdbc.message.ErrorCode;
 
 
 public class StatementImpl implements Statement {
+	/**
+	 * This parameter is used to paginate results from a query.
+	 */
 	private static final int MAX_FETCH_SIZE = 10000;
 
 	protected SolrConnection conn;
@@ -28,7 +32,7 @@ public class StatementImpl implements Statement {
 	private List<String> batchCommands;
 	private boolean isClosed = false;
 	private int maxRows;
-	private boolean escapeProcessing = true;
+	protected boolean escapeProcessing = true;
 
 	protected int fetchSize = MAX_FETCH_SIZE;
 	protected final int resultSetType;
@@ -148,6 +152,9 @@ public class StatementImpl implements Statement {
 			}
 		}
 		batchCommands = null;
+		if (error) {
+			throw new BatchUpdateException(result);
+		}
 		return result;
 	}
 
@@ -225,20 +232,17 @@ public class StatementImpl implements Statement {
 
 	@Override
 	public int getResultSetConcurrency() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return resultSetConcurrency;
 	}
 
 	@Override
 	public int getResultSetHoldability() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ResultSet.HOLD_CURSORS_OVER_COMMIT;
 	}
 
 	@Override
 	public int getResultSetType() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return resultSetType;
 	}
 
 	@Override
@@ -249,7 +253,6 @@ public class StatementImpl implements Statement {
 
 	@Override
 	public SQLWarning getWarnings() throws SQLException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -345,29 +348,29 @@ public class StatementImpl implements Statement {
 
 	@Override
 	public int getQueryTimeout() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return conn.getQueryTimeout();
 	}
 
 	@Override
 	public void setQueryTimeout(int seconds) throws SQLException {
-		// TODO Auto-generated method stub
-
+		conn.setQueryTimeout(seconds);
 	}
 
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED).getSQLException();
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "isWrapperFor")
+			.getSQLException();
 	}
 
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED).getSQLException();
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "unwrap")
+			.getSQLException();
 	}
 
 	protected void checkClosed() throws SQLException{
 		if(isClosed)
-			DbException.get(ErrorCode.OBJECT_CLOSED);
+			DbException.get(ErrorCode.OBJECT_CLOSED, "Statemnt").getSQLException();
 
 	}
 

@@ -1,11 +1,13 @@
 package com.google.code.solr_jdbc.command;
 
-import java.sql.ResultSet;
-
-import com.google.code.solr_jdbc.message.DbException;
-import com.google.code.solr_jdbc.message.ErrorCode;
+import java.util.ArrayList;
 
 import net.sf.jsqlparser.statement.drop.Drop;
+
+import com.google.code.solr_jdbc.expression.Parameter;
+import com.google.code.solr_jdbc.impl.AbstractResultSet;
+import com.google.code.solr_jdbc.message.DbException;
+import com.google.code.solr_jdbc.message.ErrorCode;
 
 
 public class DropCommand extends Command {
@@ -26,7 +28,7 @@ public class DropCommand extends Command {
 	}
 	
 	@Override
-	public ResultSet executeQuery() {
+	public AbstractResultSet executeQuery() {
 		throw DbException.get(ErrorCode.METHOD_ONLY_ALLOWED_FOR_QUERY);
 	}
 
