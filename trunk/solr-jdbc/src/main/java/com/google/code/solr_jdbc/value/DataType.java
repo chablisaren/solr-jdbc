@@ -6,6 +6,10 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.google.code.solr_jdbc.message.DbException;
+import com.google.code.solr_jdbc.message.ErrorCode;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+
 /**
  * Mapping solr types to sql types, vice-versa
  *
@@ -113,4 +117,51 @@ public class DataType {
 	public static DataType getTypeByName(String name) {
 		return TYPES_BY_NAME.get(name.toUpperCase());
 	}
+	
+    public static String getTypeClassName(SolrType type) {
+        switch(type) {
+        case BOOLEAN:
+            // "java.lang.Boolean";
+            return Boolean.class.getName();
+        case BYTE:
+            // "java.lang.Byte";
+            return Byte.class.getName();
+        case SHORT:
+            // "java.lang.Short";
+            return Short.class.getName();
+        case INT:
+            // "java.lang.Integer";
+            return Integer.class.getName();
+        case LONG:
+            // "java.lang.Long";
+            return Long.class.getName();
+        case DECIMAL:
+            // "java.math.BigDecimal";
+            return BigDecimal.class.getName();
+        case DATE:
+            // "java.sql.Date";
+            return Date.class.getName();
+        case STRING:
+            // "java.lang.String";
+            return String.class.getName();
+        case TEXT:
+            return String.class.getName();
+        case DOUBLE:
+            // "java.lang.Double";
+            return Double.class.getName();
+        case FLOAT:
+            // "java.lang.Float";
+            return Float.class.getName();
+        case NULL:
+            return null;
+        case UNKNOWN:
+            // anything
+            return Object.class.getName();
+        case ARRAY:
+            return Array.class.getName();
+        default:
+            throw DbException.get(ErrorCode.UNKNOWN_DATA_TYPE, type.name());
+        }
+    }
+
 }

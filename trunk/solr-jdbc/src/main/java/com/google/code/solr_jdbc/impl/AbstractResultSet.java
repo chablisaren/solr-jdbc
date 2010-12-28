@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.apache.solr.common.SolrDocumentList;
 
-import com.google.code.solr_jdbc.SolrColumn;
+import com.google.code.solr_jdbc.expression.Expression;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.value.DataType;
@@ -1198,7 +1198,7 @@ public abstract class AbstractResultSet implements ResultSet {
 
 	private SolrValue get(int columnIndex) throws SQLException{
 		checkClosed();
-		SolrColumn column = metaData.getColumn(columnIndex);
+		Expression column = metaData.getColumn(columnIndex);
 
 		String columnName = (column.getType() == null)?column.getResultName():column.getSolrColumnName();
 
@@ -1222,12 +1222,12 @@ public abstract class AbstractResultSet implements ResultSet {
 		return get(columnIndex);
 	}
 
-	private void checkClosed() throws SQLException {
+	protected void checkClosed() throws SQLException {
 		if (isClosed)
 			throw DbException.get(ErrorCode.OBJECT_CLOSED);
 	}
 	
-	private void checkAvailable() throws SQLException {
+	protected void checkAvailable() throws SQLException {
 		if (docIndex < 0 ||  docIndex >= docList.size()) {
 			throw DbException.get(ErrorCode.NO_DATA_AVAILABLE);
 		}

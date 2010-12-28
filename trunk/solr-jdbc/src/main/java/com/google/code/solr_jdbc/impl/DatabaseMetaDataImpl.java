@@ -16,14 +16,15 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 
-import com.google.code.solr_jdbc.SolrColumn;
+import com.google.code.solr_jdbc.expression.Expression;
+import com.google.code.solr_jdbc.expression.SolrColumn;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.value.DataType;
 
 public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	private final SolrConnection conn;
-	private Map<String, List<SolrColumn>> tableColumns;
+	private Map<String, List<Expression>> tableColumns;
 
 	public DatabaseMetaDataImpl(SolrConnection conn) {
 		this.conn = conn;
@@ -31,16 +32,16 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	}
 
 	private void buildMetadata() {
-		this.tableColumns = new HashMap<String, List<SolrColumn>>();
+		this.tableColumns = new HashMap<String, List<Expression>>();
 		try {
 			QueryResponse res = this.conn.getSolrServer().query(
 					new SolrQuery("meta.name:[A TO z]"));
 
 			for (SolrDocument doc : res.getResults()) {
 				String tableName = doc.getFieldValue("meta.name").toString();
-				List<SolrColumn> columns = new ArrayList<SolrColumn>();
+				List<Expression> columns = new ArrayList<Expression>();
 				for (Object cols : doc.getFieldValues("meta.columns")) {
-					columns.add(new DefaultSolrColumn(tableName + "."
+					columns.add(new SolrColumn(tableName + "."
 							+ cols.toString()));
 				}
 				tableColumns.put(tableName, columns);
@@ -51,8 +52,8 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		}
 	}
 
-	public SolrColumn getSolrColumn(String tableName, String columnName) {
-		for (SolrColumn solrColumn : this.tableColumns.get(tableName)) {
+	public Expression getSolrColumn(String tableName, String columnName) {
+		for (Expression solrColumn : this.tableColumns.get(tableName)) {
 			if (StringUtils.equals(solrColumn.getColumnName(), columnName)) {
 				return solrColumn;
 			}
@@ -61,7 +62,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	}
 
-	public List<SolrColumn> getSolrColumns(String tableName) {
+	public List<Expression> getSolrColumns(String tableName) {
 		if (tableColumns == null)
 			buildMetadata();
 		return this.tableColumns.get(tableName);
@@ -204,7 +205,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		rs = new CollectionResultSet();
 		rs.setColumns(Arrays.asList(columns));
 
-		for (SolrColumn column : tableColumns.get(table)) {
+		for (Expression column : tableColumns.get(table)) {
 			Object[] columnMeta = new Object[22];
 			columnMeta[1] = ""; // TABLE_SCHEM
 			columnMeta[2] = column.getTableName();
@@ -801,149 +802,239 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		return false;
 	}
 
+	/**
+	 * Checks if for CREATE TABLE Test(ID INT), getTables returns test as the
+	 * table name.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean storesLowerCaseIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Checks if for CREATE TABLE "Test"(ID INT), getTables returns test as the
+	 * table name.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean storesLowerCaseQuotedIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Checks if for CREATE TABLE Test(ID INT), getTables returns Test as the
+	 * table name
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean storesMixedCaseIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Checks if for CREATE TABLE "Test"(ID INT), getTables returns Test as the
+	 * table name.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean storesMixedCaseQuotedIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Checks if for CREATE TABLE Test(ID INT), getTables returns TEST as the
+	 * table name.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean storesUpperCaseIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Checks if for CREATE TABLE "Test"(ID INT), getTables returns TEST as the
+	 * table name.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean storesUpperCaseQuotedIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether SQL-92 entry level grammar is supported.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsANSI92EntryLevelSQL() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns whether SQL-92 full level grammer is supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsANSI92FullSQL() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether SQL-92 intermediate level grammar is supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsANSI92IntermediateSQL() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsAlterTableWithAddColumn() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsAlterTableWithDropColumn() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether batch updates is supported.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsBatchUpdates() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns whether the catalog name in INSERT, UPDATE, DELETE is supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsCatalogsInDataManipulation() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsCatalogsInIndexDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsCatalogsInPrivilegeDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsCatalogsInProcedureCalls() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsCatalogsInTableDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether column aliasing is supported.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsColumnAliasing() throws SQLException {
 		return true;
 	}
 
+	/**
+	 * Returns whether CONVERT is supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsConvert() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether CONVERT is supported for one datatype to another.
+	 * 
+	 * @return false
+	 */
 	@Override
-	public boolean supportsConvert(int i, int j) throws SQLException {
-		// TODO Auto-generated method stub
+	public boolean supportsConvert(int fromType, int toType) throws SQLException {
 		return false;
 	}
 
+	/**
+	 * Returns whether ODBC Core SQL grammar is supported.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsCoreSQLGrammar() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsCorrelatedSubqueries() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether data manipulation and CREATE/DROP is supported in
+	 * transactions.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsDataDefinitionAndDataManipulationTransactions()
 			throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether only data manipulations are supported in transactions.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsDataManipulationTransactionsOnly()
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	/**

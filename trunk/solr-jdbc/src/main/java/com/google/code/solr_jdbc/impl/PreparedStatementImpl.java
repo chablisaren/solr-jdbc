@@ -395,39 +395,42 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 	}
 
 	@Override
-	public void setTime(int arg0, Time arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void setTime(int parameterIndex, Time x) throws SQLException {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setTime")
+			.getSQLException();
 	}
 
 	@Override
-	public void setTime(int arg0, Time arg1, Calendar arg2) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void setTime(int parameterIndex, Time x, Calendar cal) throws SQLException {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setTime")
+			.getSQLException();
 	}
 
 	@Override
-	public void setTimestamp(int arg0, Timestamp arg1) throws SQLException {
-		// TODO Auto-generated method stub
-
+	public void setTimestamp(int parameterIndex, Timestamp x) throws SQLException {
+		Date d = new Date(x.getTime());
+		SolrValue value = ValueDate.get(d);
+		setParameter(parameterIndex, value);
 	}
 
 	@Override
-	public void setTimestamp(int arg0, Timestamp arg1, Calendar arg2)
+	public void setTimestamp(int parameterIndex, Timestamp x, Calendar cal)
 			throws SQLException {
-		// TODO Auto-generated method stub
-
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setTimestamp")
+			.getSQLException();
 	}
 
 	@Override
-	public void setURL(int arg0, URL arg1) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+	public void setURL(int parameterIndex, URL x) throws SQLException {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setURL")
+			.getSQLException();
 	}
 
 	@Override
-	public void setUnicodeStream(int arg0, InputStream arg1, int arg2)
+	public void setUnicodeStream(int parameterIndex, InputStream arg1, int arg2)
 			throws SQLException {
-		throw new SQLFeatureNotSupportedException("setBlob");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setUnicodeStream")
+			.getSQLException();
 	}
 
 	@Override

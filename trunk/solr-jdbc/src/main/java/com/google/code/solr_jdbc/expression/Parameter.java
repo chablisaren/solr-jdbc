@@ -2,7 +2,6 @@ package com.google.code.solr_jdbc.expression;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.google.code.solr_jdbc.SolrColumn;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.value.SolrType;
@@ -14,7 +13,7 @@ public class Parameter implements Item{
 	private int index;
 	private boolean needsLikeEscape;
 	private String likeEscapeChar = "%";
-	private SolrColumn targetColumn;
+	private Expression targetColumn;
 	
 	public Parameter(int index) {
 		this.index = index;
@@ -31,7 +30,7 @@ public class Parameter implements Item{
 		return value;
 	}
 	
-	public void setColumn(SolrColumn column) {
+	public void setColumn(Expression column) {
 		this.targetColumn = column;
 	}
 	public SolrType getType() {

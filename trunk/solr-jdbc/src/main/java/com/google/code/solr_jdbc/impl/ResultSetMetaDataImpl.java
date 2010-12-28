@@ -7,17 +7,24 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.google.code.solr_jdbc.SolrColumn;
+import com.google.code.solr_jdbc.expression.Expression;
+import com.google.code.solr_jdbc.expression.SolrColumn;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.value.DataType;
+import com.google.code.solr_jdbc.value.SolrType;
 
 
 public class ResultSetMetaDataImpl implements ResultSetMetaData {
-	private final List<SolrColumn> solrColumns = new ArrayList<SolrColumn>();
+	private final String catalog;
+	private final AbstractResultSet resultSet;
+	private final List<Expression> expressions;
+//	private final List<SolrColumn> solrColumns = new ArrayList<SolrColumn>();
 
-	public void addColumn(SolrColumn solrColumn) {
-		solrColumns.add(solrColumn);
+	public ResultSetMetaDataImpl(AbstractResultSet resultSet, List<Expression> expressions, String catalog) {
+		this.catalog = catalog;
+		this.expressions = expressions;
+		this.resultSet = resultSet;
 	}
 
 	/**
@@ -28,9 +35,9 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	 * @throws SQLException
 	 */
 	public int findColumn(String columnLabel) throws SQLException{
-		for(int i=0; i<solrColumns.size(); i++) {
-			if (StringUtils.equalsIgnoreCase(solrColumns.get(i).getAlias(), columnLabel)
-				|| StringUtils.equalsIgnoreCase(solrColumns.get(i).getColumnName(), columnLabel)) {
+		for(int i=0; i<expressions.size(); i++) {
+			if (StringUtils.equalsIgnoreCase(expressions.get(i).getAlias(), columnLabel)
+				|| StringUtils.equalsIgnoreCase(expressions.get(i).getColumnName(), columnLabel)) {
 				return i+1; // parameterIndexは1始まりなので+1する
 			}
 		}
@@ -38,66 +45,72 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	}
 	@Override
 	public String getCatalogName(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		checkClosed();
+		return catalog;
 	}
 
 	@Override
 	public String getColumnClassName(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		column--;
+		SolrType type = expressions.get(column).getType();
+		return DataType.getTypeClassName(type);
 	}
 
 	@Override
 	public int getColumnCount() throws SQLException {
-		return solrColumns.size();
+		return expressions.size();
 	}
 
 	@Override
 	public int getColumnDisplaySize(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
+		checkClosed();
+		checkColumnIndex(column);
 		return 0;
 	}
 
 	@Override
 	public String getColumnLabel(int column) throws SQLException {
-		if(column > getColumnCount() || column <= 0)
-			throw DbException.get(ErrorCode.COLUMN_COUNT_DOES_NOT_MATCH);
-		SolrColumn solrColumn = solrColumns.get(column - 1);
-		String columnName = solrColumn.getAlias();
+		checkClosed();
+		checkColumnIndex(column);
+		Expression expression = expressions.get(column - 1);
+		String columnName = expression.getAlias();
 		if(columnName != null)
 			return columnName;
-		return solrColumn.getColumnName();
+		return expression.getColumnName();
 	}
 
 	@Override
 	public String getColumnName(int column) throws SQLException {
-		// TODO 0はSQLExceptionを返すようにする
-		SolrColumn solrColumn = solrColumns.get(column - 1);
+		checkClosed();
+		checkColumnIndex(column);
+		Expression solrColumn = expressions.get(column - 1);
 		return solrColumn.getColumnName();
 	}
 
 	public String getSolrColumnName(int column) throws SQLException {
-		// TODO 0はSQLExceptionを返すようにする
-		SolrColumn solrColumn = solrColumns.get(column - 1);
+		checkClosed();
+		checkColumnIndex(column);
+		Expression solrColumn = expressions.get(column - 1);
 		return solrColumn.getSolrColumnName();
 	}
 
-	public SolrColumn getColumn(int column) throws SQLException {
-		// TODO 0はSQLExceptionを返すようにする
-		return solrColumns.get(column - 1);
+	public Expression getColumn(int column) throws SQLException {
+		checkClosed();
+		checkColumnIndex(column);
+		return expressions.get(column - 1);
 	}
 
 	@Override
 	public int getColumnType(int column) throws SQLException {
-		// TODO 0はSQLExceptionを返すようにする
-		SolrColumn solrColumn = solrColumns.get(column - 1);
+		checkClosed();
+		checkColumnIndex(column);
+		Expression solrColumn = expressions.get(column - 1);
 		return DataType.getDataType(solrColumn.getType()).sqlType;
 	}
 
 	@Override
 	public String getColumnTypeName(int column) throws SQLException {
-		SolrColumn solrColumn = solrColumns.get(column - 1);
+		Expression solrColumn = expressions.get(column - 1);
 		return DataType.getDataType(solrColumn.getType()).jdbc;
 	}
 
@@ -127,7 +140,6 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 
 	@Override
 	public boolean isAutoIncrement(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
 		return false;
 	}
 
@@ -157,8 +169,7 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 
 	@Override
 	public boolean isReadOnly(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return false;
+		return true;
 	}
 
 	@Override
@@ -175,25 +186,24 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 
 	@Override
 	public boolean isWritable(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
 		return false;
 	}
 
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return false;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "isWrapperFor")
+			.getSQLException();
 	}
 
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "unwrap")
+			.getSQLException();
 	}
 
-	public List<SolrColumn> getCountColumnList() {
-		List<SolrColumn> countColumns = new ArrayList<SolrColumn>();
-		for(SolrColumn solrColumn : solrColumns) {
+	public List<Expression> getCountColumnList() {
+		List<Expression> countColumns = new ArrayList<Expression>();
+		for(Expression solrColumn : expressions) {
 			if(solrColumn instanceof FunctionSolrColumn &&
 				StringUtils.equals(((FunctionSolrColumn)solrColumn).getFunctionName(), "count")) {
 				countColumns.add(solrColumn);
@@ -201,5 +211,16 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 		}
 		return countColumns;
 	}
-
+	
+	private void checkClosed() throws SQLException {
+		if (resultSet != null) {
+			resultSet.checkClosed();
+		}
+	}
+	
+	private void checkColumnIndex(int columnIndex) throws SQLException {
+		if (columnIndex < 1 || columnIndex > getColumnCount()) {
+			throw DbException.get(ErrorCode.INVALID_VALUE, "columnIndex:" + columnIndex);
+		}
+	}
 }

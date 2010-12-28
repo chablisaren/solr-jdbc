@@ -53,9 +53,9 @@ public class SelectCommand extends Command {
 		try {
 			response = conn.getSolrServer().query(query);
 			if(selectParser.hasGroupBy()) {
-				rs = new FacetResultSetImpl(response, selectParser.getResultSetMetaData());
+				rs = new FacetResultSetImpl(response, selectParser.getExpressions());
 			} else {
-				rs = new DefaultResultSetImpl(response.getResults(), selectParser.getResultSetMetaData());
+				rs = new DefaultResultSetImpl(response.getResults(), selectParser.getExpressions());
 			}
 		} catch (SolrServerException e) {
 			throw DbException.get(ErrorCode.GENERAL_ERROR, e,
