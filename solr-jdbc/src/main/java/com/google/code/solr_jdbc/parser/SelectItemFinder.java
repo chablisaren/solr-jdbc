@@ -1,13 +1,7 @@
 package com.google.code.solr_jdbc.parser;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import com.google.code.solr_jdbc.SolrColumn;
-import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
-import com.google.code.solr_jdbc.impl.FunctionSolrColumn;
-import com.google.code.solr_jdbc.impl.ResultSetMetaDataImpl;
-import com.google.code.solr_jdbc.message.DbException;
-import com.google.code.solr_jdbc.message.ErrorCode;
 
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
@@ -49,29 +43,36 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItemVisitor;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
+import com.google.code.solr_jdbc.expression.Expression;
+import com.google.code.solr_jdbc.expression.SolrColumn;
+import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
+import com.google.code.solr_jdbc.impl.FunctionSolrColumn;
+import com.google.code.solr_jdbc.message.DbException;
+import com.google.code.solr_jdbc.message.ErrorCode;
+
 
 public class SelectItemFinder implements SelectItemVisitor, ExpressionVisitor {
 	private final String tableName;
 	private final DatabaseMetaDataImpl dbMetaData;
-	private final ResultSetMetaDataImpl rsMetaData;
+	private final List<Expression> expressions;
 
-	private SolrColumn currentColumn;
+	private Expression currentColumn;
 
 	public SelectItemFinder(String tableName, DatabaseMetaDataImpl metaData) {
 		this.tableName  = tableName;
 		this.dbMetaData = metaData;
-		this.rsMetaData = new ResultSetMetaDataImpl();
+		this.expressions = new ArrayList<Expression>();
 	}
 
-	public ResultSetMetaDataImpl getResultSetMetaData() {
-		return rsMetaData;
+	public List<Expression> getExpressions() {
+		return expressions;
 	}
 
 	@Override
 	public void visit(AllColumns cols) {
-		List<SolrColumn> solrColumns = dbMetaData.getSolrColumns(tableName);
-		for(SolrColumn solrColumn : solrColumns) {
-			rsMetaData.addColumn(solrColumn);
+		List<Expression> solrColumns = dbMetaData.getSolrColumns(tableName);
+		for(Expression solrColumn : solrColumns) {
+			expressions.add(solrColumn);
 		}
 	}
 
@@ -84,7 +85,7 @@ public class SelectItemFinder implements SelectItemVisitor, ExpressionVisitor {
 		expr.getExpression().accept(this);
 		if (currentColumn != null) {
 			currentColumn.setAlias(expr.getAlias());
-			rsMetaData.addColumn(currentColumn);
+			expressions.add(currentColumn);
 			currentColumn = null;
 		}
 	}

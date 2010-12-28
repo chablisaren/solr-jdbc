@@ -24,8 +24,6 @@ import org.apache.solr.client.solrj.SolrServer;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 
-
-
 /**
  * implements Connection
  * 
@@ -45,13 +43,14 @@ public abstract class SolrConnection implements Connection {
 
 	}
 
-	protected void setSolrServer(SolrServer solrServer){
+	protected void setSolrServer(SolrServer solrServer) {
 		this.solrServer = solrServer;
 	}
 
 	public SolrServer getSolrServer() {
 		return solrServer;
 	}
+
 	@Override
 	public void clearWarnings() throws SQLException {
 		checkClosed();
@@ -99,17 +98,20 @@ public abstract class SolrConnection implements Connection {
 	@Override
 	public Statement createStatement() throws SQLException {
 		checkClosed();
-		return new StatementImpl(this, ResultSet.FETCH_FORWARD, ResultSet.CONCUR_READ_ONLY);
+		return new StatementImpl(this, ResultSet.FETCH_FORWARD,
+				ResultSet.CONCUR_READ_ONLY);
 	}
 
 	@Override
-	public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
+	public Statement createStatement(int resultSetType, int resultSetConcurrency)
+			throws SQLException {
 		checkClosed();
 		return new StatementImpl(this, resultSetType, resultSetConcurrency);
 	}
 
 	@Override
-	public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability)
+	public Statement createStatement(int resultSetType,
+			int resultSetConcurrency, int resultSetHoldability)
 			throws SQLException {
 		checkClosed();
 		return new StatementImpl(this, resultSetType, resultSetConcurrency);
@@ -124,7 +126,7 @@ public abstract class SolrConnection implements Connection {
 	@Override
 	public void setAutoCommit(boolean autoCommit) throws SQLException {
 		checkClosed();
-		this.autoCommit  = autoCommit;
+		this.autoCommit = autoCommit;
 	}
 
 	@Override
@@ -150,7 +152,8 @@ public abstract class SolrConnection implements Connection {
 	}
 
 	@Override
-	public void setClientInfo(Properties properties) throws SQLClientInfoException {
+	public void setClientInfo(Properties properties)
+			throws SQLClientInfoException {
 		throw new SQLClientInfoException();
 	}
 
@@ -179,7 +182,7 @@ public abstract class SolrConnection implements Connection {
 		}
 		return metaData;
 	}
-	
+
 	public DatabaseMetaDataImpl getMetaDataImpl() {
 		if (metaData == null) {
 			metaData = new DatabaseMetaDataImpl(this);
@@ -194,10 +197,10 @@ public abstract class SolrConnection implements Connection {
 
 	@Override
 	public void setTransactionIsolation(int arg0) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setTransaction")
-			.getSQLException();
+		throw DbException
+				.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setTransaction")
+				.getSQLException();
 	}
-
 
 	@Override
 	public boolean isReadOnly() throws SQLException {
@@ -205,24 +208,30 @@ public abstract class SolrConnection implements Connection {
 		return false;
 	}
 
+	/**
+	 * According to the JDBC specs, this setting is only a hint to the database
+	 * to enable optimizations - it does not cause writes to be prohibited.
+	 * 
+	 * @throws SQLException
+	 *             if the connection is closed
+	 */
 	@Override
-	public void setReadOnly(boolean arg0) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setReadOnly")
-			.getSQLException();
+	public void setReadOnly(boolean readOnly) throws SQLException {
+		checkClosed();
 	}
 
 	@Override
 	public Savepoint setSavepoint() throws SQLException {
 		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setSavepoint")
-			.getSQLException();
+				.getSQLException();
 	}
 
 	@Override
 	public Savepoint setSavepoint(String arg0) throws SQLException {
 		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setSavepoint")
-			.getSQLException();
+				.getSQLException();
 	}
-	
+
 	@Override
 	public Map<String, Class<?>> getTypeMap() throws SQLException {
 		checkClosed();
@@ -258,21 +267,22 @@ public abstract class SolrConnection implements Connection {
 	@Override
 	public CallableStatement prepareCall(String sql) throws SQLException {
 		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "prepareCall")
-			.getSQLException();
+				.getSQLException();
 	}
 
 	@Override
-	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency)
+	public CallableStatement prepareCall(String sql, int resultSetType,
+			int resultSetConcurrency) throws SQLException {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "prepareCall")
+				.getSQLException();
+	}
+
+	@Override
+	public CallableStatement prepareCall(String sql, int resultSetType,
+			int resultSetConcurrency, int resultSetHoldability)
 			throws SQLException {
 		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "prepareCall")
-			.getSQLException();
-	}
-
-	@Override
-	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
-			int resultSetHoldability) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "prepareCall")
-			.getSQLException();
+				.getSQLException();
 	}
 
 	@Override
@@ -280,8 +290,9 @@ public abstract class SolrConnection implements Connection {
 		checkClosed();
 		PreparedStatementImpl stmt;
 		try {
-			stmt = new PreparedStatementImpl(this, sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-		} catch(DbException e) {
+			stmt = new PreparedStatementImpl(this, sql,
+					ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+		} catch (DbException e) {
 			throw e.getSQLException();
 		}
 		return stmt;
@@ -306,26 +317,29 @@ public abstract class SolrConnection implements Connection {
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency)
-			throws SQLException {
+	public PreparedStatement prepareStatement(String sql, int resultSetType,
+			int resultSetConcurrency) throws SQLException {
 		checkClosed();
 		PreparedStatementImpl stmt;
 		try {
-			stmt = new PreparedStatementImpl(this, sql, resultSetType, resultSetConcurrency);
-		} catch(DbException e) {
+			stmt = new PreparedStatementImpl(this, sql, resultSetType,
+					resultSetConcurrency);
+		} catch (DbException e) {
 			throw e.getSQLException();
 		}
 		return stmt;
 	}
 
 	@Override
-	public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency,
-			int resultSetHoldability) throws SQLException {
+	public PreparedStatement prepareStatement(String sql, int resultSetType,
+			int resultSetConcurrency, int resultSetHoldability)
+			throws SQLException {
 		checkClosed();
 		PreparedStatementImpl stmt;
 		try {
-			stmt = new PreparedStatementImpl(this, sql, resultSetType, resultSetConcurrency);
-		} catch(DbException e) {
+			stmt = new PreparedStatementImpl(this, sql, resultSetType,
+					resultSetConcurrency);
+		} catch (DbException e) {
 			throw e.getSQLException();
 		}
 		return stmt;
@@ -333,8 +347,8 @@ public abstract class SolrConnection implements Connection {
 
 	@Override
 	public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "releaseSavepoint")
-			.getSQLException();
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"releaseSavepoint").getSQLException();
 	}
 
 	@Override
@@ -359,11 +373,11 @@ public abstract class SolrConnection implements Connection {
 	@Override
 	public <T> T unwrap(Class<T> arg0) throws SQLException {
 		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "unwrap")
-			.getSQLException();
+				.getSQLException();
 	}
 
 	public abstract void setQueryTimeout(int second);
-	
+
 	public abstract int getQueryTimeout();
 
 	protected void checkClosed() throws SQLException {
@@ -371,7 +385,7 @@ public abstract class SolrConnection implements Connection {
 			throw DbException.get(ErrorCode.OBJECT_CLOSED, "Connection");
 		}
 	}
-	
+
 	protected void setExecutingStatement(Statement statement) {
 		this.executingStatement = statement;
 	}

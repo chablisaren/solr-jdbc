@@ -9,7 +9,7 @@ import net.sf.jsqlparser.statement.insert.Insert;
 
 import org.apache.solr.common.SolrInputDocument;
 
-import com.google.code.solr_jdbc.SolrColumn;
+import com.google.code.solr_jdbc.expression.Expression;
 import com.google.code.solr_jdbc.expression.Item;
 import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.impl.AbstractResultSet;
@@ -52,14 +52,14 @@ public class InsertCommand extends Command {
 	public int executeUpdate() {
 		DatabaseMetaDataImpl metaData = this.conn.getMetaDataImpl();
 		String tableName = insStmt.getTable().getName();
-		List<SolrColumn> columns = metaData.getSolrColumns(tableName);
+		List<Expression> columns = metaData.getSolrColumns(tableName);
 		if (columns == null)
 			throw DbException.get(ErrorCode.TABLE_OR_VIEW_NOT_FOUND, tableName);
 
 		if (insStmt.getColumns() != null) {
-			columns = new ArrayList<SolrColumn>();
+			columns = new ArrayList<Expression>();
 			for (Column column : (List<Column>) insStmt.getColumns()) {
-				SolrColumn solrColumn = metaData.getSolrColumn(tableName,
+				Expression solrColumn = metaData.getSolrColumn(tableName,
 						column.getColumnName());
 				if (solrColumn == null)
 					throw DbException.get(ErrorCode.COLUMN_NOT_FOUND, column

@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
-
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
 import net.sf.jsqlparser.expression.CaseExpression;
@@ -44,7 +42,9 @@ import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
-import com.google.code.solr_jdbc.SolrColumn;
+import org.apache.commons.lang.StringUtils;
+
+import com.google.code.solr_jdbc.expression.Expression;
 import com.google.code.solr_jdbc.expression.Item;
 import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
@@ -62,7 +62,7 @@ public class ConditionParser implements ExpressionVisitor {
 	private final DatabaseMetaDataImpl metaData;
 	private String likeEscapeChar;
 	private ParseContext context = ParseContext.NONE;
-	private SolrColumn currentColumn = null;
+	private Expression currentColumn = null;
 
 	public ConditionParser(DatabaseMetaDataImpl metaData) {
 		this.metaData = metaData;
@@ -316,7 +316,7 @@ public class ConditionParser implements ExpressionVisitor {
 
 	@Override
 	public void visit(Column column) {
-		SolrColumn solrColumn = metaData.getSolrColumn(tableName, column.getColumnName());
+		Expression solrColumn = metaData.getSolrColumn(tableName, column.getColumnName());
 		if (solrColumn == null) {
 			throw DbException.get(ErrorCode.COLUMN_NOT_FOUND, column.getColumnName());
 		}

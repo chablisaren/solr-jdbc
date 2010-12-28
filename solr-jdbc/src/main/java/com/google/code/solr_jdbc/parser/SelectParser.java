@@ -23,8 +23,9 @@ import net.sf.jsqlparser.statement.select.Union;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.google.code.solr_jdbc.SolrColumn;
+import com.google.code.solr_jdbc.expression.Expression;
 import com.google.code.solr_jdbc.expression.Parameter;
+import com.google.code.solr_jdbc.expression.SolrColumn;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.impl.ResultSetMetaDataImpl;
 import com.google.code.solr_jdbc.message.DbException;
@@ -39,7 +40,7 @@ public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVi
 	private final Map<String, String> solrOptions;
 	private final DatabaseMetaDataImpl metaData;
 	private final List<String> selectColumns;
-	private ResultSetMetaDataImpl rsMetaData;
+	private List<Expression> expressions;
 	private boolean hasGroupBy = false;
 
 	public SelectParser(DatabaseMetaDataImpl metaData) {
@@ -59,8 +60,8 @@ public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVi
 		return selectColumns;
 	}
 
-	public ResultSetMetaDataImpl getResultSetMetaData() {
-		return rsMetaData;
+	public List<Expression> getExpressions() {
+		return expressions;
 	}
 
 	public String getQuery(List<Parameter> params) {
@@ -92,7 +93,7 @@ public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVi
 		for(Object obj : plainSelect.getSelectItems()) {
 			((SelectItem)obj).accept(selectItemFinder);
 		}
-		rsMetaData = selectItemFinder.getResultSetMetaData();
+		expressions = selectItemFinder.getExpressions();
 
 		// Where句の解析
 		if (plainSelect.getWhere()!=null) {
@@ -127,7 +128,7 @@ public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVi
 	private void parseGroupBy(List<Column> groupByColumns) {
 		for(Column column : groupByColumns) {
 			solrOptions.put("facet", "true");
-			SolrColumn solrColumn = metaData.getSolrColumn(tableName, column.getColumnName());
+			Expression solrColumn = metaData.getSolrColumn(tableName, column.getColumnName());
 			solrOptions.put("facet.field", solrColumn.getSolrColumnName());
 		}
 	}
@@ -140,7 +141,7 @@ public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVi
 			orderByElement.getColumnReference().accept(new ColumnReferenceVisitor() {
 				@Override
 				public void visit(Column col) {
-					SolrColumn solrColumn = metaData.getSolrColumn(tableName, col.getColumnName());
+					Expression solrColumn = metaData.getSolrColumn(tableName, col.getColumnName());
 					String order = (orderByElement.isAsc()) ? "asc" : "desc";
 					sortColumns.add(solrColumn.getSolrColumnName() + " " + order);
 				}
@@ -153,7 +154,7 @@ public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVi
 	}
 	@Override
 	public void visit(Union union) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "union");
 	}
 
 	@Override
@@ -167,18 +168,18 @@ public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVi
 
 	@Override
 	public void visit(SubSelect arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "subquery");
 	}
 
 	@Override
 	public void visit(SubJoin arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "subjoin");
 	}
 
 
 	@Override
 	public void visit(ExpressionList arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "expressionList");
 	}
 
 	public boolean hasGroupBy() {

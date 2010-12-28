@@ -17,7 +17,6 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 
-import com.google.code.solr_jdbc.SolrColumn;
 import com.google.code.solr_jdbc.expression.Item;
 import com.google.code.solr_jdbc.expression.Literal;
 import com.google.code.solr_jdbc.expression.Parameter;
@@ -132,7 +131,7 @@ public class UpdateCommand extends Command {
 		parameters = conditionParser.getParameters();
 
 		for(Column column : (List<Column>)updStmt.getColumns()) {
-			SolrColumn solrColumn =((DatabaseMetaDataImpl)metaData).getSolrColumn(tableName, column.getColumnName());
+			com.google.code.solr_jdbc.expression.Expression solrColumn =((DatabaseMetaDataImpl)metaData).getSolrColumn(tableName, column.getColumnName());
 			solrColumnNames.put(solrColumn.getSolrColumnName(), 1);
 		}
 

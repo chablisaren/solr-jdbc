@@ -14,4 +14,5 @@ public enum SolrType {
 	FLOAT,
 	DOUBLE,
 	ARRAY,
+	UNKNOWN,
 }

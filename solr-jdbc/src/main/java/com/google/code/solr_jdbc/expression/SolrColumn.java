@@ -1,17 +1,17 @@
-package com.google.code.solr_jdbc.impl;
+package com.google.code.solr_jdbc.expression;
 
-import com.google.code.solr_jdbc.SolrColumn;
 import com.google.code.solr_jdbc.value.SolrType;
 
 
-public class DefaultSolrColumn extends SolrColumn {
-	public DefaultSolrColumn(String tableName, String columnName, SolrType type) {
+public class SolrColumn extends Expression{
+
+	public SolrColumn(String tableName, String columnName, SolrType type) {
 		this.tableName = tableName;
 		this.columnName = columnName;
 		this.type = type;
 	}
 
-	public DefaultSolrColumn(String solrColumnName) {
+	public SolrColumn(String solrColumnName) {
 		String[] columnNameTokens = solrColumnName.split("\\.", 3);
 		if (columnNameTokens.length != 3) {
 			throw new IllegalArgumentException("invalid solr column name: " + solrColumnName);
@@ -25,4 +25,5 @@ public class DefaultSolrColumn extends SolrColumn {
 			this.type = SolrType.valueOf(columnNameTokens[2]);
 		}
 	}
+
 }

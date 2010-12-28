@@ -1,14 +1,16 @@
 package com.google.code.solr_jdbc.impl;
 
+import java.util.List;
+
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
-import com.google.code.solr_jdbc.SolrColumn;
+import com.google.code.solr_jdbc.expression.Expression;
 
 public class DefaultResultSetImpl extends AbstractResultSet {
-	public DefaultResultSetImpl(SolrDocumentList solrResult, ResultSetMetaDataImpl rsMetaData) {
+	public DefaultResultSetImpl(SolrDocumentList solrResult, List<Expression> expressions) {
 		this.docList = solrResult;
-		this.metaData = rsMetaData;
+		this.metaData = new ResultSetMetaDataImpl(this, expressions, null);
 
 		if (metaData.getCountColumnList().size() > 0) {
 			// Countがあれば0件でもResultSetが帰るため
@@ -16,7 +18,7 @@ public class DefaultResultSetImpl extends AbstractResultSet {
 				docList.add(new SolrDocument()); 
 			}
 			for(SolrDocument doc : docList) {
-				for(SolrColumn countColumn :metaData.getCountColumnList()) {
+				for(Expression countColumn :metaData.getCountColumnList()) {
 					doc.setField(countColumn.getResultName(), solrResult.getNumFound());
 				}
 			}

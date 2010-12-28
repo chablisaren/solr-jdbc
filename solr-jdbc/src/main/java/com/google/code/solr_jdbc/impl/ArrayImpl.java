@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Map;
 
+import com.google.code.solr_jdbc.message.DbException;
+import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.value.SolrType;
 import com.google.code.solr_jdbc.value.SolrValue;
 
@@ -52,29 +54,30 @@ public class ArrayImpl implements Array {
 
 	@Override
 	public ResultSet getResultSet() throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getResultSet")
+			.getSQLException();
 	}
 
 	@Override
 	public ResultSet getResultSet(Map<String, Class<?>> map)
 			throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getResultSet")
+			.getSQLException();
 	}
 
 	@Override
 	public ResultSet getResultSet(long index, int count) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getResultSet")
+			.getSQLException();
 	}
 
 	@Override
 	public ResultSet getResultSet(long index, int count,
 			Map<String, Class<?>> map) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getResultSet")
+			.getSQLException();
 	}
+	
 	@Override
 	public void free() throws SQLException {
 		value = null;
