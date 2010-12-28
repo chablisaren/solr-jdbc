@@ -1,7 +1,6 @@
 package com.google.code.solr_jdbc.command;
 
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -14,6 +13,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
 
 import com.google.code.solr_jdbc.ColumnSpec;
+import com.google.code.solr_jdbc.impl.AbstractResultSet;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.value.DataType;
@@ -37,7 +37,7 @@ public class CreateTableCommand extends Command{
 	}
 
 	@Override
-	public ResultSet executeQuery() {
+	public AbstractResultSet executeQuery() {
 		throw DbException.get(ErrorCode.METHOD_ONLY_ALLOWED_FOR_QUERY);
 	}
 

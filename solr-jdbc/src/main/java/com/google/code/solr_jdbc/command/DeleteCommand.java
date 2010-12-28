@@ -2,8 +2,8 @@ package com.google.code.solr_jdbc.command;
 
 import java.io.IOException;
 import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import net.sf.jsqlparser.statement.delete.Delete;
 
@@ -11,6 +11,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
+import com.google.code.solr_jdbc.expression.Parameter;
+import com.google.code.solr_jdbc.impl.AbstractResultSet;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
@@ -21,11 +23,12 @@ public class DeleteCommand extends Command {
 	private ConditionParser conditionParser;
 
 	public DeleteCommand(Delete stmt) {
+		this.parameters = new ArrayList<Parameter>();
 		this.delStmt = stmt;
 	}
 
 	@Override
-	public ResultSet executeQuery() {
+	public AbstractResultSet executeQuery() {
 		throw DbException.get(ErrorCode.METHOD_ONLY_ALLOWED_FOR_QUERY);
 	}
 

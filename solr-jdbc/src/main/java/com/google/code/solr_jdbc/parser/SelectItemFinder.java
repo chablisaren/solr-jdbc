@@ -101,13 +101,13 @@ public class SelectItemFinder implements SelectItemVisitor, ExpressionVisitor {
 	}
 
 	@Override
-	public void visit(InverseExpression arg0) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+	public void visit(InverseExpression expr) {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "-");
 	}
 
 	@Override
-	public void visit(JdbcParameter arg0) {
-		throw DbException.get(ErrorCode.SYNTAX_ERROR);
+	public void visit(JdbcParameter param) {
+		throw DbException.get(ErrorCode.SYNTAX_ERROR, "");
 	}
 
 	@Override

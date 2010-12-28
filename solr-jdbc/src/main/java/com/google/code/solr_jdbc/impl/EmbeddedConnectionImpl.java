@@ -17,6 +17,7 @@ import org.xml.sax.SAXException;
 
 public class EmbeddedConnectionImpl extends SolrConnection {
 	private CoreContainer coreContainer;
+	private int timeout = 0;
 	
 	public EmbeddedConnectionImpl(String serverUrl)
 			throws ParserConfigurationException, IOException, SAXException {
@@ -37,4 +38,13 @@ public class EmbeddedConnectionImpl extends SolrConnection {
 		coreContainer.shutdown();
 	}
 
+	@Override
+	public int getQueryTimeout() {
+		return timeout;
+	}
+	
+	@Override
+	public void setQueryTimeout(int timeout) {
+		this.timeout = timeout;
+	}
 }

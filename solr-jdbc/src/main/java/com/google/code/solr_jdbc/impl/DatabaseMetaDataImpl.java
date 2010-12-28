@@ -21,9 +21,6 @@ import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.value.DataType;
 
-
-
-
 public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	private final SolrConnection conn;
 	private Map<String, List<SolrColumn>> tableColumns;
@@ -43,7 +40,8 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 				String tableName = doc.getFieldValue("meta.name").toString();
 				List<SolrColumn> columns = new ArrayList<SolrColumn>();
 				for (Object cols : doc.getFieldValues("meta.columns")) {
-					columns.add(new DefaultSolrColumn(tableName + "." + cols.toString()));
+					columns.add(new DefaultSolrColumn(tableName + "."
+							+ cols.toString()));
 				}
 				tableColumns.put(tableName, columns);
 			}
@@ -54,7 +52,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	}
 
 	public SolrColumn getSolrColumn(String tableName, String columnName) {
-		for(SolrColumn solrColumn : this.tableColumns.get(tableName)) {
+		for (SolrColumn solrColumn : this.tableColumns.get(tableName)) {
 			if (StringUtils.equals(solrColumn.getColumnName(), columnName)) {
 				return solrColumn;
 			}
@@ -62,90 +60,130 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		return null;
 
 	}
+
 	public List<SolrColumn> getSolrColumns(String tableName) {
-		if(tableColumns == null)
+		if (tableColumns == null)
 			buildMetadata();
 		return this.tableColumns.get(tableName);
 	}
+
+	/**
+	 * Checks if all procedures callable.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean allProceduresAreCallable() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Checks if it possible to query all tables returned by getTables.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean allTablesAreSelectable() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns whether an exception while auto commit is on closes all result
+	 * sets.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean autoCommitFailureClosesAllResultSets() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether data manipulation and CREATE/DROP is supported in
+	 * transactions.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean dataDefinitionCausesTransactionCommit() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether CREATE/DROP do not affect transactions.
+	 * 
+	 * @return fasle
+	 */
 	@Override
 	public boolean dataDefinitionIgnoredInTransactions() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether deletes are detected.
+	 * 
+	 * @return false
+	 */
 	@Override
-	public boolean deletesAreDetected(int i) throws SQLException {
-		// TODO Auto-generated method stub
+	public boolean deletesAreDetected(int type) throws SQLException {
 		return false;
 	}
 
+	/**
+	 * Returns whether the maximum row size includes blobs.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean doesMaxRowSizeIncludeBlobs() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public ResultSet getAttributes(String s, String s1, String s2, String s3)
+	public ResultSet getAttributes(String catalog, String schemaPattern,
+			String typeNamePattern, String attributeNamePattern)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getAttributes")
+				.getSQLException();
 	}
 
 	@Override
 	public ResultSet getBestRowIdentifier(String s, String s1, String s2,
 			int i, boolean flag) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBestRowIdentifier");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getBestRowIdentifier").getSQLException();
 	}
 
 	@Override
 	public String getCatalogSeparator() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getCatalogSeparator");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getCatalogSeparator").getSQLException();
 	}
 
 	@Override
 	public String getCatalogTerm() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getCatalogTerm");
+		throw DbException
+				.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getCatalogTerm")
+				.getSQLException();
 	}
 
 	@Override
 	public ResultSet getCatalogs() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getCatalogs");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getCatalogs")
+				.getSQLException();
 	}
 
 	@Override
 	public ResultSet getClientInfoProperties() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getClientInfoProperties");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getClientInfoProperties").getSQLException();
 	}
 
 	@Override
 	public ResultSet getColumnPrivileges(String s, String s1, String s2,
 			String s3) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getColumnPrivileges");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getColumnPrivileges").getSQLException();
 	}
 
 	@Override
@@ -156,12 +194,13 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		}
 
 		CollectionResultSet rs;
-		String[] columns = { "TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "COLUMN_NAME",
-				"DATA_TYPE", "TYPE_NAME", "COLUMN_SIZE", "BUFFER_LENGTH", "DECIMAL_DIGITS",
-				"NUM_PREC_RADIX", "NULLABLE", "REMARKS", "COLUMN_DEF",
-				"SQL_DATA_TYPE", "SQL_DATETIME_SUB", "CHAR_OCTET_LENGTH", "ORDINAL_POSITION",
-				"IS_NULLABLE", "SCOPE_CATLOG", "SCOPE_SCHEMA", "SCOPE_TABLE", "SOURCE_DATA_TYPE"
-		};
+		String[] columns = { "TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME",
+				"COLUMN_NAME", "DATA_TYPE", "TYPE_NAME", "COLUMN_SIZE",
+				"BUFFER_LENGTH", "DECIMAL_DIGITS", "NUM_PREC_RADIX",
+				"NULLABLE", "REMARKS", "COLUMN_DEF", "SQL_DATA_TYPE",
+				"SQL_DATETIME_SUB", "CHAR_OCTET_LENGTH", "ORDINAL_POSITION",
+				"IS_NULLABLE", "SCOPE_CATLOG", "SCOPE_SCHEMA", "SCOPE_TABLE",
+				"SOURCE_DATA_TYPE" };
 		rs = new CollectionResultSet();
 		rs.setColumns(Arrays.asList(columns));
 
@@ -190,7 +229,8 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	@Override
 	public ResultSet getCrossReference(String s, String s1, String s2,
 			String s3, String s4, String s5) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getCrossReference");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getCrossReference");
 	}
 
 	@Override
@@ -200,24 +240,30 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public int getDatabaseMajorVersion() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getDatabaseMajorVersion");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getDatabaseMajorVersion");
 	}
 
 	@Override
 	public int getDatabaseMinorVersion() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getDatabaseMinorVersion");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getDatabaseMinorVersion");
 	}
-
 
 	@Override
 	public String getDatabaseProductVersion() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getDatabaseProductVersion");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getDatabaseProductVersion");
 	}
 
+	/**
+	 * Returns default transaction isolation.
+	 * 
+	 * @return Connection.TRANSACTION_READ_COMMITTED
+	 */
 	@Override
 	public int getDefaultTransactionIsolation() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return Connection.TRANSACTION_READ_COMMITTED;
 	}
 
 	@Override
@@ -243,18 +289,21 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	@Override
 	public ResultSet getExportedKeys(String s, String s1, String s2)
 			throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getExportedKeys");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getExportedKeys");
 	}
 
 	@Override
 	public String getExtraNameCharacters() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getExtraNameCharacters");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getExtraNameCharacters");
 	}
 
 	@Override
 	public ResultSet getFunctionColumns(String s, String s1, String s2,
 			String s3) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getFunctionColumns");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getFunctionColumns");
 	}
 
 	@Override
@@ -265,31 +314,30 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public String getIdentifierQuoteString() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getFunctionColumns");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getFunctionColumns");
 	}
 
 	@Override
 	public ResultSet getImportedKeys(String catalog, String schema, String table)
 			throws SQLException {
 		CollectionResultSet rs = new CollectionResultSet();
-		String[] columns = {
-				"PKTABLE_CAT", "PKTABLE_SCHEM", "PKTABLE_NAME", "PKCOLUMN_NAME",
-				"FKTABLE_CAT", "FKTABLE_SCHEM", "FKTABLE_NAME", "FKCOLUMN_NAME",
-				"KEY_SEQ", "UPDATE_RULE", "DELETE_RULE", "FK_NAME", "PK_NAME", "DEFERRABILITY"
-				};
+		String[] columns = { "PKTABLE_CAT", "PKTABLE_SCHEM", "PKTABLE_NAME",
+				"PKCOLUMN_NAME", "FKTABLE_CAT", "FKTABLE_SCHEM",
+				"FKTABLE_NAME", "FKCOLUMN_NAME", "KEY_SEQ", "UPDATE_RULE",
+				"DELETE_RULE", "FK_NAME", "PK_NAME", "DEFERRABILITY" };
 		rs.setColumns(Arrays.asList(columns));
 		return rs;
 	}
 
 	@Override
-	public ResultSet getIndexInfo(String catalog, String schema, String table, boolean unique,
-			boolean approximate) throws SQLException {
+	public ResultSet getIndexInfo(String catalog, String schema, String table,
+			boolean unique, boolean approximate) throws SQLException {
 		CollectionResultSet rs = new CollectionResultSet();
-		String[] columns = {
-				"TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "NON_UNIQUE",
-				"INDEX_QUALIFIER", "INDEX_NAME", "TYPE", "ORDINAL_POSITION",
-				"COLUMN_NAME", "ASC_OR_DESC", "CARDINALITY", "PAGES", "FILTER_CONDITION"
-				};
+		String[] columns = { "TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME",
+				"NON_UNIQUE", "INDEX_QUALIFIER", "INDEX_NAME", "TYPE",
+				"ORDINAL_POSITION", "COLUMN_NAME", "ASC_OR_DESC",
+				"CARDINALITY", "PAGES", "FILTER_CONDITION" };
 		rs.setColumns(Arrays.asList(columns));
 		return rs;
 	}
@@ -306,22 +354,38 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public int getMaxBinaryLiteralLength() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getMaxBinaryLiteralLength");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getMaxBinaryLiteralLength");
 	}
 
+	/**
+	 * Returns the maximum length for a catalog name.
+	 * 
+	 * @return 0 for limit is unknown.
+	 */
 	@Override
 	public int getMaxCatalogNameLength() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getMaxCatalogNameLength");
+		return 0;
 	}
 
+	/**
+	 * Returns the maximum length of literals.
+	 * 
+	 * @return 0 for limit is unknown
+	 */
 	@Override
 	public int getMaxCharLiteralLength() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getMaxCharLiteralLength");
+		return 0;
 	}
 
+	/**
+	 * Returns the maximum length of column names.
+	 * 
+	 * @return 0 for limit is unknown
+	 */
 	@Override
 	public int getMaxColumnNameLength() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getMaxColumnNameLength");
+		return 0;
 	}
 
 	/**
@@ -330,17 +394,17 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	 */
 	@Override
 	public int getMaxColumnsInGroupBy() throws SQLException {
-		return 1;
+		return 0;
 	}
 
 	@Override
 	public int getMaxColumnsInIndex() throws SQLException {
-		return 255;
+		return 0;
 	}
 
 	@Override
 	public int getMaxColumnsInOrderBy() throws SQLException {
-		return 255;
+		return 0;
 	}
 
 	@Override
@@ -355,22 +419,22 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public int getMaxConnections() throws SQLException {
-		return 255;
+		return 0;
 	}
 
 	@Override
 	public int getMaxCursorNameLength() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getMaxCursorNameLength");
+		return 0;
 	}
 
 	@Override
 	public int getMaxIndexLength() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getMaxIndexLength");
+		return 0;
 	}
 
 	@Override
 	public int getMaxProcedureNameLength() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getMaxProcedureNameLength");
+		return 0;
 	}
 
 	@Override
@@ -383,79 +447,87 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		return 0; // No limitation
 	}
 
+	/**
+	 * Returns the maximum length of a statement.
+	 * 
+	 * @return 0 for limit is unknown
+	 */
 	@Override
 	public int getMaxStatementLength() throws SQLException {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
+	/**
+	 * Returns the maximum number of open statements.
+	 * 
+	 * @return 0 for limit is unknown
+	 */
 	@Override
 	public int getMaxStatements() throws SQLException {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public int getMaxTableNameLength() throws SQLException {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public int getMaxTablesInSelect() throws SQLException {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public int getMaxUserNameLength() throws SQLException {
-		return 0; // No limitation
+		return 0;
 	}
 
 	@Override
 	public String getNumericFunctions() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getNumericFunctions");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getNumericFunctions");
 	}
 
 	@Override
 	public ResultSet getPrimaryKeys(String catalog, String schema, String table)
 			throws SQLException {
 		CollectionResultSet rs;
-		String[] columns = { "TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME", "COLUMN_NAME",
-				"KEY_SEQ", "PK_NAME"
-		};
+		String[] columns = { "TABLE_CAT", "TABLE_SCHEM", "TABLE_NAME",
+				"COLUMN_NAME", "KEY_SEQ", "PK_NAME" };
 		rs = new CollectionResultSet();
 		rs.setColumns(Arrays.asList(columns));
 
-		/* TODO PKをセットする
-		for (SolrColumn column : tableColumns.get(table)) {
-			Object[] columnMeta = new Object[6];
-			columnMeta[2] = column.getTableName();
-			columnMeta[3] = column.getColumnName(); // COLUMN_NAME
-
-			columnMeta[4] = DataType.getDataType(column.getType()).sqlType; // KEY_SEQ
-			columnMeta[5] = DataType.getDataType(column.getType()).jdbc; // PK_NAME
-			rs.add(Arrays.asList(columnMeta));
-		}
-		*/
+		/*
+		 * TODO PKをセットする for (SolrColumn column : tableColumns.get(table)) {
+		 * Object[] columnMeta = new Object[6]; columnMeta[2] =
+		 * column.getTableName(); columnMeta[3] = column.getColumnName(); //
+		 * COLUMN_NAME
+		 * 
+		 * columnMeta[4] = DataType.getDataType(column.getType()).sqlType; //
+		 * KEY_SEQ columnMeta[5] = DataType.getDataType(column.getType()).jdbc;
+		 * // PK_NAME rs.add(Arrays.asList(columnMeta)); }
+		 */
 		return rs;
 	}
 
 	@Override
 	public ResultSet getProcedureColumns(String s, String s1, String s2,
 			String s3) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getProcedureColumns");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getProcedureColumns");
 	}
 
 	@Override
 	public String getProcedureTerm() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getProcedureTerm");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getProcedureTerm");
 	}
 
 	@Override
 	public ResultSet getProcedures(String s, String s1, String s2)
-		throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getProcedureTerm");
+			throws SQLException {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getProcedureTerm");
 	}
 
 	@Override
@@ -470,7 +542,8 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public String getSQLKeywords() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getSQLKeywords");
+		throw DbException
+				.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getSQLKeywords");
 	}
 
 	@Override
@@ -500,13 +573,15 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public String getStringFunctions() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getStringFunctions");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getStringFunctions");
 	}
 
 	@Override
 	public ResultSet getSuperTables(String s, String s1, String s2)
 			throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getSuperTables");
+		throw DbException
+				.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getSuperTables");
 	}
 
 	@Override
@@ -517,21 +592,23 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public String getSystemFunctions() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getSystemFunctions");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getSystemFunctions");
 	}
 
 	@Override
 	public ResultSet getTablePrivileges(String s, String s1, String s2)
 			throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getTablePrivileges");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getTablePrivileges");
 	}
 
 	@Override
 	public ResultSet getTableTypes() throws SQLException {
-		String[] columns = {"TABLE_TYPE"};
+		String[] columns = { "TABLE_TYPE" };
 		CollectionResultSet rs = new CollectionResultSet();
 		rs.setColumns(Arrays.asList(columns));
-		Object[] record = {"TABLE"}; 
+		Object[] record = { "TABLE" };
 		rs.add(Arrays.asList(record));
 		return rs;
 	}
@@ -588,96 +665,139 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	@Override
 	public ResultSet getVersionColumns(String s, String s1, String s2)
 			throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getVersionColumns");
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
+				"getVersionColumns");
 	}
 
+	/**
+	 * Returns whether inserts are detected.
+	 */
 	@Override
 	public boolean insertsAreDetected(int i) throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether the catalog is at the beginning.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean isCatalogAtStart() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns the same as Connection.isReadOnly().
+	 * 
+	 * @return if read only optimization is switched on
+	 */
 	@Override
 	public boolean isReadOnly() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return conn.isReadOnly();
 	}
 
+	/**
+	 * Does the database make a copy before updating.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean locatorsUpdateCopy() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether NULL+1 is NULL or not.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean nullPlusNonNullIsNull() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
-	@Override
-	public boolean nullsAreSortedAtEnd() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
+	/**
+	 * Checks if NULL is sorted at the beginning (no matter if ASC or DESC is used).
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean nullsAreSortedAtStart() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Checks if NULL is sorted at the end (no matter if ASC or DESC is used).
+	 * 
+	 * @return false
+	 */
+	@Override
+	public boolean nullsAreSortedAtEnd() throws SQLException {
+		return false;
+	}
+
+	/**
+	 * Checks if NULL is sorted high (bigger than anything that is not null).
+	 */
 	@Override
 	public boolean nullsAreSortedHigh() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Checks if NULL is sorted low (bigger than anything that is not null).
+	 */
 	@Override
 	public boolean nullsAreSortedLow() throws SQLException {
-		// TODO Auto-generated method stub
+		return true;
+	}
+
+	/**
+	 * Returns whether other deletes are visible.
+	 */
+	@Override
+	public boolean othersDeletesAreVisible(int type) throws SQLException {
 		return false;
 	}
 
+	/**
+	 * Returns whether other inserts are visible.
+	 */
 	@Override
-	public boolean othersDeletesAreVisible(int i) throws SQLException {
-		// TODO Auto-generated method stub
+	public boolean othersInsertsAreVisible(int type) throws SQLException {
 		return false;
 	}
 
+	/**
+	 * Returns whether other updates are visible.
+	 */
 	@Override
-	public boolean othersInsertsAreVisible(int i) throws SQLException {
-		// TODO Auto-generated method stub
+	public boolean othersUpdatesAreVisible(int type) throws SQLException {
 		return false;
 	}
 
+	/**
+	 * Returns whether own deletes are visible
+	 */
 	@Override
-	public boolean othersUpdatesAreVisible(int i) throws SQLException {
-		// TODO Auto-generated method stub
+	public boolean ownDeletesAreVisible(int type) throws SQLException {
 		return false;
 	}
 
+	/**
+	 * Returns whether own inserts are visible
+	 */
 	@Override
-	public boolean ownDeletesAreVisible(int i) throws SQLException {
-		// TODO Auto-generated method stub
+	public boolean ownInsertsAreVisible(int type) throws SQLException {
 		return false;
 	}
 
+	/**
+	 * Returns whether own updates are visible
+	 */
 	@Override
-	public boolean ownInsertsAreVisible(int i) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean ownUpdatesAreVisible(int i) throws SQLException {
-		// TODO Auto-generated method stub
+	public boolean ownUpdatesAreVisible(int type) throws SQLException {
 		return false;
 	}
 
@@ -785,8 +905,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public boolean supportsColumnAliasing() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
@@ -827,52 +946,75 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsDifferentTableCorrelationNames() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsExpressionsInOrderBy() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsExtendedSQLGrammar() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsFullOuterJoins() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsGetGeneratedKeys() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return true
+	 */
 	@Override
 	public boolean supportsGroupBy() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Checks whether a GROUP BY clause can use columns that are not in the
+	 * SELECT clause, provided that it specifies all the columns in the SELECT
+	 * clause.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsGroupByBeyondSelect() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns whether GROUP BY is supported if the column is not in the SELECT
+	 * list.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsGroupByUnrelated() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
@@ -881,274 +1023,440 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		return false;
 	}
 
+	/**
+	 * @return true
+	 */
 	@Override
 	public boolean supportsLikeEscapeClause() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsLimitedOuterJoins() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether ODBC Minimum SQL grammar is supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsMinimumSQLGrammar() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Checks if for CREATE TABLE Test(ID INT), getTables returns Test as the
+	 * table name.
+	 * 
+	 * TODO case sensitiveに変更する。
+	 */
 	@Override
 	public boolean supportsMixedCaseIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Checks if a table created with CREATE TABLE "Test"(ID INT) is a different
+	 * table than a table created with CREATE TABLE TEST(ID INT).
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsMixedCaseQuotedIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Does the database support multiple open result sets.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsMultipleOpenResults() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns whether multiple result sets are supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsMultipleResultSets() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether multiple transactions are supported.
+	 * 
+	 * @false
+	 */
 	@Override
 	public boolean supportsMultipleTransactions() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Does the database support named parameters.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsNamedParameters() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether columns with NOT NULL are supported.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsNonNullableColumns() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns whether open result sets across commits are supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsOpenCursorsAcrossCommit() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether open result sets across rollback are supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsOpenCursorsAcrossRollback() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether open statements across commit are supported.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsOpenStatementsAcrossCommit() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns whether open statements across rollback are supported.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsOpenStatementsAcrossRollback() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns whether ORDER BY is supported if the column is not in the SELECT
+	 * list.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsOrderByUnrelated() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns whether outer joins are supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsOuterJoins() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether positioned deletes are supported.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsPositionedDelete() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns whether positioned updates are supported.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsPositionedUpdate() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns whether a specific result set concurrency is supported.
+	 */
 	@Override
-	public boolean supportsResultSetConcurrency(int i, int j)
+	public boolean supportsResultSetConcurrency(int type, int concurrency)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return type != ResultSet.TYPE_SCROLL_SENSITIVE;
 	}
 
+	/**
+	 * Does this database supports a result set holdability.
+	 * 
+	 * @return true if the holdability is ResultSet.CLOSE_CURSORS_AT_COMMIT
+	 */
 	@Override
-	public boolean supportsResultSetHoldability(int i) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean supportsResultSetHoldability(int holdability)
+			throws SQLException {
+		return holdability == ResultSet.CLOSE_CURSORS_AT_COMMIT;
 	}
 
+	/**
+	 * Returns whether a specific result set type is supported.
+	 */
 	@Override
-	public boolean supportsResultSetType(int i) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean supportsResultSetType(int type) throws SQLException {
+		return type != ResultSet.TYPE_SCROLL_SENSITIVE;
 	}
 
+	/**
+	 * Returns wheter savepoints is supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsSavepoints() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether the schema name in INSERT, UPDATE, DELETE is supported.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsSchemasInDataManipulation() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns whether the schema name in CREATE INDEX is supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsSchemasInIndexDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsSchemasInPrivilegeDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsSchemasInProcedureCalls() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsSchemasInTableDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * @return false
+	 */
 	@Override
 	public boolean supportsSelectForUpdate() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Does the database support statement pooling.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsStatementPooling() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether the database supports calling functions using the call syntax.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsStoredFunctionsUsingCallSyntax() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether stored procedures are supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsStoredProcedures() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether subqueries (SELECT) in comparisons are supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsSubqueriesInComparisons() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether SELECT in EXISTS is supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsSubqueriesInExists() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether IN(SELECT...) is supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsSubqueriesInIns() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether subqueries in quantified expression are supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsSubqueriesInQuantifieds() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether table correlation names (table alias) are supported.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsTableCorrelationNames() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns whether a specific transaction isolation level.
+	 * 
+	 * @retunr true, if level is TRANSACTION_READ_COMMITTED
+	 */
 	@Override
-	public boolean supportsTransactionIsolationLevel(int i) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean supportsTransactionIsolationLevel(int level)
+			throws SQLException {
+		switch (level) {
+		case Connection.TRANSACTION_READ_COMMITTED:
+			return true;
+		default:
+			return false;
+		}
 	}
 
+	/**
+	 * Returns whether transactions are supported.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean supportsTransactions() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
+	/**
+	 * Returns whether UNION SELECT is supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsUnion() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether UNION ALL SELECT is supported.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean supportsUnionAll() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Returns whether updates are detected.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean updatesAreDetected(int i) throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Checks if this database use one file per table.
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean usesLocalFilePerTable() throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Checks if this database store data in local files.
+	 * 
+	 * @return true
+	 */
 	@Override
 	public boolean usesLocalFiles() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "isWrapperFor")
+				.getSQLException();
 	}
 
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "unwrap")
+				.getSQLException();
 	}
 }

@@ -10,6 +10,8 @@ import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 
 
 public class CommonsHttpConnectionImpl extends SolrConnection {
+	private int timeout = 0;
+	
 	public CommonsHttpConnectionImpl(String serverUrl) throws MalformedURLException {
 		super(serverUrl);
 		HttpClient httpClient = new HttpClient();
@@ -24,4 +26,15 @@ public class CommonsHttpConnectionImpl extends SolrConnection {
 		
 	}
 
+	@Override
+	public int getQueryTimeout() {
+		return timeout;
+	}
+	
+	@Override
+	public void setQueryTimeout(int timeout) {
+		this.timeout = timeout;
+		((CommonsHttpSolrServer)getSolrServer()).setConnectionTimeout(timeout*1000);
+		((CommonsHttpSolrServer)getSolrServer()).setSoTimeout(timeout*1000);
+	}
 }

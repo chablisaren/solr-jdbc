@@ -1,6 +1,5 @@
 package com.google.code.solr_jdbc.command;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -12,6 +11,8 @@ import org.apache.solr.common.SolrInputDocument;
 
 import com.google.code.solr_jdbc.SolrColumn;
 import com.google.code.solr_jdbc.expression.Item;
+import com.google.code.solr_jdbc.expression.Parameter;
+import com.google.code.solr_jdbc.impl.AbstractResultSet;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
@@ -25,6 +26,7 @@ public class InsertCommand extends Command {
 
 	public InsertCommand(Insert stmt) {
 		this.insStmt = stmt;
+		this.parameters = new ArrayList<Parameter>();
 	}
 
 	@Override
@@ -41,7 +43,7 @@ public class InsertCommand extends Command {
 	}
 
 	@Override
-	public ResultSet executeQuery() {
+	public AbstractResultSet executeQuery() {
 		throw DbException.get(ErrorCode.METHOD_ONLY_ALLOWED_FOR_QUERY);
 	}
 
