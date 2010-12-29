@@ -51,7 +51,9 @@ public class S2JDBCTest extends S2TestCase {
 		assertNull("設定しなかったところはnullが入る", player.registeredAt);
 
 		player.playerName = "野村謙二郎";
+		userTransaction.begin();
 		int res = playerService.update(player);
+		userTransaction.commit();
 
 		assertEquals("1件更新される", 1, res);
 
@@ -82,8 +84,8 @@ public class S2JDBCTest extends S2TestCase {
 		userTransaction.commit();
 		
 		List<Player> playerList = playerService.findBySql();
-		assertEquals("二塁手", playerList.get(0).position.get(0));			
-		assertEquals("遊撃手", playerList.get(0).position.get(1));			
+		assertEquals("二塁手", playerList.get(0).position.get(0));
+		assertEquals("遊撃手", playerList.get(0).position.get(1));
 
 	}
 }
