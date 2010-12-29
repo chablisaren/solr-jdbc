@@ -3,15 +3,15 @@ package com.google.code.solr_jdbc.expression;
 import com.google.code.solr_jdbc.value.SolrType;
 
 
-public class SolrColumn extends Expression{
+public class ColumnExpression extends Expression{
 
-	public SolrColumn(String tableName, String columnName, SolrType type) {
+	public ColumnExpression(String tableName, String columnName, SolrType type) {
 		this.tableName = tableName;
 		this.columnName = columnName;
 		this.type = type;
 	}
 
-	public SolrColumn(String solrColumnName) {
+	public ColumnExpression(String solrColumnName) {
 		String[] columnNameTokens = solrColumnName.split("\\.", 3);
 		if (columnNameTokens.length != 3) {
 			throw new IllegalArgumentException("invalid solr column name: " + solrColumnName);

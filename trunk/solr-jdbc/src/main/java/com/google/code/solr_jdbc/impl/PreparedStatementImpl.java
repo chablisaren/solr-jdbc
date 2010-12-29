@@ -18,13 +18,16 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.RowId;
 import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
 import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.statement.Statement;
 
 import com.google.code.solr_jdbc.command.Command;
 import com.google.code.solr_jdbc.command.CommandFactory;
@@ -39,10 +42,6 @@ import com.google.code.solr_jdbc.value.ValueDecimal;
 import com.google.code.solr_jdbc.value.ValueDouble;
 import com.google.code.solr_jdbc.value.ValueNull;
 import com.google.code.solr_jdbc.value.ValueString;
-
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.parser.CCJSqlParserManager;
-import net.sf.jsqlparser.statement.Statement;
 
 /**
  * Solr PreparedStatement

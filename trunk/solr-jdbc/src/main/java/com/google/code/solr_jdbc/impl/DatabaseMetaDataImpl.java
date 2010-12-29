@@ -17,7 +17,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 
 import com.google.code.solr_jdbc.expression.Expression;
-import com.google.code.solr_jdbc.expression.SolrColumn;
+import com.google.code.solr_jdbc.expression.ColumnExpression;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.value.DataType;
@@ -41,7 +41,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 				String tableName = doc.getFieldValue("meta.name").toString();
 				List<Expression> columns = new ArrayList<Expression>();
 				for (Object cols : doc.getFieldValues("meta.columns")) {
-					columns.add(new SolrColumn(tableName + "."
+					columns.add(new ColumnExpression(tableName + "."
 							+ cols.toString()));
 				}
 				tableColumns.put(tableName, columns);
@@ -499,7 +499,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		rs.setColumns(Arrays.asList(columns));
 
 		/*
-		 * TODO PKをセットする for (SolrColumn column : tableColumns.get(table)) {
+		 * TODO PKをセットする for (ColumnExpression column : tableColumns.get(table)) {
 		 * Object[] columnMeta = new Object[6]; columnMeta[2] =
 		 * column.getTableName(); columnMeta[3] = column.getColumnName(); //
 		 * COLUMN_NAME

@@ -6,11 +6,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class MultiValueTest {
 	Connection conn;
 
+	@BeforeClass
+	public static void setUpLog() {
+		Logger logger = org.slf4j.LoggerFactory.getLogger("");
+	}
 	@Before
 	public void setUp() throws Exception{
 		Class.forName(SolrDriver.class.getName());
@@ -39,7 +45,7 @@ public class MultiValueTest {
 	}
 
 	@Test
-	public void test_multiValue() throws Exception {
+	public void multiValue() throws Exception {
 		PreparedStatement selStmt = conn.prepareStatement(
 				"SELECT * FROM books");
 		ResultSet rs = selStmt.executeQuery();
@@ -50,7 +56,7 @@ public class MultiValueTest {
 	}
 
 	@Test
-	public void test_multiValueWhereClause() throws Exception {
+	public void multiValueWhereClause() throws Exception {
 		PreparedStatement selStmt = conn.prepareStatement(
 				"SELECT * FROM books where author = ?");
 		selStmt.setString(1, "勝間和代");

@@ -8,7 +8,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.code.solr_jdbc.expression.Expression;
-import com.google.code.solr_jdbc.expression.SolrColumn;
+import com.google.code.solr_jdbc.expression.FunctionExpression;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.value.DataType;
@@ -19,7 +19,7 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	private final String catalog;
 	private final AbstractResultSet resultSet;
 	private final List<Expression> expressions;
-//	private final List<SolrColumn> solrColumns = new ArrayList<SolrColumn>();
+//	private final List<ColumnExpression> solrColumns = new ArrayList<ColumnExpression>();
 
 	public ResultSetMetaDataImpl(AbstractResultSet resultSet, List<Expression> expressions, String catalog) {
 		this.catalog = catalog;
@@ -204,8 +204,8 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	public List<Expression> getCountColumnList() {
 		List<Expression> countColumns = new ArrayList<Expression>();
 		for(Expression solrColumn : expressions) {
-			if(solrColumn instanceof FunctionSolrColumn &&
-				StringUtils.equals(((FunctionSolrColumn)solrColumn).getFunctionName(), "count")) {
+			if(solrColumn instanceof FunctionExpression &&
+				StringUtils.equals(((FunctionExpression)solrColumn).getFunctionName(), "count")) {
 				countColumns.add(solrColumn);
 			}
 		}

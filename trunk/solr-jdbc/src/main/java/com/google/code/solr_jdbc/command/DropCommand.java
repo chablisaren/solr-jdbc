@@ -1,10 +1,7 @@
 package com.google.code.solr_jdbc.command;
 
-import java.util.ArrayList;
-
 import net.sf.jsqlparser.statement.drop.Drop;
 
-import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.impl.AbstractResultSet;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;

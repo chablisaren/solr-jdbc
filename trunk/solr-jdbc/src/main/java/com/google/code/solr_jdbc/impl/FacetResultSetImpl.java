@@ -9,7 +9,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
 import com.google.code.solr_jdbc.expression.Expression;
-import com.google.code.solr_jdbc.expression.SolrColumn;
+import com.google.code.solr_jdbc.expression.ColumnExpression;
 
 
 /**
@@ -24,7 +24,7 @@ public class FacetResultSetImpl extends AbstractResultSet {
 		docList = new SolrDocumentList();
 		for (FacetField field : response.getFacetFields()) {
 			try {
-				int columnIndex = metaData.findColumn(new SolrColumn(field.getName()).getColumnName());
+				int columnIndex = metaData.findColumn(new ColumnExpression(field.getName()).getColumnName());
 				String columnName = metaData.getSolrColumnName(columnIndex);
 				for (Count count : field.getValues()) {
 					SolrDocument doc = new SolrDocument();
