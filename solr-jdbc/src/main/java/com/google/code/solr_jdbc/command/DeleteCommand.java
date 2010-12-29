@@ -85,7 +85,7 @@ public class DeleteCommand extends Command {
 			conditionParser = new ConditionParser((DatabaseMetaDataImpl)metaData);
 			conditionParser.setTableName(delStmt.getTable().getName());
 			delStmt.getWhere().accept(conditionParser);
-			parameters = getParameters();
+			parameters = conditionParser.getParameters();
 		}
 	}
 
