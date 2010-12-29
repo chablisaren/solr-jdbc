@@ -1,6 +1,7 @@
 package com.google.code.solr_jdbc.value;
 
 import java.math.BigDecimal;
+import java.sql.Array;
 import java.sql.Date;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -8,7 +9,6 @@ import java.util.HashMap;
 
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 /**
  * Mapping solr types to sql types, vice-versa

@@ -20,6 +20,7 @@ import org.apache.solr.common.SolrInputDocument;
 import com.google.code.solr_jdbc.expression.Item;
 import com.google.code.solr_jdbc.expression.Literal;
 import com.google.code.solr_jdbc.expression.Parameter;
+import com.google.code.solr_jdbc.expression.ValueExpression;
 import com.google.code.solr_jdbc.impl.AbstractResultSet;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.message.DbException;
@@ -119,9 +120,12 @@ public class UpdateCommand extends Command {
 				parameters.add(p);
 				setItemList.add(p);
 			} else {
-				setItemList.add(new Literal(expressionParser.getValue()));
+				if (expressionParser.getExpression() instanceof ValueExpression) {
+					setItemList.add(new Literal(((ValueExpression)expressionParser.getExpression()).getValue()));
+				} else {
+					DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "itemList must be literal.");
+				}
 			}
-			
 		}
 
 		// Where句の解析

@@ -11,6 +11,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 import com.google.code.solr_jdbc.expression.Item;
 import com.google.code.solr_jdbc.expression.Literal;
 import com.google.code.solr_jdbc.expression.Parameter;
+import com.google.code.solr_jdbc.expression.ValueExpression;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 
@@ -45,7 +46,11 @@ public class ItemListParser implements ItemsListVisitor{
 				parameters.add(p);
 				itemList.add(p);
 			} else {
-				itemList.add(new Literal(expressionParser.getValue()));
+				if (expressionParser.getExpression() instanceof ValueExpression) {
+					itemList.add(new Literal(((ValueExpression)expressionParser.getExpression()).getValue()));
+				} else {
+					DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "itemList must be literal.");
+				}
 			}
 		}
 		

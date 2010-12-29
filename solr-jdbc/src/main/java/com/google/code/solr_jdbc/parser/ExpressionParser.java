@@ -1,5 +1,7 @@
 package com.google.code.solr_jdbc.parser;
 
+import java.sql.Date;
+
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnyComparisonExpression;
 import net.sf.jsqlparser.expression.CaseExpression;
@@ -36,9 +38,14 @@ import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
+import com.google.code.solr_jdbc.expression.Expression;
+import com.google.code.solr_jdbc.expression.FunctionExpression;
+import com.google.code.solr_jdbc.expression.ValueExpression;
+import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.value.SolrValue;
+import com.google.code.solr_jdbc.value.ValueDate;
 import com.google.code.solr_jdbc.value.ValueDouble;
 import com.google.code.solr_jdbc.value.ValueLong;
 import com.google.code.solr_jdbc.value.ValueNull;
@@ -46,14 +53,21 @@ import com.google.code.solr_jdbc.value.ValueString;
 
 public class ExpressionParser implements ExpressionVisitor {
 
-	private SolrValue value;
+	private Expression expression;
 	private boolean isParameter;
+	private DatabaseMetaDataImpl metaData;
+	private String tableName;
 	
 	public ExpressionParser() {
 	}
 
-	public SolrValue getValue() {
-		return value;
+	public ExpressionParser(String talbeName, DatabaseMetaDataImpl metaData) {
+		this.tableName = talbeName;
+		this.metaData = metaData;
+	}
+	
+	public Expression getExpression() {
+		return this.expression;
 	}
 	
 	public boolean isParameter() {
@@ -62,12 +76,12 @@ public class ExpressionParser implements ExpressionVisitor {
 	
 	@Override
 	public void visit(NullValue val) {
-		value = ValueNull.INSTANCE;
+		expression = ValueExpression.get(ValueNull.INSTANCE);
 	}
 
 	@Override
 	public void visit(Function func) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, func.getName());
+		expression = new FunctionExpression(func);
 	}
 
 	@Override
@@ -82,17 +96,20 @@ public class ExpressionParser implements ExpressionVisitor {
 
 	@Override
 	public void visit(DoubleValue val) {
-		value = ValueDouble.get(val.getValue());
+		SolrValue value = ValueDouble.get(val.getValue());
+		expression = ValueExpression.get(value);
 	}
 
 	@Override
 	public void visit(LongValue val) {
-		value = ValueLong.get(val.getValue());
+		SolrValue value = ValueLong.get(val.getValue());
+		expression = ValueExpression.get(value);
 	}
 
 	@Override
 	public void visit(DateValue val) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "Date Literal:"+val);
+		SolrValue value = ValueDate.get(val.getValue());
+		expression = ValueExpression.get(value);
 	}
 
 	@Override
@@ -102,7 +119,8 @@ public class ExpressionParser implements ExpressionVisitor {
 
 	@Override
 	public void visit(TimestampValue val) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "Timestamp Literal:"+val);
+		SolrValue value = ValueDate.get(new Date(val.getValue().getTime()));
+		expression = ValueExpression.get(value);
 	}
 
 	@Override
@@ -112,7 +130,8 @@ public class ExpressionParser implements ExpressionVisitor {
 
 	@Override
 	public void visit(StringValue val) {
-		value = ValueString.get(val.getValue());
+		SolrValue value = ValueString.get(val.getValue());
+		expression = ValueExpression.get(value);
 	}
 
 	@Override
@@ -196,8 +215,10 @@ public class ExpressionParser implements ExpressionVisitor {
 	}
 
 	@Override
-	public void visit(Column arg0) {
-		throw DbException.get(ErrorCode.SYNTAX_ERROR);
+	public void visit(Column column) {
+		expression = metaData.getSolrColumn(tableName, column.getColumnName());
+		if(expression == null)
+			throw DbException.get(ErrorCode.COLUMN_NOT_FOUND, column.getColumnName());
 	}
 
 	@Override

@@ -25,9 +25,7 @@ import org.apache.commons.lang.StringUtils;
 
 import com.google.code.solr_jdbc.expression.Expression;
 import com.google.code.solr_jdbc.expression.Parameter;
-import com.google.code.solr_jdbc.expression.SolrColumn;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
-import com.google.code.solr_jdbc.impl.ResultSetMetaDataImpl;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 
