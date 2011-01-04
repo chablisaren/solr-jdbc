@@ -8,8 +8,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
+import com.google.code.solr_jdbc.expression.ColumnExpression;
+import com.google.code.solr_jdbc.expression.Expression;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
+import com.google.code.solr_jdbc.value.SolrType;
 
 public class CollectionResultSet extends AbstractResultSet {
 	private List<String> columns;
@@ -29,6 +32,12 @@ public class CollectionResultSet extends AbstractResultSet {
 
 	protected void setColumns(List<String> columnNames) {
 		this.columns = columnNames;
+		List<Expression> expressions = new ArrayList<Expression>();
+		for(String columnName : columns) {
+			ColumnExpression expression = new ColumnExpression(null, columnName, SolrType.UNKNOWN);
+			expressions.add(expression);
+		}
+		this.metaData = new ResultSetMetaDataImpl(this, expressions, null);
 	}
 	@Override
 	public int findColumn(String columnLabel) throws SQLException {
