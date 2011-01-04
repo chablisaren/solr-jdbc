@@ -141,7 +141,7 @@
         <dependency>
         	<groupId>com.google.code</groupId>
         	<artifactId>solr-jdbc</artifactId>
-        	<version>0.1.1-SNAPSHOT</version>
+        	<version>0.1.1</version>
         </dependency>
   </dependencies>
 </project>
