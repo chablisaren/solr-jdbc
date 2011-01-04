@@ -14,7 +14,13 @@
 			<url>dummy</url>
 		</snapshotRepository>
 	</distributionManagement>
-	
+
+	<scm>
+		<connection>scm:svn:http://solr-jdbc.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://solr-jdbc.googlecode.com/svn/trunk/</developerConnection>
+		<url>scm:svn:http://solr-jdbc.googlecode.com/svn/trunk/</url>
+	</scm>
+
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<outputDirectory>target/classes</outputDirectory>
