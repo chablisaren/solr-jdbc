@@ -1,4 +1,4 @@
-#Solr JDBC Example
+#summary Solr JDBC Example
 
 = using S2JDBC =
 
