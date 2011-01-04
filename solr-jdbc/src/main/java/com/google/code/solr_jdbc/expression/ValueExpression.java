@@ -35,4 +35,14 @@ public class ValueExpression extends Expression {
 	public SolrType getType() {
 		return value.getType();
 	}
+
+	@Override
+	public long getPrecision() {
+		return 0;
+	}
+
+	@Override
+	public int getScale() {
+		return 0;
+	}
 }

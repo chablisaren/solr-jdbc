@@ -16,5 +16,15 @@ public class FunctionExpression extends Expression {
 		return functionName;
 	}
 
+	@Override
+	public long getPrecision() {
+		return 0;
+	}
+
+	@Override
+	public int getScale() {
+		return 0;
+	}
+
 
 }

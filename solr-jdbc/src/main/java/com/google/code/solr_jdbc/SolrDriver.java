@@ -75,8 +75,7 @@ public class SolrDriver implements Driver {
 	@Override
 	public DriverPropertyInfo[] getPropertyInfo(String s, Properties properties)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return new DriverPropertyInfo[0];
 	}
 
 	/**

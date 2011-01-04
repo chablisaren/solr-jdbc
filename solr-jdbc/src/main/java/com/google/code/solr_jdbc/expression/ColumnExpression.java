@@ -1,5 +1,6 @@
 package com.google.code.solr_jdbc.expression;
 
+import com.google.code.solr_jdbc.value.DataType;
 import com.google.code.solr_jdbc.value.SolrType;
 
 
@@ -24,6 +25,16 @@ public class ColumnExpression extends Expression{
 		} else {
 			this.type = SolrType.valueOf(columnNameTokens[2]);
 		}
+	}
+
+	@Override
+	public long getPrecision() {
+		return 0;
+	}
+
+	@Override
+	public int getScale() {
+		return 0;
 	}
 
 }
