@@ -223,11 +223,10 @@ public class SelectQueryTest {
 
 	@BeforeClass
 	public static void init() throws SQLException, ClassNotFoundException {
-		Connection setUpConn = null;
 		Class.forName(SolrDriver.class.getName());
+		Connection setUpConn = DriverManager.getConnection("jdbc:solr:s");
 
 		try {
-			setUpConn = DriverManager.getConnection("jdbc:solr:s");
 			PreparedStatement dropStmt = setUpConn.prepareStatement("DROP TABLE player");
 			try {
 				dropStmt.executeUpdate();
