@@ -498,16 +498,18 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		rs = new CollectionResultSet();
 		rs.setColumns(Arrays.asList(columns));
 
+		//TODO PKをセットする
 		/*
-		 * TODO PKをセットする for (ColumnExpression column : tableColumns.get(table)) {
-		 * Object[] columnMeta = new Object[6]; columnMeta[2] =
-		 * column.getTableName(); columnMeta[3] = column.getColumnName(); //
-		 * COLUMN_NAME
-		 * 
-		 * columnMeta[4] = DataType.getDataType(column.getType()).sqlType; //
-		 * KEY_SEQ columnMeta[5] = DataType.getDataType(column.getType()).jdbc;
-		 * // PK_NAME rs.add(Arrays.asList(columnMeta)); }
-		 */
+		for (Expression column : tableColumns.get(table)) {
+			Object[] columnMeta = new Object[6];
+			columnMeta[2] = column.getTableName();
+			columnMeta[3] = column.getColumnName(); //COLUMN_NAME
+			columnMeta[4] = DataType.getDataType(column.getType()).sqlType; //KEY_SEQ
+			columnMeta[5] = DataType.getDataType(column.getType()).jdbc; // PK_NAME
+			rs.add(Arrays.asList(columnMeta));
+		}
+		*/
+
 		return rs;
 	}
 
@@ -1110,8 +1112,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public boolean supportsIntegrityEnhancementFacility() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	/**

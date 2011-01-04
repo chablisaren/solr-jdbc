@@ -62,17 +62,17 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	}
 
 	@Override
-	public int getColumnDisplaySize(int column) throws SQLException {
+	public int getColumnDisplaySize(int columnIndex) throws SQLException {
 		checkClosed();
-		checkColumnIndex(column);
+		checkColumnIndex(columnIndex);
 		return 0;
 	}
 
 	@Override
-	public String getColumnLabel(int column) throws SQLException {
+	public String getColumnLabel(int columnIndex) throws SQLException {
 		checkClosed();
-		checkColumnIndex(column);
-		Expression expression = expressions.get(column - 1);
+		checkColumnIndex(columnIndex);
+		Expression expression = expressions.get(columnIndex - 1);
 		String columnName = expression.getAlias();
 		if(columnName != null)
 			return columnName;
@@ -80,24 +80,24 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	}
 
 	@Override
-	public String getColumnName(int column) throws SQLException {
+	public String getColumnName(int columnIndex) throws SQLException {
 		checkClosed();
-		checkColumnIndex(column);
-		Expression solrColumn = expressions.get(column - 1);
+		checkColumnIndex(columnIndex);
+		Expression solrColumn = expressions.get(columnIndex - 1);
 		return solrColumn.getColumnName();
 	}
 
-	public String getSolrColumnName(int column) throws SQLException {
+	public String getSolrColumnName(int columnIndex) throws SQLException {
 		checkClosed();
-		checkColumnIndex(column);
-		Expression solrColumn = expressions.get(column - 1);
+		checkColumnIndex(columnIndex);
+		Expression solrColumn = expressions.get(columnIndex - 1);
 		return solrColumn.getSolrColumnName();
 	}
 
-	public Expression getColumn(int column) throws SQLException {
+	public Expression getColumn(int columnIndex) throws SQLException {
 		checkClosed();
-		checkColumnIndex(column);
-		return expressions.get(column - 1);
+		checkColumnIndex(columnIndex);
+		return expressions.get(columnIndex - 1);
 	}
 
 	@Override
@@ -109,79 +109,133 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	}
 
 	@Override
-	public String getColumnTypeName(int column) throws SQLException {
-		Expression solrColumn = expressions.get(column - 1);
+	public String getColumnTypeName(int columnIndex) throws SQLException {
+		checkClosed();
+		checkColumnIndex(columnIndex);
+		Expression solrColumn = expressions.get(columnIndex - 1);
 		return DataType.getDataType(solrColumn.getType()).jdbc;
 	}
 
 	@Override
-	public int getPrecision(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return 0;
+	public int getPrecision(int columnIndex) throws SQLException {
+		checkClosed();
+		checkColumnIndex(columnIndex);
+		Expression expression = expressions.get(columnIndex -1);
+		return (int)expression.getPrecision();
 	}
 
 	@Override
-	public int getScale(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return 0;
+	public int getScale(int columnIndex) throws SQLException {
+		checkClosed();
+		checkColumnIndex(columnIndex);
+		Expression expression = expressions.get(columnIndex);
+		return expression.getScale();
 	}
 
 	@Override
-	public String getSchemaName(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	public String getSchemaName(int columnIndex) throws SQLException {
+		checkClosed();
+		checkColumnIndex(columnIndex);
+		Expression expression = expressions.get(columnIndex - 1);
+		return expression.getSchemaName();
 	}
 
 	@Override
-	public String getTableName(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	public String getTableName(int columnIndex) throws SQLException {
+		checkClosed();
+		checkColumnIndex(columnIndex);
+		return expressions.get(columnIndex).getTableName();
 	}
 
 	@Override
-	public boolean isAutoIncrement(int column) throws SQLException {
+	public boolean isAutoIncrement(int columnIndex) throws SQLException {
+		checkClosed();
+		checkColumnIndex(columnIndex);
 		return false;
 	}
 
 	@Override
-	public boolean isCaseSensitive(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return false;
-	}
-
-	@Override
-	public boolean isCurrency(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return false;
-	}
-
-	@Override
-	public boolean isDefinitelyWritable(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return false;
-	}
-
-	@Override
-	public int isNullable(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
-		return 0;
-	}
-
-	@Override
-	public boolean isReadOnly(int column) throws SQLException {
+	public boolean isCaseSensitive(int columnIndex) throws SQLException {
+		checkClosed();
+		checkColumnIndex(columnIndex);
 		return true;
 	}
 
+	/**
+	 * Checks if this is a currency column
+	 * It always return false.
+	 * 
+	 * @param columnIndex the column index (1,2,...)
+	 * @return true
+	 */
 	@Override
-	public boolean isSearchable(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
+	public boolean isCurrency(int columnIndex) throws SQLException {
+		checkClosed();
+		checkColumnIndex(columnIndex);
 		return false;
 	}
 
+	/**
+	 * Checks whether a write on this column will definitely succeed.
+	 * It always returns false
+	 * 
+	 * @return false
+	 */
 	@Override
-	public boolean isSigned(int column) throws SQLException {
-		// TODO 自動生成されたメソッド・スタブ
+	public boolean isDefinitelyWritable(int columnIndex) throws SQLException {
+		checkClosed();
+		checkColumnIndex(columnIndex);
 		return false;
+	}
+
+	/**
+	 * Checks if this is nullable column.
+	 */
+	@Override
+	public int isNullable(int columnIndex) throws SQLException {
+		checkClosed();
+		checkColumnIndex(columnIndex);
+		Expression expression = expressions.get(columnIndex - 1);
+		return expression.getNullable();
+	}
+
+	/**
+	 * Checks if this is read only.
+	 * It always returns true.
+	 * 
+	 * @return true
+	 */
+	@Override
+	public boolean isReadOnly(int columnIndex) throws SQLException {
+		checkClosed();
+		checkColumnIndex(columnIndex);
+		return true;
+	}
+
+	/**
+	 * Checks if this column is searchable.
+	 * It always returns true.
+	 * 
+	 * @return true
+	 */
+	@Override
+	public boolean isSearchable(int columnIndex) throws SQLException {
+		checkClosed();
+		checkColumnIndex(columnIndex);
+		return true;
+	}
+
+	/**
+	 * Checks if this column is signed.
+	 * It always returns true
+	 * 
+	 * @return true
+	 */
+	@Override
+	public boolean isSigned(int columnIndex) throws SQLException {
+		checkClosed();
+		checkColumnIndex(columnIndex);
+		return true;
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.google.code.solr_jdbc.expression;
 
+import java.sql.ResultSetMetaData;
+
 import org.apache.commons.lang.StringUtils;
 
 import com.google.code.solr_jdbc.value.SolrType;
@@ -58,5 +60,16 @@ public abstract class Expression {
 		}
 		return columnName;
 	}
+
+	public abstract long getPrecision();
 	
+	public abstract int getScale();
+
+	public int getNullable() {
+		return ResultSetMetaData.columnNullableUnknown;
+	}
+	
+	public String getSchemaName() {
+		return null;
+	}
 }
