@@ -44,7 +44,6 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.google.code.solr_jdbc.expression.Condition;
 import com.google.code.solr_jdbc.expression.Expression;
 import com.google.code.solr_jdbc.expression.Item;
 import com.google.code.solr_jdbc.expression.Parameter;
@@ -64,7 +63,6 @@ public class ConditionParser implements ExpressionVisitor {
 	private String likeEscapeChar;
 	private ParseContext context = ParseContext.NONE;
 	private Expression currentColumn = null;
-	private Condition condition = null;
 
 	public ConditionParser(DatabaseMetaDataImpl metaData) {
 		this.metaData = metaData;
