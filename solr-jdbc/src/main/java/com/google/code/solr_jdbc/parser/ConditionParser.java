@@ -44,6 +44,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.google.code.solr_jdbc.expression.Condition;
 import com.google.code.solr_jdbc.expression.Expression;
 import com.google.code.solr_jdbc.expression.Item;
 import com.google.code.solr_jdbc.expression.Parameter;
@@ -63,13 +64,14 @@ public class ConditionParser implements ExpressionVisitor {
 	private String likeEscapeChar;
 	private ParseContext context = ParseContext.NONE;
 	private Expression currentColumn = null;
+	private Condition condition = null;
 
 	public ConditionParser(DatabaseMetaDataImpl metaData) {
 		this.metaData = metaData;
 		query = new StringBuilder();
 		parameters = new ArrayList<Parameter>();
 	}
-	
+
 	public ConditionParser(DatabaseMetaDataImpl metaData, List<Parameter> parameters) {
 		this(metaData);
 		this.parameters.addAll(parameters);
@@ -82,7 +84,7 @@ public class ConditionParser implements ExpressionVisitor {
 	public List<Parameter> getParameters() {
 		return parameters;
 	}
-	
+
 	public String getQuery(List<Parameter> params) {
 		String queryString;
 		if(query.length() == 0) {
@@ -214,7 +216,15 @@ public class ConditionParser implements ExpressionVisitor {
 
 	@Override
 	public void visit(Between expr) {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "between");
+		context = ParseContext.BETWEEN;
+		expr.getLeftExpression().accept(this);
+		query.append(":[");
+		expr.getBetweenExpressionStart().accept(this);
+		query.append(" TO ");
+		expr.getBetweenExpressionEnd().accept(this);
+		query.append("] ");
+		context = ParseContext.NONE;
+		currentColumn = null;
 	}
 
 	@Override
@@ -322,6 +332,7 @@ public class ConditionParser implements ExpressionVisitor {
 		}
 		query.append(solrColumn.getSolrColumnName());
 		currentColumn = solrColumn;
+
 	}
 
 	@Override

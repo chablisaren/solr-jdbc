@@ -60,7 +60,7 @@ public class SelectQueryTest {
 		verifyStatement("SELECT player_name FROM player WHERE player_id >= 1 AND player_id <= 3",
 				expected2);
 	}
-	
+
 	@Test
 	public void testStatementOr() throws SQLException {
 		Object[][] expected1 = {{"ランディーバース"}};
@@ -76,7 +76,7 @@ public class SelectQueryTest {
 		Object[][] expected = {{"カープ", "4"}, {"阪神", "1"}};
 		verifyStatement("SELECT team, count(*) FROM player GROUP BY team", expected);
 	}
-	
+
 	@Test
 	public void testStatementIn() throws SQLException {
 		Object[][] expected = {{"山崎隆造"}, {"衣笠祥雄"}, {"ランディーバース"}};
@@ -96,7 +96,7 @@ public class SelectQueryTest {
 				params,
 				expected);
 	}
-	
+
 	@Test
 	public void testLikeForText() throws SQLException {
 		Object[][] expected = {{"高橋慶彦"}};
@@ -106,7 +106,17 @@ public class SelectQueryTest {
 				params,
 				expected);
 	}
-	
+
+	@Test
+	public void testBetween() throws SQLException {
+		Object[][] expected = {{"山崎隆造"}, {"衣笠祥雄"}};
+		Object[] params = {2,3};
+		verifyPreparedStatement(
+				"SELECT player_name FROM player WHERE player_id BETWEEN ? AND ?",
+				params,
+				expected);
+	}
+
 	@Test
 	public void testBoolean() throws SQLException {
 		Object[][] expected = {{"山本浩二"}, {"ランディーバース"}};
@@ -118,7 +128,7 @@ public class SelectQueryTest {
 	/**
 	 * メタキャラクタを含んだクエリのテスト
 	 * エラーにならないこと
-	 * 
+	 *
 	 * @throws SQLException
 	 */
 	@Test
@@ -141,7 +151,7 @@ public class SelectQueryTest {
 
 	}
 
-	
+
 	@Test
 	public void testStatementColumnNotFound() throws SQLException {
 		PreparedStatement stmt = null;
@@ -172,7 +182,7 @@ public class SelectQueryTest {
 			stmt.close();
 		}
 	}
-	
+
 	private void verifyStatement(String selectQuery, Object[][] expected) throws SQLException{
 		Statement stmt = null;
 		try {
@@ -235,7 +245,7 @@ public class SelectQueryTest {
 			} finally {
 				dropStmt.close();
 			}
-	
+
 			PreparedStatement stmt = setUpConn.prepareStatement(
 					"CREATE TABLE player (player_id number, team varchar(10), "
 					+ " player_name varchar(50), position varchar(10) ARRAY, "
@@ -246,7 +256,7 @@ public class SelectQueryTest {
 			} finally {
 				stmt.close();
 			}
-	
+
 			PreparedStatement insStmt = setUpConn.prepareStatement("INSERT INTO player Values (?,?,?,?,?,?,?)");
 			try {
 				insStmt.setInt(1, 1);
@@ -257,7 +267,7 @@ public class SelectQueryTest {
 				insStmt.setString(6, "走攻守の三拍子そろった切込隊長");
 				insStmt.setDate(7, new Date(System.currentTimeMillis()));
 				insStmt.executeUpdate();
-		
+
 				insStmt.setInt(1, 2);
 				insStmt.setString(2, "カープ");
 				insStmt.setString(3, "山崎隆造");
@@ -266,7 +276,7 @@ public class SelectQueryTest {
 				insStmt.setString(6, "ベストナイン3回、ゴールデングラブ賞4回");
 				insStmt.setDate(7, new Date(System.currentTimeMillis()));
 				insStmt.executeUpdate();
-		
+
 				insStmt.setInt(1, 3);
 				insStmt.setString(2, "カープ");
 				insStmt.setString(3, "衣笠祥雄");
@@ -275,7 +285,7 @@ public class SelectQueryTest {
 				insStmt.setString(6, "鉄人。国民栄誉賞");
 				insStmt.setDate(7, new Date(System.currentTimeMillis()));
 				insStmt.executeUpdate();
-		
+
 				insStmt.setInt(1, 4);
 				insStmt.setString(2, "カープ");
 				insStmt.setString(3, "山本浩二");
@@ -284,7 +294,7 @@ public class SelectQueryTest {
 				insStmt.setString(6, "ミスター赤ヘル");
 				insStmt.setDate(7, new Date(System.currentTimeMillis()));
 				insStmt.executeUpdate();
-		
+
 				insStmt.setInt(1, 5);
 				insStmt.setString(2, "阪神");
 				insStmt.setString(3, "ランディーバース");
@@ -296,7 +306,7 @@ public class SelectQueryTest {
 			} finally {
 				insStmt.close();
 			}
-	
+
 			setUpConn.commit();
 		} finally {
 			setUpConn.close();
