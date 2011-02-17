@@ -99,6 +99,7 @@ public class StatementImpl implements Statement {
 				resultSet = (AbstractResultSet)command.executeQuery();
 			} else {
 				updateCount = command.executeUpdate();
+				this.conn.setUpdatedInTx(true);
 			}
 		} catch (DbException e) {
 			throw e.getSQLException();
@@ -174,7 +175,9 @@ public class StatementImpl implements Statement {
 		checkClosed();
 		Command command = parseSQL(sql);
 		try {
-			return command.executeUpdate();
+			int cnt =  command.executeUpdate();
+			this.conn.setUpdatedInTx(true);
+			return cnt;
 		} catch (DbException e) {
 			throw e.getSQLException();
 		}
