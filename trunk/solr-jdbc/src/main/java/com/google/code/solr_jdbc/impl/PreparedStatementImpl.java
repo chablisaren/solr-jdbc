@@ -102,6 +102,7 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 			} else {
 				returnsResultSet = false;
 				updateCount = command.executeUpdate();
+				this.conn.setUpdatedInTx(true);
 			}
 		} catch(DbException e) {
 			throw e.getSQLException();
@@ -125,7 +126,9 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 	public int executeUpdate() throws SQLException {
 		checkClosed();
 		try {
-			return command.executeUpdate();
+			int cnt = command.executeUpdate();
+			this.conn.setUpdatedInTx(true);
+			return cnt;
 		} catch (DbException e) {
 			throw e.getSQLException();
 		}

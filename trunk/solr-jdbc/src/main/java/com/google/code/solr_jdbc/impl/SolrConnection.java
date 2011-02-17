@@ -38,6 +38,8 @@ public abstract class SolrConnection implements Connection {
 	private boolean autoCommit = false;
 	private String catalog;
 	protected Statement executingStatement;
+	
+	private boolean updatedInTx = false;
 
 	protected SolrConnection(String serverUrl) {
 
@@ -59,9 +61,12 @@ public abstract class SolrConnection implements Connection {
 	@Override
 	public void commit() throws SQLException {
 		try {
-			solrServer.commit();
+			if(updatedInTx)
+				solrServer.commit();
 		} catch (Exception e) {
 			throw new SQLException(e);
+		} finally {
+			updatedInTx = false;
 		}
 	}
 
@@ -354,9 +359,12 @@ public abstract class SolrConnection implements Connection {
 	@Override
 	public void rollback() throws SQLException {
 		try {
-			solrServer.rollback();
+			if(updatedInTx)
+				solrServer.rollback();
 		} catch (Exception e) {
 			throw new SQLException(e);
+		} finally {
+			updatedInTx = false;
 		}
 	}
 
@@ -376,6 +384,10 @@ public abstract class SolrConnection implements Connection {
 				.getSQLException();
 	}
 
+	public void setUpdatedInTx(boolean updateInTx) {
+		this.updatedInTx = updateInTx;
+	}
+
 	public abstract void setQueryTimeout(int second);
 
 	public abstract int getQueryTimeout();
@@ -389,4 +401,5 @@ public abstract class SolrConnection implements Connection {
 	protected void setExecutingStatement(Statement statement) {
 		this.executingStatement = statement;
 	}
+	
 }

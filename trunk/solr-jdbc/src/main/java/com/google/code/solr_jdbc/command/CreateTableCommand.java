@@ -75,6 +75,7 @@ public class CreateTableCommand extends Command{
 		doc.setField("id", UUID.randomUUID().toString());
 		try {
 			conn.getSolrServer().add(doc);
+			conn.setUpdatedInTx(true);
 			conn.commit();
 		} catch (SolrServerException e) {
 			throw DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error");
