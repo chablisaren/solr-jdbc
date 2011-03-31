@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.google.code</groupId>
 	<artifactId>solr-jdbc-s2jdbc</artifactId>
-	<version>0.1.1-SNAPSHOT</version>
+	<version>0.1.1</version>
 	<name>solr-jdbc-s2jdbc</name>
 
 	<distributionManagement>
@@ -17,9 +17,9 @@
 	</distributionManagement>
 
 	<scm>
-		<connection>scm:svn:http://solr-jdbc.googlecode.com/svn/trunk/</connection>
-		<developerConnection>scm:svn:https://solr-jdbc.googlecode.com/svn/trunk/</developerConnection>
-		<url>scm:svn:http://solr-jdbc.googlecode.com/svn/trunk/</url>
+		<connection>scm:svn:http://solr-jdbc.googlecode.com/svn/tags/solr-jdbc-s2jdbc-0.1.1</connection>
+		<developerConnection>scm:svn:https://solr-jdbc.googlecode.com/svn/tags/solr-jdbc-s2jdbc-0.1.1</developerConnection>
+		<url>scm:svn:http://solr-jdbc.googlecode.com/svn/tags/solr-jdbc-s2jdbc-0.1.1</url>
 	</scm>
   
 	<build>
@@ -141,7 +141,7 @@
         <dependency>
         	<groupId>com.google.code</groupId>
         	<artifactId>solr-jdbc</artifactId>
-        	<version>0.1.2-SNAPSHOT</version>
+        	<version>0.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
