@@ -50,7 +50,7 @@ public class CollectionResultSet extends AbstractResultSet {
 		if(i==columns.size()) {
 			throw DbException.get(ErrorCode.COLUMN_NOT_FOUND, columnLabel);
 		}
-		return i;
+		return i+1;
 	}
 
 }

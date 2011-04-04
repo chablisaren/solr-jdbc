@@ -29,6 +29,7 @@ import com.google.code.solr_jdbc.expression.Expression;
 import com.google.code.solr_jdbc.message.DbException;
 import com.google.code.solr_jdbc.message.ErrorCode;
 import com.google.code.solr_jdbc.value.DataType;
+import com.google.code.solr_jdbc.value.SolrType;
 import com.google.code.solr_jdbc.value.SolrValue;
 import com.google.code.solr_jdbc.value.ValueNull;
 
@@ -107,13 +108,13 @@ public abstract class AbstractResultSet implements ResultSet {
 	@Override
 	public boolean next() throws SQLException {
 		checkClosed();
-	
+
 		docIndex +=1;
 		if (docIndex >= docList.size()) {
 			docIndex = docList.size();
 			return false;
 		}
-	
+
 		return true;
 	}
 
@@ -121,7 +122,7 @@ public abstract class AbstractResultSet implements ResultSet {
 	public boolean previous() throws SQLException {
 		// TODO スクロールが不可能な場合はSQLException
 		checkClosed();
-		
+
 		docIndex -= 1;
 		if (docIndex < 0) {
 			docIndex = 0;
@@ -176,13 +177,13 @@ public abstract class AbstractResultSet implements ResultSet {
 	@Override
 	public InputStream getAsciiStream(int columnIndex) throws SQLException {
 		checkClosed();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getAsciiStream"); 
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getAsciiStream");
 	}
 
 	@Override
 	public InputStream getAsciiStream(String s) throws SQLException {
 		checkClosed();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getAsciiStream"); 
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getAsciiStream");
 	}
 
 	@Override
@@ -203,26 +204,26 @@ public abstract class AbstractResultSet implements ResultSet {
 	public BigDecimal getBigDecimal(int columnIndex, int j) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBigDecimal"); 
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBigDecimal");
 	}
 
 	@Override
 	public BigDecimal getBigDecimal(String s, int i) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBigDecimal"); 
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBigDecimal");
 	}
 
 	@Override
 	public InputStream getBinaryStream(int i) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBinaryStream"); 
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBinaryStream");
 	}
 
 	@Override
 	public InputStream getBinaryStream(String s) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBinaryStream"); 
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBinaryStream");
 	}
 
 	@Override
@@ -236,7 +237,7 @@ public abstract class AbstractResultSet implements ResultSet {
 	public Blob getBlob(String s) throws SQLException {
 		checkClosed();
 		checkAvailable();
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBlob"); 
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "getBlob");
 	}
 
 	@Override
@@ -656,7 +657,7 @@ public abstract class AbstractResultSet implements ResultSet {
 	@Override
 	public void setFetchDirection(int fetchDirection) throws SQLException {
 		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "setFetchDirection");
-	
+
 	}
 
 	@Override
@@ -1200,7 +1201,7 @@ public abstract class AbstractResultSet implements ResultSet {
 		checkClosed();
 		Expression column = metaData.getColumn(columnIndex);
 
-		String columnName = (column.getType() == null)?column.getResultName():column.getSolrColumnName();
+		String columnName = (column.getType() == SolrType.UNKNOWN) ? column.getResultName():column.getSolrColumnName();
 
 		Object x;
 		Collection<Object> objs = docList.get(docIndex).getFieldValues(columnName);
@@ -1226,7 +1227,7 @@ public abstract class AbstractResultSet implements ResultSet {
 		if (isClosed)
 			throw DbException.get(ErrorCode.OBJECT_CLOSED);
 	}
-	
+
 	protected void checkAvailable() throws SQLException {
 		if (docIndex < 0 ||  docIndex >= docList.size()) {
 			throw DbException.get(ErrorCode.NO_DATA_AVAILABLE);
