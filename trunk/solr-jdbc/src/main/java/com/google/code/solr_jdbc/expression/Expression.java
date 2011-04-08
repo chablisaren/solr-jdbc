@@ -14,6 +14,8 @@ public abstract class Expression {
 	protected SolrType originalType;
 
 	public SolrType getType() {
+		if(type == null)
+			return SolrType.UNKNOWN;
 		return type;
 	}
 
@@ -25,7 +27,7 @@ public abstract class Expression {
 	public String getColumnName() {
 		return columnName;
 	}
-	
+
 	/**
 	 * テーブル名を返します
 	 *
@@ -62,13 +64,13 @@ public abstract class Expression {
 	}
 
 	public abstract long getPrecision();
-	
+
 	public abstract int getScale();
 
 	public int getNullable() {
 		return ResultSetMetaData.columnNullableUnknown;
 	}
-	
+
 	public String getSchemaName() {
 		return null;
 	}
