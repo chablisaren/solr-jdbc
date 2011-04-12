@@ -259,7 +259,7 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 		List<Expression> countColumns = new ArrayList<Expression>();
 		for(Expression solrColumn : expressions) {
 			if(solrColumn instanceof FunctionExpression &&
-				StringUtils.equals(((FunctionExpression)solrColumn).getFunctionName(), "count")) {
+				StringUtils.equalsIgnoreCase(((FunctionExpression)solrColumn).getFunctionName(), "count")) {
 				countColumns.add(solrColumn);
 			}
 		}
