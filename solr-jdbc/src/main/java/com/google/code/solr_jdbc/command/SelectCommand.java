@@ -1,14 +1,18 @@
 package com.google.code.solr_jdbc.command;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.jsqlparser.statement.select.Select;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
+import com.google.code.solr_jdbc.expression.Expression;
+import com.google.code.solr_jdbc.expression.FunctionExpression;
 import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.impl.AbstractResultSet;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
@@ -32,12 +36,23 @@ public class SelectCommand extends Command {
 	public boolean isQuery() {
 		return true;
 	}
-	
+
 	@Override
 	public void parse() {
 		DatabaseMetaDataImpl metaData= this.conn.getMetaDataImpl();
 		selectParser = new SelectParser(metaData);
 		select.getSelectBody().accept(selectParser);
+
+		Map<String, String> options = selectParser.getSolrOptions();
+		if(!selectParser.hasGroupBy()) {
+			for(Expression expression : selectParser.getExpressions()) {
+				if(expression instanceof FunctionExpression &&
+					StringUtils.equalsIgnoreCase(((FunctionExpression)expression).getFunctionName(), "count")) {
+					options.put("rows", "0");
+				}
+			}
+		}
+
 		parameters = selectParser.getParameters();
 	}
 

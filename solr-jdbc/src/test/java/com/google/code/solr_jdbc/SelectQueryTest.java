@@ -72,6 +72,12 @@ public class SelectQueryTest {
 	}
 
 	@Test
+	public void testStatementCount() throws SQLException {
+		Object[][] expected = {{"5"}};
+		verifyStatement("SELECT count(*) FROM player", expected);
+	}
+
+	@Test
 	public void testStatementGroupBy() throws SQLException {
 		Object[][] expected = {{"カープ", "4"}, {"阪神", "1"}};
 		verifyStatement("SELECT team, count(*) FROM player GROUP BY team", expected);
