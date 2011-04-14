@@ -22,7 +22,9 @@ import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.select.Union;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrQuery;
 
+import com.google.code.solr_jdbc.expression.ColumnExpression;
 import com.google.code.solr_jdbc.expression.Expression;
 import com.google.code.solr_jdbc.expression.Parameter;
 import com.google.code.solr_jdbc.impl.DatabaseMetaDataImpl;
@@ -33,16 +35,18 @@ import com.google.code.solr_jdbc.message.ErrorCode;
 public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVisitor{
 
 	private ConditionParser conditionParser;
-	
+
 	private String tableName;
 	private final Map<String, String> solrOptions;
 	private final DatabaseMetaDataImpl metaData;
 	private final List<String> selectColumns;
 	private List<Expression> expressions;
 	private boolean hasGroupBy = false;
+	private SolrQuery solrQuery;
 
 	public SelectParser(DatabaseMetaDataImpl metaData) {
 		this.selectColumns = new ArrayList<String>();
+		this.solrQuery = new SolrQuery();
 		this.solrOptions = new HashMap<String, String>();
 		this.metaData = metaData;
 	}
@@ -62,7 +66,7 @@ public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVi
 		return expressions;
 	}
 
-	public String getQuery(List<Parameter> params) {
+	public SolrQuery getQuery(List<Parameter> params) {
 		String queryString;
 		if(conditionParser == null) {
 			// select all records if there is no WHERE clause.
@@ -70,8 +74,9 @@ public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVi
 		} else {
 			queryString = conditionParser.getQuery(params);
 		}
+		solrQuery.setQuery(queryString);
 
-		return queryString;
+		return solrQuery;
 	}
 
 	public List<Parameter> getParameters() {
@@ -92,6 +97,11 @@ public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVi
 			((SelectItem)obj).accept(selectItemFinder);
 		}
 		expressions = selectItemFinder.getExpressions();
+		for(Expression expression : expressions) {
+			if(expression instanceof ColumnExpression) {
+				solrQuery.addField(expression.getSolrColumnName());
+			}
+		}
 
 		// Where句の解析
 		if (plainSelect.getWhere()!=null) {
@@ -111,7 +121,7 @@ public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVi
 			parseGroupBy(groupByColumns);
 			hasGroupBy = true;
 		}
-		
+
 		// Limitの解析
 		Limit limit = plainSelect.getLimit();
 		if(limit != null) {
