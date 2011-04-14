@@ -58,7 +58,7 @@ public class SelectCommand extends Command {
 
 	@Override
 	public AbstractResultSet executeQuery() {
-		SolrQuery query = new SolrQuery(selectParser.getQuery(parameters));
+		SolrQuery query = selectParser.getQuery(parameters);
 		Map<String,String> options = selectParser.getSolrOptions();
 		for(Map.Entry<String, String> entry:options.entrySet()) {
 			query.set(entry.getKey(), entry.getValue());
