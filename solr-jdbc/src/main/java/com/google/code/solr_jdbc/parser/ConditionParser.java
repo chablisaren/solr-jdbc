@@ -23,6 +23,10 @@ import net.sf.jsqlparser.expression.TimeValue;
 import net.sf.jsqlparser.expression.TimestampValue;
 import net.sf.jsqlparser.expression.WhenClause;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseAnd;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseOr;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseXor;
+import net.sf.jsqlparser.expression.operators.arithmetic.Concat;
 import net.sf.jsqlparser.expression.operators.arithmetic.Division;
 import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
 import net.sf.jsqlparser.expression.operators.arithmetic.Subtraction;
@@ -36,6 +40,7 @@ import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.InExpression;
 import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
+import net.sf.jsqlparser.expression.operators.relational.Matches;
 import net.sf.jsqlparser.expression.operators.relational.MinorThan;
 import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
@@ -356,6 +361,31 @@ public class ConditionParser implements ExpressionVisitor {
 	@Override
 	public void visit(AnyComparisonExpression arg0) {
 		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "any");
+	}
+
+	@Override
+	public void visit(Concat arg0) {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "concat");
+	}
+
+	@Override
+	public void visit(Matches arg0) {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "matches");
+	}
+
+	@Override
+	public void visit(BitwiseAnd arg0) {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "&");
+	}
+
+	@Override
+	public void visit(BitwiseOr arg0) {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "|");
+	}
+
+	@Override
+	public void visit(BitwiseXor arg0) {
+		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED, "^");
 	}
 
 
