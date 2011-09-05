@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.google.code</groupId>
 	<artifactId>solr-jdbc-s2jdbc</artifactId>
-	<version>0.1.2</version>
+	<version>0.1.3-SNAPSHOT</version>
 	<name>solr-jdbc-s2jdbc</name>
 
 	<distributionManagement>
@@ -20,9 +20,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<scm>
-		<connection>scm:svn:http://solr-jdbc.googlecode.com/svn/tags/solr-jdbc-s2jdbc-0.1.2</connection>
-		<developerConnection>scm:svn:https://solr-jdbc.googlecode.com/svn/tags/solr-jdbc-s2jdbc-0.1.2</developerConnection>
-		<url>scm:svn:http://solr-jdbc.googlecode.com/svn/tags/solr-jdbc-s2jdbc-0.1.2</url>
+		<connection>scm:svn:http://solr-jdbc.googlecode.com/svn/trunk/solr-jdbc-s2jdbc</connection>
+		<developerConnection>scm:svn:https://solr-jdbc.googlecode.com/svn/trunk/solr-jdbc-s2jdbc</developerConnection>
+		<url>scm:svn:http://solr-jdbc.googlecode.com/svn/trunk/solr-jdbc-s2jdbc</url>
 	</scm>
 
 	<build>
