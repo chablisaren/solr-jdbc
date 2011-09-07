@@ -177,8 +177,7 @@ public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVi
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public void parseOrderBy(List orderByElements) {
+	public void parseOrderBy(List<OrderByElement> orderByElements) {
 		final List<String> sortColumns = new ArrayList<String>();
 		for(Object elm : orderByElements) {
 			final OrderByElement orderByElement = (OrderByElement)elm;
@@ -429,11 +428,10 @@ public class SelectParser implements SelectVisitor, FromItemVisitor, ItemsListVi
 
 	@Override
 	public void visit(Table table){
-		tableName = table.getName();
-		if(metaData.getSolrColumns(tableName) == null) {
-			throw DbException.get(ErrorCode.TABLE_OR_VIEW_NOT_FOUND, tableName);
-		}
+		if(!metaData.hasTable(table.getName()))
+			throw DbException.get(ErrorCode.TABLE_OR_VIEW_NOT_FOUND, table.getName());
 
+		tableName = metaData.getOriginalTableName(table.getName());
 	}
 
 	@Override

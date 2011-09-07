@@ -48,7 +48,7 @@ public class UpdateCommand extends Command {
 	public boolean isQuery() {
 		return false;
 	}
-	
+
 	@Override
 	public AbstractResultSet executeQuery() {
 		throw DbException.get(ErrorCode.METHOD_ONLY_ALLOWED_FOR_QUERY);
@@ -107,7 +107,7 @@ public class UpdateCommand extends Command {
 	public void parse() {
 		DatabaseMetaDataImpl metaData= this.conn.getMetaDataImpl();
 		String tableName = updStmt.getTable().getName();
-		if(metaData.getSolrColumns(tableName) == null)
+		if(!metaData.hasTable(tableName))
 			throw DbException.get(ErrorCode.TABLE_OR_VIEW_NOT_FOUND, tableName);
 
 		// SET句の解析

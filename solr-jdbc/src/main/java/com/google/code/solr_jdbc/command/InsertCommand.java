@@ -79,7 +79,7 @@ public class InsertCommand extends Command {
 					item.getValue());
 		}
 		doc
-				.setField("id", "@" + tableName + "."
+				.setField("id", "@" + metaData.getOriginalTableName(tableName) + "."
 						+ UUID.randomUUID().toString());
 		try {
 			conn.getSolrServer().add(doc);

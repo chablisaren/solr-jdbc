@@ -1,8 +1,6 @@
 package com.google.code.solr_jdbc.command;
 
 import java.io.IOException;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.sf.jsqlparser.statement.delete.Delete;
@@ -21,6 +19,7 @@ import com.google.code.solr_jdbc.parser.ConditionParser;
 public class DeleteCommand extends Command {
 	private final Delete delStmt;
 	private ConditionParser conditionParser;
+	private String tableName;
 
 	public DeleteCommand(Delete stmt) {
 		this.parameters = new ArrayList<Parameter>();
@@ -72,18 +71,17 @@ public class DeleteCommand extends Command {
 
 	@Override
 	public void parse() {
-		DatabaseMetaData metaData = null;
+		DatabaseMetaDataImpl metaData= this.conn.getMetaDataImpl();
 
-		try {
-			metaData= this.conn.getMetaData();
-		} catch (SQLException e) {
-			throw DbException.get(ErrorCode.GENERAL_ERROR, e, "Solr Server Error:"+e.getMessage());
-		}
+		tableName = delStmt.getTable().getName();
+		if(!metaData.hasTable(tableName))
+			throw DbException.get(ErrorCode.TABLE_OR_VIEW_NOT_FOUND, tableName);
+		tableName = metaData.getOriginalTableName(tableName);
 
 		// Where句の解析
 		if(delStmt.getWhere() != null) {
 			conditionParser = new ConditionParser((DatabaseMetaDataImpl)metaData);
-			conditionParser.setTableName(delStmt.getTable().getName());
+			conditionParser.setTableName(tableName);
 			delStmt.getWhere().accept(conditionParser);
 			parameters = conditionParser.getParameters();
 		}

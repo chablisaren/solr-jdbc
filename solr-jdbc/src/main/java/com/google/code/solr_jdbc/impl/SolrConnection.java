@@ -26,7 +26,7 @@ import com.google.code.solr_jdbc.message.ErrorCode;
 
 /**
  * implements Connection
- * 
+ *
  * @author kawasima
  */
 public abstract class SolrConnection implements Connection {
@@ -38,7 +38,7 @@ public abstract class SolrConnection implements Connection {
 	private boolean autoCommit = false;
 	private String catalog;
 	protected Statement executingStatement;
-	
+
 	private boolean updatedInTx = false;
 
 	protected SolrConnection(String serverUrl) {
@@ -53,6 +53,9 @@ public abstract class SolrConnection implements Connection {
 		return solrServer;
 	}
 
+	public void refreshMetaData() {
+		metaData = null;
+	}
 	@Override
 	public void clearWarnings() throws SQLException {
 		checkClosed();
@@ -62,7 +65,7 @@ public abstract class SolrConnection implements Connection {
 	public void commit() throws SQLException {
 		try {
 			if(updatedInTx)
-				solrServer.commit();
+				solrServer.commit(true, true);
 		} catch (Exception e) {
 			throw new SQLException(e);
 		} finally {
@@ -216,7 +219,7 @@ public abstract class SolrConnection implements Connection {
 	/**
 	 * According to the JDBC specs, this setting is only a hint to the database
 	 * to enable optimizations - it does not cause writes to be prohibited.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             if the connection is closed
 	 */
@@ -401,5 +404,5 @@ public abstract class SolrConnection implements Connection {
 	protected void setExecutingStatement(Statement statement) {
 		this.executingStatement = statement;
 	}
-	
+
 }

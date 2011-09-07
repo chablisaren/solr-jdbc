@@ -14,22 +14,22 @@ public class Parameter implements Item{
 	private boolean needsLikeEscape;
 	private String likeEscapeChar = "%";
 	private Expression targetColumn;
-	
+
 	public Parameter(int index) {
 		this.index = index;
 	}
-	
+
 	public void setValue(SolrValue value) {
 		this.value = value;
 	}
-	
+
 	public SolrValue getValue() {
 		if(value == null) {
 			return ValueNull.INSTANCE;
 		}
 		return value;
 	}
-	
+
 	public void setColumn(Expression column) {
 		this.targetColumn = column;
 	}
@@ -40,7 +40,7 @@ public class Parameter implements Item{
 		// FIXME Unknown
 		return SolrType.STRING;
 	}
-	
+
 	public String getQueryString() {
 		if (value != null) {
 			if (needsLikeEscape) {
@@ -74,5 +74,9 @@ public class Parameter implements Item{
 	public void setLikeEscapeChar(String likeEscapeChar) {
 		this.likeEscapeChar = likeEscapeChar;
 	}
-	
+
+	@Override
+	public String toString() {
+		return getQueryString();
+	}
 }

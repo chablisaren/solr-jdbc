@@ -128,7 +128,7 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	public int getScale(int columnIndex) throws SQLException {
 		checkClosed();
 		checkColumnIndex(columnIndex);
-		Expression expression = expressions.get(columnIndex);
+		Expression expression = expressions.get(columnIndex - 1);
 		return expression.getScale();
 	}
 
@@ -144,7 +144,7 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	public String getTableName(int columnIndex) throws SQLException {
 		checkClosed();
 		checkColumnIndex(columnIndex);
-		return expressions.get(columnIndex).getTableName();
+		return expressions.get(columnIndex - 1).getTableName();
 	}
 
 	@Override
@@ -164,7 +164,7 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	/**
 	 * Checks if this is a currency column
 	 * It always return false.
-	 * 
+	 *
 	 * @param columnIndex the column index (1,2,...)
 	 * @return true
 	 */
@@ -178,7 +178,7 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	/**
 	 * Checks whether a write on this column will definitely succeed.
 	 * It always returns false
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -202,7 +202,7 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	/**
 	 * Checks if this is read only.
 	 * It always returns true.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -215,7 +215,7 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	/**
 	 * Checks if this column is searchable.
 	 * It always returns true.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -228,7 +228,7 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 	/**
 	 * Checks if this column is signed.
 	 * It always returns true
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -265,13 +265,13 @@ public class ResultSetMetaDataImpl implements ResultSetMetaData {
 		}
 		return countColumns;
 	}
-	
+
 	private void checkClosed() throws SQLException {
 		if (resultSet != null) {
 			resultSet.checkClosed();
 		}
 	}
-	
+
 	private void checkColumnIndex(int columnIndex) throws SQLException {
 		if (columnIndex < 1 || columnIndex > getColumnCount()) {
 			throw DbException.get(ErrorCode.INVALID_VALUE, "columnIndex:" + columnIndex);

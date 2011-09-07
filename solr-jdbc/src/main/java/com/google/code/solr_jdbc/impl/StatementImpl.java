@@ -54,7 +54,7 @@ public class StatementImpl implements Statement {
 			command.setConnection(conn);
 			command.parse();
 		} catch (JSQLParserException ex) {
-			throw new SQLException(ex);
+			throw DbException.get(ErrorCode.SYNTAX_ERROR, ex, ex.getMessage()).getSQLException();
 		}
 		return command;
 
