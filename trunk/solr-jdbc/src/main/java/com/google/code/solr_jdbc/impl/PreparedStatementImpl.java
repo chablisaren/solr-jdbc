@@ -61,8 +61,8 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 			this.command = CommandFactory.getCommand(statement);
 			command.setConnection(conn);
 			command.parse();
-		} catch (JSQLParserException e) {
-			throw DbException.get(ErrorCode.SYNTAX_ERROR, e.getMessage());
+		} catch (JSQLParserException ex) {
+			throw DbException.get(ErrorCode.SYNTAX_ERROR, ex, ex.getMessage()).getSQLException();
 		}
 	}
 
@@ -115,7 +115,7 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 		checkClosed();
 		try {
 			resultSet = command.executeQuery();
-			
+
 			return resultSet;
 		} catch (DbException e) {
 			throw e.getSQLException();

@@ -74,4 +74,9 @@ public abstract class Expression {
 	public String getSchemaName() {
 		return null;
 	}
+
+	@Override
+	public String toString() {
+		return getColumnName();
+	}
 }

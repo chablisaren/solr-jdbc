@@ -25,6 +25,7 @@ import com.google.code.solr_jdbc.value.DataType;
 public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	private final SolrConnection conn;
 	private Map<String, List<Expression>> tableColumns;
+	private Map<String, String> originalTables;
 
 	public DatabaseMetaDataImpl(SolrConnection conn) {
 		this.conn = conn;
@@ -32,6 +33,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	}
 
 	private void buildMetadata() {
+		this.originalTables = new HashMap<String, String>();
 		this.tableColumns = new HashMap<String, List<Expression>>();
 		try {
 			QueryResponse res = this.conn.getSolrServer().query(
@@ -44,7 +46,8 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 					columns.add(new ColumnExpression(tableName + "."
 							+ cols.toString()));
 				}
-				tableColumns.put(tableName, columns);
+				tableColumns.put(StringUtils.upperCase(tableName), columns);
+				originalTables.put(StringUtils.upperCase(tableName), tableName);
 			}
 
 		} catch (Exception e) {
@@ -53,7 +56,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	}
 
 	public Expression getSolrColumn(String tableName, String columnName) {
-		for (Expression solrColumn : this.tableColumns.get(tableName)) {
+		for (Expression solrColumn : this.tableColumns.get(StringUtils.upperCase(tableName))) {
 			if (StringUtils.equals(solrColumn.getColumnName(), columnName)) {
 				return solrColumn;
 			}
@@ -65,12 +68,20 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	public List<Expression> getSolrColumns(String tableName) {
 		if (tableColumns == null)
 			buildMetadata();
-		return this.tableColumns.get(tableName);
+		return this.tableColumns.get(StringUtils.upperCase(tableName));
+	}
+
+	public boolean hasTable(String tableName) {
+		return originalTables.containsKey(StringUtils.upperCase(tableName));
+	}
+
+	public String getOriginalTableName(String tableName) {
+		return originalTables.get(StringUtils.upperCase(tableName));
 	}
 
 	/**
 	 * Checks if all procedures callable.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -80,7 +91,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Checks if it possible to query all tables returned by getTables.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -91,7 +102,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	/**
 	 * Returns whether an exception while auto commit is on closes all result
 	 * sets.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -102,7 +113,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	/**
 	 * Returns whether data manipulation and CREATE/DROP is supported in
 	 * transactions.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -112,7 +123,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether CREATE/DROP do not affect transactions.
-	 * 
+	 *
 	 * @return fasle
 	 */
 	@Override
@@ -122,7 +133,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether deletes are detected.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -132,7 +143,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether the maximum row size includes blobs.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -241,25 +252,22 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public int getDatabaseMajorVersion() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
-				"getDatabaseMajorVersion");
+		return 0;
 	}
 
 	@Override
 	public int getDatabaseMinorVersion() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
-				"getDatabaseMinorVersion");
+		return 1;
 	}
 
 	@Override
 	public String getDatabaseProductVersion() throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED,
-				"getDatabaseProductVersion");
+		return "0.1.4-SNAPSHOT";
 	}
 
 	/**
 	 * Returns default transaction isolation.
-	 * 
+	 *
 	 * @return Connection.TRANSACTION_READ_COMMITTED
 	 */
 	@Override
@@ -284,7 +292,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	@Override
 	public String getDriverVersion() throws SQLException {
-		return "0.1.0";
+		return "0.1.4-SNAPSHOT";
 	}
 
 	@Override
@@ -361,7 +369,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns the maximum length for a catalog name.
-	 * 
+	 *
 	 * @return 0 for limit is unknown.
 	 */
 	@Override
@@ -371,7 +379,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns the maximum length of literals.
-	 * 
+	 *
 	 * @return 0 for limit is unknown
 	 */
 	@Override
@@ -381,7 +389,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns the maximum length of column names.
-	 * 
+	 *
 	 * @return 0 for limit is unknown
 	 */
 	@Override
@@ -391,7 +399,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * SolrのFacetの仕様のため、1を返す.
-	 * 
+	 *
 	 */
 	@Override
 	public int getMaxColumnsInGroupBy() throws SQLException {
@@ -450,7 +458,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns the maximum length of a statement.
-	 * 
+	 *
 	 * @return 0 for limit is unknown
 	 */
 	@Override
@@ -460,7 +468,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns the maximum number of open statements.
-	 * 
+	 *
 	 * @return 0 for limit is unknown
 	 */
 	@Override
@@ -682,7 +690,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether the catalog is at the beginning.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -692,7 +700,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns the same as Connection.isReadOnly().
-	 * 
+	 *
 	 * @return if read only optimization is switched on
 	 */
 	@Override
@@ -702,7 +710,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Does the database make a copy before updating.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -712,7 +720,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether NULL+1 is NULL or not.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -722,7 +730,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Checks if NULL is sorted at the beginning (no matter if ASC or DESC is used).
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -732,7 +740,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Checks if NULL is sorted at the end (no matter if ASC or DESC is used).
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -807,7 +815,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	/**
 	 * Checks if for CREATE TABLE Test(ID INT), getTables returns test as the
 	 * table name.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -818,7 +826,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	/**
 	 * Checks if for CREATE TABLE "Test"(ID INT), getTables returns test as the
 	 * table name.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -829,7 +837,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	/**
 	 * Checks if for CREATE TABLE Test(ID INT), getTables returns Test as the
 	 * table name
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -840,7 +848,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	/**
 	 * Checks if for CREATE TABLE "Test"(ID INT), getTables returns Test as the
 	 * table name.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -851,7 +859,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	/**
 	 * Checks if for CREATE TABLE Test(ID INT), getTables returns TEST as the
 	 * table name.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -862,7 +870,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	/**
 	 * Checks if for CREATE TABLE "Test"(ID INT), getTables returns TEST as the
 	 * table name.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -872,7 +880,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether SQL-92 entry level grammar is supported.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -882,7 +890,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether SQL-92 full level grammer is supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -892,7 +900,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether SQL-92 intermediate level grammar is supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -918,7 +926,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether batch updates is supported.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -928,7 +936,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether the catalog name in INSERT, UPDATE, DELETE is supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -970,7 +978,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether column aliasing is supported.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -980,7 +988,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether CONVERT is supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -990,7 +998,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether CONVERT is supported for one datatype to another.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1000,7 +1008,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether ODBC Core SQL grammar is supported.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -1019,7 +1027,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	/**
 	 * Returns whether data manipulation and CREATE/DROP is supported in
 	 * transactions.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1030,7 +1038,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether only data manipulations are supported in transactions.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -1091,7 +1099,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	 * Checks whether a GROUP BY clause can use columns that are not in the
 	 * SELECT clause, provided that it specifies all the columns in the SELECT
 	 * clause.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -1102,7 +1110,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	/**
 	 * Returns whether GROUP BY is supported if the column is not in the SELECT
 	 * list.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -1133,7 +1141,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether ODBC Minimum SQL grammar is supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1144,7 +1152,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	/**
 	 * Checks if for CREATE TABLE Test(ID INT), getTables returns Test as the
 	 * table name.
-	 * 
+	 *
 	 * TODO case sensitiveに変更する。
 	 */
 	@Override
@@ -1155,7 +1163,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	/**
 	 * Checks if a table created with CREATE TABLE "Test"(ID INT) is a different
 	 * table than a table created with CREATE TABLE TEST(ID INT).
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1165,7 +1173,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Does the database support multiple open result sets.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -1175,7 +1183,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether multiple result sets are supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1185,7 +1193,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether multiple transactions are supported.
-	 * 
+	 *
 	 * @false
 	 */
 	@Override
@@ -1195,7 +1203,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Does the database support named parameters.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1205,7 +1213,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether columns with NOT NULL are supported.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -1215,7 +1223,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether open result sets across commits are supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1225,7 +1233,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether open result sets across rollback are supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1235,7 +1243,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether open statements across commit are supported.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -1245,7 +1253,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether open statements across rollback are supported.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -1256,7 +1264,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 	/**
 	 * Returns whether ORDER BY is supported if the column is not in the SELECT
 	 * list.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -1266,7 +1274,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether outer joins are supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1276,7 +1284,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether positioned deletes are supported.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -1286,7 +1294,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether positioned updates are supported.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -1305,7 +1313,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Does this database supports a result set holdability.
-	 * 
+	 *
 	 * @return true if the holdability is ResultSet.CLOSE_CURSORS_AT_COMMIT
 	 */
 	@Override
@@ -1324,7 +1332,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns wheter savepoints is supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1334,7 +1342,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether the schema name in INSERT, UPDATE, DELETE is supported.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -1344,7 +1352,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether the schema name in CREATE INDEX is supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1386,7 +1394,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Does the database support statement pooling.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1396,7 +1404,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether the database supports calling functions using the call syntax.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1406,7 +1414,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether stored procedures are supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1416,7 +1424,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether subqueries (SELECT) in comparisons are supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1426,7 +1434,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether SELECT in EXISTS is supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1436,7 +1444,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether IN(SELECT...) is supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1446,7 +1454,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether subqueries in quantified expression are supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1456,7 +1464,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether table correlation names (table alias) are supported.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -1466,7 +1474,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether a specific transaction isolation level.
-	 * 
+	 *
 	 * @retunr true, if level is TRANSACTION_READ_COMMITTED
 	 */
 	@Override
@@ -1482,7 +1490,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether transactions are supported.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -1492,7 +1500,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether UNION SELECT is supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1502,7 +1510,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether UNION ALL SELECT is supported.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1512,7 +1520,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Returns whether updates are detected.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1522,7 +1530,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Checks if this database use one file per table.
-	 * 
+	 *
 	 * @return false
 	 */
 	@Override
@@ -1532,7 +1540,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 
 	/**
 	 * Checks if this database store data in local files.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
