@@ -77,9 +77,16 @@ public class DataType {
 		case Types.VARCHAR:
 		case Types.LONGVARCHAR:
 			return SolrType.STRING;
+		case Types.BIGINT:
+			return SolrType.LONG;
+		case Types.INTEGER:
+			return SolrType.INT;
 		case Types.NUMERIC:
 		case Types.DECIMAL:
 			return SolrType.DECIMAL;
+		case Types.CLOB:
+			return SolrType.TEXT;
+		case Types.BOOLEAN:
 		case Types.BIT:
 			return SolrType.BOOLEAN;
 		case Types.DATE:
@@ -117,7 +124,7 @@ public class DataType {
 	public static DataType getTypeByName(String name) {
 		return TYPES_BY_NAME.get(name.toUpperCase());
 	}
-	
+
     public static String getTypeClassName(SolrType type) {
         switch(type) {
         case BOOLEAN:

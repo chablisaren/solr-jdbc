@@ -231,15 +231,15 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 	}
 
 	@Override
-	public void setCharacterStream(int arg0, Reader arg1, int arg2)
+	public void setCharacterStream(int parameterIndex, Reader r, int length)
 			throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		setClob(parameterIndex, r, length);
 	}
 
 	@Override
-	public void setCharacterStream(int arg0, Reader arg1, long arg2)
+	public void setCharacterStream(int parameterIndex, Reader r, long length)
 			throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		setClob(parameterIndex, r, length);
 	}
 
 	@Override
@@ -267,9 +267,18 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 	}
 
 	@Override
-	public void setClob(int parameterIndex, Reader r, long arg2) throws SQLException {
-		//TODO
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+	public void setClob(int parameterIndex, Reader r, long length) throws SQLException {
+		if(length > Integer.MAX_VALUE)
+			throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+		int len = (int)length;
+		char[] cbuf = new char[len];
+		try {
+			r.read(cbuf, 0, len);
+		} catch(IOException e) {
+			throw DbException.get(ErrorCode.IO_EXCEPTION, e);
+		}
+		SolrValue value = ValueString.get(new String(cbuf));
+		setParameter(parameterIndex, value);
 	}
 
 	@Override
@@ -331,8 +340,8 @@ public class PreparedStatementImpl extends StatementImpl implements PreparedStat
 	}
 
 	@Override
-	public void setNClob(int arg0, Reader arg1, long arg2) throws SQLException {
-		throw DbException.get(ErrorCode.FEATURE_NOT_SUPPORTED);
+	public void setNClob(int parameterIndex, Reader r, long length) throws SQLException {
+		setClob(parameterIndex, r, length);
 	}
 
 	@Override
