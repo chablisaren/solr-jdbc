@@ -216,7 +216,7 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		rs = new CollectionResultSet();
 		rs.setColumns(Arrays.asList(columns));
 
-		for (Expression column : tableColumns.get(table)) {
+		for (Expression column : tableColumns.get(StringUtils.upperCase(table))) {
 			Object[] columnMeta = new Object[22];
 			columnMeta[1] = ""; // TABLE_SCHEM
 			columnMeta[2] = column.getTableName();
