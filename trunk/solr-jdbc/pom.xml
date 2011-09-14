@@ -60,6 +60,9 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-shade-plugin</artifactId>
+				<configuration>
+					<outputFile>solr-jdbc-full.jar</outputFile>
+				</configuration>
 				<executions>
 					<execution>
 						<id>uber-jar</id>
