@@ -132,6 +132,7 @@
             		<groupId>org.slf4j</groupId>
             	</exclusion>
             </exclusions>
+            <scope>test</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
