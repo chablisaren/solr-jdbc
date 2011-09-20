@@ -16,9 +16,9 @@
 	</distributionManagement>
 
 	<scm>
-		<connection>scm:svn:http://solr-jdbc.googlecode.com/svn/trunk/</connection>
-		<developerConnection>scm:svn:https://solr-jdbc.googlecode.com/svn/trunk/</developerConnection>
-		<url>scm:svn:http://solr-jdbc.googlecode.com/svn/trunk/</url>
+		<connection>scm:svn:http://solr-jdbc.googlecode.com/svn/trunk/solr-jdbc</connection>
+		<developerConnection>scm:svn:https://solr-jdbc.googlecode.com/svn/trunk/solr-jdbc</developerConnection>
+		<url>scm:svn:http://solr-jdbc.googlecode.com/svn/trunk/solr-jdbc</url>
 	</scm>
 
 	<build>
