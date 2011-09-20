@@ -1,0 +1,3 @@
+SELECT * 
+FROM PLAYER
+WHERE POSITION IN /*position*/('aaa')
