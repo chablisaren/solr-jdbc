@@ -24,7 +24,10 @@ public class S2JDBCTest extends S2TestCase {
 
 
 	public void testSearchSimple() throws Exception {
-		jdbcManager.updateBySql("DROP TABLE PLAYER").execute();
+		try {
+			jdbcManager.updateBySql("DROP TABLE PLAYER").execute();
+		} catch(Exception ignore) {
+		}
 		jdbcManager.updateBySql("CREATE TABLE PLAYER(PLAYER_ID number, TEAM varchar(10), PLAYER_NAME varchar(50), POSITION varchar(10) ARRAY, REGISTERED_AT DATE)").execute();
 		Player player1 = new Player();
 		player1.playerId = 1;
@@ -61,9 +64,13 @@ public class S2JDBCTest extends S2TestCase {
 		assertEquals("playerNameの値が更新されている", "野村謙二郎", player.playerName);
 
 	}
-	
+
 	public void test2WaySQL() throws Exception {
-		jdbcManager.updateBySql("DROP TABLE PLAYER").execute();
+		try {
+			jdbcManager.updateBySql("DROP TABLE PLAYER").execute();
+		} catch(Exception ignore) {
+
+		}
 		jdbcManager.updateBySql("CREATE TABLE PLAYER(PLAYER_ID number, TEAM varchar(10), PLAYER_NAME varchar(50), POSITION varchar(10) ARRAY, REGISTERED_AT DATE)").execute();
 		Player player1 = new Player();
 		player1.playerId = 1;
@@ -82,7 +89,7 @@ public class S2JDBCTest extends S2TestCase {
 		player2.position = null;
 		playerService.insert(player2);
 		userTransaction.commit();
-		
+
 		List<Player> playerList = playerService.findBySql();
 		assertEquals("二塁手", playerList.get(0).position.get(0));
 		assertEquals("遊撃手", playerList.get(0).position.get(1));
