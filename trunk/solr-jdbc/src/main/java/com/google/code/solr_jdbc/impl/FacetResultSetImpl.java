@@ -26,6 +26,8 @@ public class FacetResultSetImpl extends AbstractResultSet {
 			try {
 				int columnIndex = metaData.findColumn(new ColumnExpression(field.getName()).getColumnName());
 				String columnName = metaData.getSolrColumnName(columnIndex);
+				if (field.getValueCount() == 0)
+					continue;
 				for (Count count : field.getValues()) {
 					SolrDocument doc = new SolrDocument();
 					doc.setField(columnName, count.getName());
@@ -34,10 +36,7 @@ public class FacetResultSetImpl extends AbstractResultSet {
 					}
 					docList.add(doc);
 				}
-			} catch(Exception ignore) {
-				// カラムが見つからない場合はスキップ
-				ignore.printStackTrace();
-			}
+			} catch(Exception ignore) {}
 		}
 	}
 

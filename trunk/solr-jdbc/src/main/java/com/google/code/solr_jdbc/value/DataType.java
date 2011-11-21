@@ -91,6 +91,8 @@ public class DataType {
 			return SolrType.BOOLEAN;
 		case Types.DATE:
 			return SolrType.DATE;
+		case Types.ARRAY:
+			return SolrType.ARRAY;
 		default:
 			throw new RuntimeException("UNKNOWN sql types:" + sqlType);
 		}

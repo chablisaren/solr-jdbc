@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -638,13 +639,21 @@ public class DatabaseMetaDataImpl implements DatabaseMetaData {
 		rs = new CollectionResultSet();
 		rs.setColumns(Arrays.asList(columns));
 
+		Pattern ptn = getPattern(tableNamePattern);
 		for (String tableName : tableColumns.keySet()) {
-			Object[] tableMeta = { null, "", tableName, "TABLE", "", null,
+			if(ptn.matcher(tableName).matches()) {
+				Object[] tableMeta = { null, "", tableName, "TABLE", "", null,
 					null, null, null, null };
-			rs.add(Arrays.asList(tableMeta));
+				rs.add(Arrays.asList(tableMeta));
+			}
 		}
 
 		return rs;
+	}
+
+	protected Pattern getPattern(String ptnStr) {
+		ptnStr = ptnStr.replaceAll("(?<!\\\\)_", ".?").replaceAll("(?<!\\\\)%", ".*?");
+		return Pattern.compile("^" + ptnStr + "$", Pattern.CASE_INSENSITIVE);
 	}
 
 	@Override
