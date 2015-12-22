@@ -1,0 +1,7 @@
+## Features ##
+
+  * You can use DDL(CREATE TABLE, DROP TABLE) and DML(SELECT, INSERT, UPDATE, DELETE).
+
+## Restrictions ##
+
+  * can't join tables.
